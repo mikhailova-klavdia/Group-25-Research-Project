@@ -1,3 +1,6 @@
+# Claude Code
+.claude/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -190,6 +193,9 @@ cython_debug/
 
 # Ruff stuff:
 .ruff_cache/
+
+# Downloaded PDFs
+*.pdf
 
 # PyPI configuration file
 .pypirc
