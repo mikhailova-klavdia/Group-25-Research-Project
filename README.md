@@ -1,6 +1,6 @@
 # Research Agents
 
-Research agents powered by the OpenAI Agents SDK for analyzing scientific papers.
+Research agents powered by the OpenAI Agents SDK for analyzing local paper + repository projects.
 
 ## Prerequisites
 
@@ -23,20 +23,34 @@ cp .env.example .env
 uv sync
 ```
 
+## Project Layout
+
+Create a local workspace under `papers/` for each paper you want to analyze:
+
+```text
+papers/<project-slug>/
+  paper.pdf
+  repo/
+```
+
+- `paper.pdf` is the local paper file.
+- `repo/` is the full checked-out repository associated with that paper.
+- `papers/` is a local workspace and is ignored by git.
+
 ## Usage
 
 ```bash
 uv run python -m research_agents.main \
-  --paper "https://www.biorxiv.org/content/10.1101/2025.11.13.688364v1" \
-  --question "What does SEGMA stand for, and what therapeutic problem does it address?"
+  --project papers/segma \
+  --question "Which file defines the main model pipeline?"
 ```
 
 To use a different model:
 
 ```bash
 uv run python -m research_agents.main \
-  --paper "https://www.biorxiv.org/content/10.1101/2025.11.13.688364v1" \
-  --question "What does SEGMA stand for?" \
+  --project papers/segma \
+  --question "Which file defines the main model pipeline?" \
   --model gpt-5-mini-2025-08-07
 ```
 
@@ -54,13 +68,15 @@ research_agents/
 ├── agents/
 │   └── research_agent.py   # Agent definition and instructions
 ├── tools/
-│   └── paper_tools.py      # Paper download and text extraction tool
+│   ├── paper_tools.py      # Local paper text extraction tool
+│   └── repo_tools.py       # Read-only repository inspection tools
+├── project.py              # Local project resolution
 ├── config.py                # API key and model settings
 └── main.py                  # CLI entry point
 ```
 
 ## Known Limitations
 
-- **Biorxiv Cloudflare blocking**: Biorxiv PDFs are often blocked by Cloudflare. The tool falls back to the biorxiv API, which returns only the abstract and metadata (not the full paper text).
-- **Text-only PDF extraction**: When PDFs are accessible, only text is extracted. Images, figures, and tables rendered as images are not captured.
-- **Analysis only**: The agent reads and analyzes papers but does not execute code from repositories.
+- **Fixed local layout**: Each project must contain `paper.pdf` and `repo/` directly under the project folder.
+- **Text-only PDF extraction**: Only extracted text is available. Images, figures, and tables rendered as images are not captured.
+- **Read-only repository analysis**: The agent inspects the repository but does not install dependencies or execute repo code.
