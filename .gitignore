@@ -1,6 +1,12 @@
 # Claude Code
 .claude/
 
+# OpenAI Codex
+.codex/
+
+# macOS
+.DS_Store
+
 # Local paper workspaces
 papers/
 

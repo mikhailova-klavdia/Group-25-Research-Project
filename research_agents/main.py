@@ -8,6 +8,7 @@ import argparse
 import sys
 
 from agents import Runner
+from agents.exceptions import MaxTurnsExceeded
 
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
 from research_agents.agents.research_agent import create_research_agent
@@ -22,15 +23,36 @@ def run_research_query(context: ResearchContext, question: str, model: str):
     print(f"Project: {context.project_dir}")
     print(f"Paper: {context.paper_path}")
     print(f"Repository: {context.repo_path}")
+    print(f"Run: {context.run_id}")
+    print(f"Run directory: {context.run_dir}")
+    print(f"Workspace: {context.workspace_path}")
     print(f"Question: {question}")
     print("-" * 60)
 
-    result = Runner.run_sync(agent, question, context=context)
+    # Fresh per-run environments require more setup turns than read-only Q&A.
+    try:
+        result = Runner.run_sync(agent, question, context=context, max_turns=60)
+    except MaxTurnsExceeded:
+        print(
+            "\nError: Agent did not finish within 60 turns. "
+            "The task may be too complex or the agent may be stuck in a loop.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     output = result.final_output
     print(f"\nAnswer: {output.answer}")
     print(f"\nReasoning: {output.reasoning}")
     print(f"\nSources: {', '.join(output.sources)}")
+    if output.execution:
+        ex = output.execution
+        status = "SUCCESS" if ex.success else "FAILED"
+        print(f"\nExecution: {status} (attempts: {ex.attempts})")
+        print(f"  Script: {ex.script_path}")
+        print(f"  Commands: {', '.join(ex.commands_run)}")
+        print(f"  Output: {ex.output_summary}")
+        if ex.error_summary:
+            print(f"  Errors: {ex.error_summary}")
 
 
 def main():
