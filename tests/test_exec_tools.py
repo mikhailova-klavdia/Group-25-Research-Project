@@ -6,6 +6,7 @@ from research_agents.tools import exec_tools
 from research_agents.tools.exec_tools import (
     execute_command_text,
     list_workspace_files_text,
+    read_workspace_file_text,
     stage_repo_path_text,
     write_file_text,
 )
@@ -214,6 +215,52 @@ class ListWorkspaceFilesTests(unittest.TestCase):
         self.assertIn("empty", result.lower())
 
 
+class ReadWorkspaceFileTests(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.workspace = Path(self.tmpdir.name) / "workspace"
+        self.workspace.mkdir()
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+
+    def test_reads_file_contents(self):
+        (self.workspace / "output.csv").write_text("a,b\n1,2\n", encoding="utf-8")
+
+        result = read_workspace_file_text(self.workspace, "output.csv")
+
+        self.assertIn("a,b", result)
+        self.assertIn("1,2", result)
+
+    def test_reads_nested_file(self):
+        (self.workspace / "results").mkdir()
+        (self.workspace / "results" / "log.txt").write_text("done\n", encoding="utf-8")
+
+        result = read_workspace_file_text(self.workspace, "results/log.txt")
+
+        self.assertIn("done", result)
+
+    def test_truncates_large_file(self):
+        big_content = "x" * 300_000
+        (self.workspace / "big.txt").write_text(big_content, encoding="utf-8")
+
+        result = read_workspace_file_text(self.workspace, "big.txt")
+
+        self.assertIn("truncated", result)
+
+    def test_rejects_path_traversal(self):
+        with self.assertRaisesRegex(ValueError, "outside the workspace"):
+            read_workspace_file_text(self.workspace, "../outside.txt")
+
+    def test_rejects_absolute_path(self):
+        with self.assertRaisesRegex(ValueError, "must be relative"):
+            read_workspace_file_text(self.workspace, "/tmp/bad.txt")
+
+    def test_rejects_nonexistent_file(self):
+        with self.assertRaisesRegex(ValueError, "does not exist"):
+            read_workspace_file_text(self.workspace, "nope.txt")
+
+
 class ToolSchemaTests(unittest.TestCase):
     def test_write_file_does_not_expose_workspace_path(self):
         props = exec_tools.write_file.params_json_schema["properties"]
@@ -238,3 +285,8 @@ class ToolSchemaTests(unittest.TestCase):
     def test_list_workspace_files_has_no_params(self):
         self.assertEqual(exec_tools.list_workspace_files.params_json_schema["properties"], {})
         self.assertEqual(exec_tools.list_workspace_files.params_json_schema["required"], [])
+
+    def test_read_workspace_file_does_not_expose_workspace_path(self):
+        props = exec_tools.read_workspace_file.params_json_schema["properties"]
+        self.assertNotIn("workspace_path", props)
+        self.assertIn("relative_path", props)

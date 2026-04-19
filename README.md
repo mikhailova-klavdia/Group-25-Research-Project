@@ -55,6 +55,14 @@ uv run python -m research_agents.main \
   --question "What is the main contribution of this paper?"
 ```
 
+Reproduce all feasible experiments from a paper:
+
+```bash
+uv run python -m research_agents.main \
+  --project papers/segma \
+  --question "Reproduce the experiments described in this paper. Run every feasible script, interpret the results, and compare with the paper."
+```
+
 Ask the agent to run an existing repo script from a fresh run workspace:
 
 ```bash
@@ -96,7 +104,7 @@ research_agents/
 ├── tools/
 │   ├── paper_tools.py      # Local paper text extraction tool
 │   ├── repo_tools.py       # Read-only repository inspection tools
-│   └── exec_tools.py       # File writing, command execution, workspace listing
+│   └── exec_tools.py       # File writing, command execution, workspace I/O
 ├── project.py              # Local project resolution and venv setup
 ├── config.py               # API key and model settings
 └── main.py                 # CLI entry point
@@ -104,15 +112,15 @@ research_agents/
 
 ## How It Works
 
-The agent has eight tools organized in two groups:
+The agent has nine tools organized in two groups:
 
 **Reading tools** — read the paper, list repo files, search repo, read repo files.
 
-**Execution tools** — write files to workspace, stage repo files into workspace, run commands from workspace, list workspace files.
+**Execution tools** — write files to workspace, stage repo files into workspace, run commands from workspace, list workspace files, read workspace files.
 
 Every CLI run gets a fresh isolated Python virtual environment (created automatically via `uv venv`) under `runs/<run-id>/.venv`. The agent can `pip install` dependencies without affecting the system Python or other runs.
 
-The agent follows a five-phase workflow: understand the question, plan an approach, stage or create the files it needs in the run workspace, execute there, and report results with structured output.
+The agent follows a six-phase workflow: **understand** the paper and question, **plan** which experiments to reproduce, **setup** the workspace with dependencies and staged files, **execute** each experiment, **interpret** outputs and compare with the paper, and **report** structured results with a reproducibility assessment.
 
 ## Known Limitations
 

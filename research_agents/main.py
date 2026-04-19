@@ -29,30 +29,49 @@ def run_research_query(context: ResearchContext, question: str, model: str):
     print(f"Question: {question}")
     print("-" * 60)
 
-    # Fresh per-run environments require more setup turns than read-only Q&A.
+    # Reproducing all experiments from a paper can take many tool calls.
     try:
-        result = Runner.run_sync(agent, question, context=context, max_turns=60)
+        result = Runner.run_sync(agent, question, context=context, max_turns=150)
     except MaxTurnsExceeded:
         print(
-            "\nError: Agent did not finish within 60 turns. "
+            "\nError: Agent did not finish within 150 turns. "
             "The task may be too complex or the agent may be stuck in a loop.",
             file=sys.stderr,
         )
         sys.exit(1)
 
     output = result.final_output
-    print(f"\nAnswer: {output.answer}")
-    print(f"\nReasoning: {output.reasoning}")
+    print(f"\nAnswer:\n{output.answer}")
+    print(f"\nReasoning:\n{output.reasoning}")
     print(f"\nSources: {', '.join(output.sources)}")
-    if output.execution:
-        ex = output.execution
-        status = "SUCCESS" if ex.success else "FAILED"
-        print(f"\nExecution: {status} (attempts: {ex.attempts})")
-        print(f"  Script: {ex.script_path}")
-        print(f"  Commands: {', '.join(ex.commands_run)}")
-        print(f"  Output: {ex.output_summary}")
-        if ex.error_summary:
-            print(f"  Errors: {ex.error_summary}")
+
+    if output.experiments:
+        print(f"\n{'=' * 60}")
+        print(f"EXPERIMENTS ({len(output.experiments)} total)")
+        print("=" * 60)
+        for i, exp in enumerate(output.experiments, 1):
+            status = "SUCCESS" if exp.success else "FAILED"
+            print(f"\n--- Experiment {i}: {exp.name} [{status}] ---")
+            print(f"  Paper ref:      {exp.paper_reference}")
+            print(f"  Scripts:        {', '.join(exp.scripts_used)}")
+            print(f"  Commands:       {', '.join(exp.commands_run)}")
+            print(f"  Attempts:       {exp.attempts}")
+            if exp.key_findings:
+                print(f"  Key findings:")
+                for finding in exp.key_findings:
+                    print(f"    - {finding}")
+            if exp.output_files:
+                print(f"  Output files:   {', '.join(exp.output_files)}")
+            print(f"  Interpretation: {exp.interpretation}")
+            if exp.paper_comparison:
+                print(f"  vs. paper:      {exp.paper_comparison}")
+            if exp.error_summary:
+                print(f"  Errors:         {exp.error_summary}")
+
+    if output.overall_interpretation:
+        print(f"\nOverall Interpretation:\n{output.overall_interpretation}")
+    if output.reproducibility_assessment:
+        print(f"\nReproducibility Assessment:\n{output.reproducibility_assessment}")
 
 
 def main():

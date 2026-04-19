@@ -1,10 +1,11 @@
 # Tools for writing files and executing commands.
 #
-# Four tools are exposed to the agent:
+# Five tools are exposed to the agent:
 #   write_file           — create or overwrite a file in workspace/
 #   stage_repo_path      — copy a repo file or directory into workspace/
 #   execute_command      — run a shell command in workspace/
 #   list_workspace_files — see what files exist in workspace/
+#   read_workspace_file  — read a file the agent produced in workspace/
 #
 # New files are always written to workspace/. Commands always run from the
 # current run workspace, never from the shared repo. The shared repo stays
@@ -24,8 +25,9 @@ from research_agents.tools.repo_tools import IGNORED_DIRS
 
 MAX_WRITE_BYTES = 500_000  # reject files bigger than ~500 KB
 MAX_OUTPUT_BYTES = 50_000  # truncate stdout/stderr beyond this
+MAX_READ_BYTES = 200_000   # truncate workspace file reads beyond this
 DEFAULT_TIMEOUT = 120
-MAX_TIMEOUT = 300
+MAX_TIMEOUT = 600
 MAX_LISTED_FILES = 400
 
 
@@ -207,6 +209,36 @@ def list_workspace_files_text(workspace_path: str | Path) -> str:
     return "\n".join(lines)
 
 
+def read_workspace_file_text(workspace_path: str | Path, relative_path: str) -> str:
+    """Read a file from the workspace directory."""
+    root = Path(workspace_path).resolve()
+
+    candidate = Path(relative_path)
+    if candidate.is_absolute():
+        raise ValueError("relative_path must be relative to the workspace/ directory")
+
+    resolved = (root / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise ValueError("Requested path is outside the workspace/ directory") from exc
+
+    if not resolved.exists():
+        raise ValueError(f"File does not exist in workspace: {relative_path}")
+    if not resolved.is_file():
+        raise ValueError(f"Path is not a file: {relative_path}")
+
+    try:
+        content = resolved.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        content = resolved.read_text(encoding="utf-8", errors="replace")
+
+    if len(content) > MAX_READ_BYTES:
+        content = content[:MAX_READ_BYTES] + f"\n[truncated at {MAX_READ_BYTES} bytes]"
+
+    return f"Contents of workspace/{relative_path}:\n{content}"
+
+
 # --- SDK tool wrappers ---
 
 
@@ -256,7 +288,7 @@ def execute_command(
 
     Args:
         command: The shell command to run (e.g. "python run_experiment.py").
-        timeout: Max seconds to wait (default 120, max 300).
+        timeout: Max seconds to wait (default 120, max 600).
     """
     repo_path = context.context.repo_path.resolve()
     env_vars = {
@@ -286,3 +318,16 @@ def execute_command(
 def list_workspace_files(context: RunContextWrapper[ResearchContext]) -> str:
     """List all files the agent has created in the workspace directory."""
     return list_workspace_files_text(context.context.workspace_path)
+
+
+@function_tool
+def read_workspace_file(
+    context: RunContextWrapper[ResearchContext],
+    relative_path: str,
+) -> str:
+    """Read a file from the workspace directory (output files, logs, CSVs, etc.).
+
+    Args:
+        relative_path: Path relative to workspace/ (e.g. "results/output.csv").
+    """
+    return read_workspace_file_text(context.context.workspace_path, relative_path)
