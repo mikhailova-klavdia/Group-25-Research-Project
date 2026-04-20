@@ -43,7 +43,37 @@ papers/<project-slug>/
 - `runs/<run-id>/.venv/` is a fresh isolated Python environment created for that run only.
 - `repo/` is shared across runs and treated as input-only. The agent reads from it and stages files into the run workspace before execution.
 - `papers/` is a local workspace and is ignored by git.
-- Any local examples such as `segma`, `pplm`, or `medchem` are workspace data, not tracked repository contents.
+- Any local corpus under `papers/<slug>/` (Paper2AgentBench non-bio and compbio picks, plus local examples) is workspace data, not tracked repository contents.
+
+## Evaluation Corpus
+
+The agent is tested against a local `papers/<slug>/` workspace per paper. `papers/` is gitignored — contributors clone the repos and download the PDFs locally. Benchmark questions and (where available) ground truths come from [Paper2AgentBench](https://github.com/jmiao24/Paper2AgentBench):
+
+| Bench set | Questions | Paper / repo mapping | Ground truth |
+|-----------|-----------|----------------------|--------------|
+| Non-bio | [`5_nonbio_repos/17_questions.csv`](https://github.com/jmiao24/Paper2AgentBench/blob/main/eval/5_nonbio_repos/17_questions.csv) | `github_link` column | Manual grading |
+| Compbio | [`100_compbio_repos/300_questions.csv`](https://github.com/jmiao24/Paper2AgentBench/blob/main/eval/100_compbio_repos/300_questions.csv) | [`100_compbio_repos/100_papers_link.csv`](https://github.com/jmiao24/Paper2AgentBench/blob/main/eval/100_compbio_repos/100_papers_link.csv) (bioRxiv DOIs) | `ground_truth` column |
+
+### Non-bio test set (papers present locally)
+
+| Slug | Paper | Repo |
+|------|-------|------|
+| `grf` | [Generalized Random Forests (Athey, Tibshirani, Wager — arxiv 1610.01271)](https://arxiv.org/abs/1610.01271) | [grf-labs/grf](https://github.com/grf-labs/grf) |
+| `tabpfn` | [Accurate predictions on small data with a tabular foundation model (Hollmann et al., Nature 2025)](https://doi.org/10.1038/s41586-024-08328-6) | [PriorLabs/TabPFN](https://github.com/PriorLabs/TabPFN) |
+| `sam2` | [SAM 2: Segment Anything in Images and Videos (Ravi et al., arxiv 2408.00714)](https://arxiv.org/abs/2408.00714) | [facebookresearch/sam2](https://github.com/facebookresearch/sam2) |
+| `saelens` | [Sparse Autoencoders Find Highly Interpretable Features in Language Models (Cunningham et al., arxiv 2309.08600)](https://arxiv.org/abs/2309.08600)¹ | [decoderesearch/SAELens](https://github.com/decoderesearch/SAELens) |
+| `binoculars` | [Spotting LLMs With Binoculars (Hans et al., arxiv 2401.12070)](https://arxiv.org/abs/2401.12070) | [ahans30/Binoculars](https://github.com/ahans30/Binoculars) |
+
+¹ SAELens itself has no standalone academic paper — its README self-cites the codebase. The linked Cunningham et al. paper is the foundational SAE-interpretability work the library is built around.
+
+### Compbio test set (papers present locally)
+
+| Slug | Paper (bioRxiv) | Repo |
+|------|-----------------|------|
+| `segma` | [10.1101/2025.11.13.688364](https://www.biorxiv.org/content/10.1101/2025.11.13.688364v1) | clone per `papers/segma/repo/` remote |
+| `medchem` | bioRxiv MolGenBench (DOI to be cross-referenced in `100_papers_link.csv`) | [datamol-io/medchem](https://github.com/datamol-io/medchem) |
+
+The compbio `300_questions.csv` carries a `ground_truth` column, so compbio runs can be graded automatically.
 
 ## Usage
 
@@ -61,14 +91,6 @@ Reproduce all feasible experiments from a paper:
 uv run python -m research_agents.main \
   --project papers/segma \
   --question "Reproduce the experiments described in this paper. Run every feasible script, interpret the results, and compare with the paper."
-```
-
-Ask the agent to run an existing repo script from a fresh run workspace:
-
-```bash
-uv run python -m research_agents.main \
-  --project papers/pplm \
-  --question "Use the existing run_pplm-ppi.py script to run PPI prediction on the example data."
 ```
 
 Ask the agent to create and run a new script:

@@ -141,6 +141,15 @@ Your workflow has six phases:
    - After 5 failed attempts on one experiment, record the failure and
      move on to the next experiment.
    - Do NOT stop at the first failure — attempt every feasible experiment.
+   - When a component is blocked (license gate, missing weights, API
+     token required, gated dataset), keep running whatever is not
+     blocked.  A run that blocks on a gated model but still produces
+     sklearn baselines is far more useful than one that abandons
+     everything.
+   - When an error message lists workarounds (public checkpoint, non-
+     gated model version, alternative example script, env var to set),
+     try those before reporting the problem to the user.  "Tell the
+     user to do X manually" is a last resort, not a first response.
 
 5. INTERPRET
    - For each experiment that succeeded, read and analyse the output files
@@ -168,6 +177,12 @@ Your workflow has six phases:
 
 Guidelines:
 - Base everything on the paper and repository content.  Do not fabricate.
+- Paper-reported numbers are NOT your results.  If you could not run a
+  given experiment, record a failed ExperimentResult — never copy the
+  paper's claimed metrics into key_findings or interpretation as if you
+  had produced them yourself.
+- Every experiment attempt gets an ExperimentResult, success or failure.
+  Failed attempts are data: they show the user what was blocked and why.
 - Prefer existing repo scripts — do not reinvent what already exists.
 - repo/ is input-only.  Stage what you need into workspace/.
 - All new scripts and outputs go in workspace/.
