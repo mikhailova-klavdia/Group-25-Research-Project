@@ -70,8 +70,8 @@ The agent is tested against a local `papers/<slug>/` workspace per paper. `paper
 
 | Slug | Paper (bioRxiv) | Repo |
 |------|-----------------|------|
-| `segma` | [10.1101/2025.11.13.688364](https://www.biorxiv.org/content/10.1101/2025.11.13.688364v1) | clone per `papers/segma/repo/` remote |
-| `medchem` | bioRxiv MolGenBench (DOI to be cross-referenced in `100_papers_link.csv`) | [datamol-io/medchem](https://github.com/datamol-io/medchem) |
+| `segma` | [10.1101/2025.11.13.688364](https://doi.org/10.1101/2025.11.13.688364) | clone per `papers/segma/repo/` remote |
+| `medchem` | local example — not part of Paper2AgentBench's 100 compbio corpus | [datamol-io/medchem](https://github.com/datamol-io/medchem) |
 
 The compbio `300_questions.csv` carries a `ground_truth` column, so compbio runs can be graded automatically.
 
@@ -110,6 +110,40 @@ uv run python -m research_agents.main \
   --model gpt-5-mini-2025-08-07
 ```
 
+## Walkthrough: Running a Paper2AgentBench question end-to-end
+
+The example below runs an entire Paper2AgentBench non-bio question — `sam2` Q07 (`cars.jpg`) — from a cold workspace. The agent downloads the `sam2.1_hiera_large` checkpoint, installs the SAM 2 package in editable mode so its Hydra configs register, and produces 54 binary mask PNGs plus a colored overlay. This is one of the reproductions that succeeded fully in our benchmark runs.
+
+**Prerequisite**: clone `facebookresearch/sam2` to `papers/sam2/repo/` and place the SAM 2 paper at `papers/sam2/paper.pdf`.
+
+**Exact command** (verbatim Paper2AgentBench question, `gpt-5-mini-2025-08-07` model):
+
+```bash
+uv run python -m research_agents.main \
+  --project papers/sam2 \
+  --model gpt-5-mini-2025-08-07 \
+  --question "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/notebooks/images/cars.jpg'"
+```
+
+**Why `gpt-5-mini-2025-08-07` and not the default**: SAM 2 registers its Hydra configs only after `pip install -e .` on the repo. On a CPU-only machine, only the stronger model consistently discovered this workaround; the default `gpt-4.1-mini` variant failed to route around CUDA-assumption errors in `build_sam2()` during our runs.
+
+**What the agent actually does during a successful run**:
+
+1. Reads `paper.pdf` and explores the repo (`list_repo_files`, `read_repo_file README.md`, `search_repo "sam2.1_hiera_large"`).
+2. Stages `checkpoints/download_ckpts.sh` and `sam2/` into the run workspace.
+3. Installs dependencies in the per-run venv: `pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu`, `pip install hydra-core omegaconf tqdm numpy pillow requests`.
+4. Downloads checkpoints with `bash checkpoints/download_ckpts.sh` (~1.5 GB total across tiny/small/base_plus/large).
+5. Runs `pip install -e .` so SAM 2's Hydra config search path resolves.
+6. Writes a short `run_amg.py` that downloads `cars.jpg`, builds `sam2.1_hiera_l.yaml` + the large checkpoint, runs `SAM2AutomaticMaskGenerator`, and saves each mask as a PNG plus a colored overlay.
+7. Executes the script, producing `workspace/amg_output/mask_000.png` … `mask_053.png` and `workspace/amg_output/overlay.png`.
+
+**Expected outcome** (what success looks like):
+
+- `runs/<run-id>/workspace/amg_output/` contains **54 binary mask PNGs** (`mask_000.png` through `mask_053.png`) plus a single **`overlay.png`** composite.
+- The agent's structured `ResearchAnswer` reports one `ExperimentResult` with `success=true`, `output_files` listing the mask directory, and a `findings` entry noting the mask count.
+
+**Grading note**: Paper2AgentBench's non-bio `17_questions.csv` has **no `ground_truth` column** — the expected outcome is qualitative (did the pipeline produce valid masks at all?). The compbio `300_questions.csv` does carry ground truths, which is why automated grading is only feasible on that subset.
+
 ## Available Models
 
 | Model | Description |
@@ -140,7 +174,7 @@ The agent has nine tools organized in two groups:
 
 **Execution tools** — write files to workspace, stage repo files into workspace, run commands from workspace, list workspace files, read workspace files.
 
-Every CLI run gets a fresh isolated Python virtual environment (created automatically via `uv venv`) under `runs/<run-id>/.venv`. The agent can `pip install` dependencies without affecting the system Python or other runs.
+Every CLI run gets a fresh isolated Python virtual environment (created automatically via `uv venv --seed`) under `runs/<run-id>/.venv`. The `--seed` flag pre-installs `pip`, `setuptools`, and `wheel` so the agent can `pip install` dependencies immediately without affecting the system Python or other runs.
 
 The agent follows a six-phase workflow: **understand** the paper and question, **plan** which experiments to reproduce, **setup** the workspace with dependencies and staged files, **execute** each experiment, **interpret** outputs and compare with the paper, and **report** structured results with a reproducibility assessment.
 

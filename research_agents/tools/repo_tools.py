@@ -69,9 +69,26 @@ IGNORED_SUFFIXES = {
     ".jar",
     ".lock",
 }
+# Files above this size are almost always data dumps, pretrained weights, or
+# generated assets — rarely source code the agent would benefit from reading.
+# 200 KB comfortably covers typical Python / C++ / docs files while keeping
+# the token budget for `read_repo_file` bounded and predictable.
 MAX_FILE_BYTES = 200_000  # skip files bigger than ~200 KB
+
+# Upper bound on entries returned by `list_repo_files`.  Large monorepos
+# (e.g. sam2, grf) easily have thousands of files; showing all of them
+# drowns the agent and wastes tokens.  400 is enough to orient in most
+# research repos; anything beyond that, the agent should narrow with search.
 MAX_LISTED_FILES = 400
+
+# Upper bound on matches returned by `search_repo`.  Generous grep hits on
+# common terms (e.g. "import") quickly blow past any useful signal; cap at
+# 50 and instruct the agent to refine the query when it hits the ceiling.
 MAX_MATCHES = 50
+
+# Preview trimmed per matching line.  240 chars fits most single-line code
+# or prose matches without forcing the reader to scroll horizontally and
+# without swamping the result list.
 MAX_LINE_LENGTH = 240
 
 
@@ -88,7 +105,15 @@ def _resolve_repo_root(repo_path: str | Path) -> Path:
 
 
 def _is_text_file(path: Path) -> bool:
-    """Quick check: if the first 4 KB contain a null byte, it's probably binary."""
+    """Quick check: if the first 4 KB contain a null byte, it's probably binary.
+
+    This is the same heuristic `git` uses to decide whether a file is binary.
+    It's not perfect — some text encodings can contain nulls — but for the
+    file types we actually care about (source code, docs, configs, CSVs) it
+    has near-zero false positives and is dramatically cheaper than invoking
+    `file(1)` or sniffing with a MIME library.  4 KB is enough to catch
+    truly-binary files while still being trivially fast even on large trees.
+    """
     try:
         with path.open("rb") as handle:
             chunk = handle.read(4096)
@@ -109,6 +134,14 @@ def _should_skip_file(path: Path) -> bool:
 def _iter_repo_files(root: Path):
     """Walk the repo tree, skipping ignored dirs and non-text files."""
     for current_root, dirnames, filenames in root.walk():
+        # `dirnames[:] = ...` is the canonical os.walk / Path.walk idiom for
+        # pruning subtrees during iteration.  Reassigning `dirnames` (without
+        # the slice) would bind a NEW local name; the walker checks the SAME
+        # list object after yielding, so it wouldn't notice the swap.  The
+        # `[:]` slice mutates the list in place, which the walker DOES see —
+        # meaning ignored directories (`.git`, `.venv`, `node_modules`, ...)
+        # are never descended into, saving both time and memory on large
+        # trees.
         dirnames[:] = [dirname for dirname in dirnames if dirname not in IGNORED_DIRS]
 
         current_path = Path(current_root)

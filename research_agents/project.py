@@ -30,12 +30,42 @@ class ResearchContext:
 
 
 def _create_run_id() -> str:
+    """Generate a unique, sortable run ID.
+
+    Format is ``<UTC-timestamp>-<uuid4-hex8>`` (e.g.
+    ``20260420T143022-a1b2c3d4``).  The timestamp prefix keeps runs
+    chronologically sortable when you ``ls runs/``; the 8-char uuid
+    suffix disambiguates runs launched in the same second (e.g. two
+    benchmark questions fired in parallel).  UTC is used so that runs
+    launched from different machines / timezones still sort correctly.
+    """
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
     return f"{timestamp}-{uuid4().hex[:8]}"
 
 
 def _ensure_venv(venv_path: Path) -> None:
+    """Create an isolated Python venv for this run if one isn't there yet.
+
+    We use a fresh venv per run so that:
+      * experiments from one paper (e.g. conflicting torch versions) cannot
+        contaminate another paper's run,
+      * a second run against the same paper starts clean — no stale installs
+        from a prior attempt,
+      * the system Python is never touched; users don't need to maintain
+        or trust a shared project env.
+
+    ``uv venv --seed`` creates the venv and pre-installs ``pip`` /
+    ``setuptools`` so the agent's first ``pip install`` call works without
+    bootstrap steps.  ``capture_output=True`` keeps uv's progress noise out
+    of the CLI output; ``check=True`` lets exceptions propagate if venv
+    creation fails (e.g. uv not on PATH).
+    """
+    # Check for the interpreter on BOTH Unix (`bin/python`) and Windows
+    # (`Scripts/python.exe`) layouts.  Primary dev environment is macOS, but
+    # a Windows user with uv installed should still get idempotent behaviour.
     if (venv_path / "bin" / "python").exists():
+        return
+    if (venv_path / "Scripts" / "python.exe").exists():
         return
 
     subprocess.run(

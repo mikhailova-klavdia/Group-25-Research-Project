@@ -19,6 +19,8 @@ def run_research_query(context: ResearchContext, question: str, model: str):
     """Run the agent on a single question and print the result."""
     agent = create_research_agent(model=model)
 
+    # Announce the run parameters up-front — mirrored into the log files so
+    # we can trace back which model / project / run dir produced which output.
     print(f"Running Research Assistant with {model}...")
     print(f"Project: {context.project_dir}")
     print(f"Paper: {context.paper_path}")
@@ -29,7 +31,19 @@ def run_research_query(context: ResearchContext, question: str, model: str):
     print(f"Question: {question}")
     print("-" * 60)
 
-    # Reproducing all experiments from a paper can take many tool calls.
+    # max_turns=150 is deliberately generous: reproducing every experiment
+    # in a paper involves reading the PDF, exploring the repo, installing
+    # dependencies, staging files, and running+inspecting each experiment.
+    # Typical runs land between 30-80 turns; 150 leaves enough headroom for
+    # a paper with many experiments or a few retries, without letting a
+    # genuinely stuck agent run forever.
+    #
+    # MaxTurnsExceeded is the SDK's hard stop — when it fires, the agent
+    # did NOT produce a ResearchAnswer, so we exit with a non-zero status
+    # instead of trying to salvage partial output. This is the right
+    # default for batch benchmarking: a timed-out run is a failure, and
+    # downstream scripts can distinguish it from a successful run by the
+    # exit code.
     try:
         result = Runner.run_sync(agent, question, context=context, max_turns=150)
     except MaxTurnsExceeded:
@@ -91,6 +105,9 @@ def main():
     )
     args = parser.parse_args()
 
+    # Fail fast on missing API key: the SDK would raise a cryptic 401 later.
+    # `config.py` reads OPENAI_API_KEY from the environment (with dotenv), so
+    # this single check covers both `.env` and exported-var workflows.
     if not OPENAI_API_KEY:
         print("Error: OPENAI_API_KEY not set. Create a .env file or export it.", file=sys.stderr)
         sys.exit(1)

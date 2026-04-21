@@ -26,36 +26,83 @@ from research_agents.tools.exec_tools import (
 
 
 class ExperimentResult(BaseModel):
-    """Captures one experiment the agent attempted to reproduce."""
+    """Captures one experiment the agent attempted to reproduce.
 
+    One ExperimentResult is produced per experiment ATTEMPTED, regardless
+    of whether execution succeeded.  Failed attempts are data too: they
+    tell the reader which paper claims could not be verified in this
+    environment (and why).
+    """
+
+    # Human-readable label for the experiment; shown verbatim in the CLI
+    # output and used by downstream tooling to cross-reference runs.
     name: str = Field(description="Short name, e.g. 'PPI prediction on example pair'")
+
+    # Traceability: points the reader to the section/table/figure of the
+    # paper this experiment corresponds to.  Helps the user verify that
+    # the agent is not hallucinating experiments that don't exist.
     paper_reference: str = Field(
         description="Where this experiment is described in the paper, "
         "e.g. 'Section 4.2, Table 1'"
     )
+
+    # Scripts actually invoked — either from the staged repo contents or
+    # helpers the agent wrote into the workspace.
     scripts_used: list[str] = Field(
         description="Scripts executed (repo scripts or agent-created)"
     )
+
+    # Full shell commands run for this experiment, so the user can
+    # reproduce the exact invocation outside the agent if they want to.
     commands_run: list[str] = Field(
         description="All shell commands executed for this experiment"
     )
+
+    # True only if the experiment produced usable results.  A setup step
+    # that installs a dependency is NOT an experiment; success=False
+    # means the paper's claim could not be verified.
     success: bool
+
+    # Results the agent *produced itself* — metrics, counts, logs.  The
+    # prompt explicitly forbids copying paper-reported numbers in here.
     key_findings: list[str] = Field(
         description="Quantitative or qualitative results, "
         "e.g. ['Accuracy: 0.95', 'AUC: 0.87']"
     )
+
+    # Paths (relative to workspace/) of files the experiment produced.
+    # Default is an empty list because some experiments only print to
+    # stdout; marking this field optional keeps the structured output
+    # from getting noisy on read-only or trivial cases.
     output_files: list[str] = Field(
         default_factory=list,
         description="Files produced in the workspace",
     )
+
+    # What the findings mean relative to the paper's claim.  Required,
+    # because raw numbers without interpretation are close to useless.
     interpretation: str = Field(
         description="What the results mean in the context of the paper"
     )
+
+    # Optional because some experiments have nothing paper-reported to
+    # compare against (e.g. the paper only gives qualitative claims).
     paper_comparison: str | None = Field(
         default=None,
         description="How the reproduced results compare with the paper's reported results",
     )
+
+    # Populated only when success=False; describes the blocker (missing
+    # weights, timeout, license gate, etc.) in enough detail that the
+    # user can decide whether to unblock and retry.
     error_summary: str | None = None
+
+    # Total execution attempts the agent made for this experiment before
+    # recording this result.  Defaults to 1 meaning "succeeded or gave up
+    # on first try"; if the agent retried failures (the prompt allows up
+    # to 5 retries per experiment), the agent should set this field to
+    # the final count so the user can tell at a glance whether the run
+    # converged quickly or only after heavy iteration.
     attempts: int = 1
 
 

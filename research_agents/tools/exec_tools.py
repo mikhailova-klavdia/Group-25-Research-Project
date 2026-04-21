@@ -23,11 +23,32 @@ from agents import RunContextWrapper, function_tool
 from research_agents.project import ResearchContext
 from research_agents.tools.repo_tools import IGNORED_DIRS
 
+# Cap for `write_file`.  Paper-reproducing helpers are usually small
+# scripts; something over 500 KB is almost certainly an LLM hallucinating
+# a giant dataset inline instead of generating or downloading it.
 MAX_WRITE_BYTES = 500_000  # reject files bigger than ~500 KB
+
+# Trimming cap for stdout/stderr returned from `execute_command`.  50 KB
+# is enough to include error tracebacks and summary tables while keeping
+# the agent's context window from being flooded by verbose training logs.
 MAX_OUTPUT_BYTES = 50_000  # truncate stdout/stderr beyond this
+
+# Cap for `read_workspace_file`.  Matches the repo-side limit so the
+# agent has the same mental model for "readable size" on either side.
 MAX_READ_BYTES = 200_000   # truncate workspace file reads beyond this
+
+# Default subprocess timeout.  120 seconds covers most small-scale
+# experiments (loading a model, running a handful of predictions) while
+# still catching runaway commands quickly during development.
 DEFAULT_TIMEOUT = 120
+
+# Hard upper bound on timeout the agent can request.  The Runner itself
+# has a turn limit and the benchmark harness expects bounded wall-clock
+# per run; 600 s is a generous ceiling for training loops or downloads
+# without allowing a single command to dominate the overall run time.
 MAX_TIMEOUT = 600
+
+# Matches repo_tools.MAX_LISTED_FILES; see that comment for rationale.
 MAX_LISTED_FILES = 400
 
 
@@ -136,16 +157,34 @@ def execute_command_text(
     if not root.is_dir():
         raise ValueError(f"Workspace directory does not exist: {workspace_path}")
 
+    # Even if the agent passes a huge timeout, we clamp so a single command
+    # cannot exceed the wall-clock budget we've set for the whole run.
     timeout = min(timeout, MAX_TIMEOUT)
 
     env = os.environ.copy()
+    # Prepend the run's venv/bin to PATH so bare `python` / `pip` calls in
+    # the agent's commands route into the isolated venv automatically.  The
+    # agent doesn't have to know the absolute path — this is what makes
+    # "pip install x" Just Work without the agent writing `.venv/bin/pip`.
+    # VIRTUAL_ENV is also set for packaging tools that check for it (uv,
+    # pip itself) to recognise the activated env.
     if venv_path is not None:
         venv_bin = str(Path(venv_path).resolve() / "bin")
         env["PATH"] = venv_bin + os.pathsep + env.get("PATH", "")
         env["VIRTUAL_ENV"] = str(Path(venv_path).resolve())
+    # env_vars carries the RESEARCH_* locators plus a PYTHONPATH that
+    # already has the repo root prepended; see the `execute_command` SDK
+    # wrapper below for where that's assembled.
     if env_vars:
         env.update(env_vars)
 
+    # `shell=True` is deliberate: the agent writes shell-style commands
+    # (pipes, redirects, `cd && run`) and we want those to Just Work.  The
+    # usual warning about `shell=True` — untrusted user input becomes
+    # command injection — is accepted here because the "user" issuing
+    # commands IS the agent, running inside a run-scoped workspace + venv,
+    # and we're the sole operator.  Don't copy this pattern into a
+    # multi-tenant or web-facing tool without rethinking the threat model.
     try:
         result = subprocess.run(
             command,
@@ -156,12 +195,44 @@ def execute_command_text(
             timeout=timeout,
             env=env,
         )
-    except subprocess.TimeoutExpired:
-        return f"Command timed out after {timeout} seconds:\n  {command}"
+    except subprocess.TimeoutExpired as exc:
+        # When a command times out, subprocess stashes whatever it had
+        # already read from the child's stdout/stderr pipes on the
+        # exception.  Surfacing that partial output is often the only
+        # way to tell whether the command was stuck in an infinite loop,
+        # waiting on network, or genuinely long-running — so we include
+        # it in the error message rather than dropping it silently.
+        # Both fields may be None or bytes; decode defensively.
+        partial_stdout = exc.stdout
+        partial_stderr = exc.stderr
+        if isinstance(partial_stdout, bytes):
+            partial_stdout = partial_stdout.decode("utf-8", errors="replace")
+        if isinstance(partial_stderr, bytes):
+            partial_stderr = partial_stderr.decode("utf-8", errors="replace")
+
+        parts = [f"Command timed out after {timeout} seconds:\n  {command}"]
+        if partial_stdout and partial_stdout.strip():
+            if len(partial_stdout) > MAX_OUTPUT_BYTES:
+                partial_stdout = (
+                    partial_stdout[:MAX_OUTPUT_BYTES]
+                    + f"\n[stdout truncated at {MAX_OUTPUT_BYTES} bytes]"
+                )
+            parts.append(f"\nSTDOUT (partial):\n{partial_stdout}")
+        if partial_stderr and partial_stderr.strip():
+            if len(partial_stderr) > MAX_OUTPUT_BYTES:
+                partial_stderr = (
+                    partial_stderr[:MAX_OUTPUT_BYTES]
+                    + f"\n[stderr truncated at {MAX_OUTPUT_BYTES} bytes]"
+                )
+            parts.append(f"\nSTDERR (partial):\n{partial_stderr}")
+        return "\n".join(parts)
 
     stdout = result.stdout
     stderr = result.stderr
 
+    # Truncate early so one noisy training log doesn't blow past the
+    # agent's context window.  The trailing marker tells the agent
+    # truncation happened, so it can narrow its next investigation.
     if len(stdout) > MAX_OUTPUT_BYTES:
         stdout = stdout[:MAX_OUTPUT_BYTES] + f"\n[stdout truncated at {MAX_OUTPUT_BYTES} bytes]"
     if len(stderr) > MAX_OUTPUT_BYTES:
@@ -291,6 +362,10 @@ def execute_command(
         timeout: Max seconds to wait (default 120, max 600).
     """
     repo_path = context.context.repo_path.resolve()
+    # Expose the key paths as RESEARCH_* env vars so commands the agent
+    # generates can reference them without hard-coding absolute paths.
+    # The agent's prompt documents these; they're the contract between
+    # the runtime and any helper scripts the agent might write.
     env_vars = {
         "RESEARCH_PROJECT_PATH": str(context.context.project_dir.resolve()),
         "RESEARCH_REPO_PATH": str(repo_path),
@@ -299,6 +374,10 @@ def execute_command(
         "RESEARCH_WORKSPACE_PATH": str(context.context.workspace_path.resolve()),
     }
 
+    # Prepend the repo root to PYTHONPATH so `import <repo-package>` works
+    # from the workspace without the agent having to replicate the repo
+    # layout.  Any PYTHONPATH inherited from the parent process is kept
+    # at the end (lower priority) so our prepending wins on name collisions.
     existing_pythonpath = os.environ.get("PYTHONPATH", "")
     env_vars["PYTHONPATH"] = (
         str(repo_path)
