@@ -6,6 +6,7 @@
 
 import argparse
 import sys
+from pathlib import Path
 
 from agents import Runner
 from agents.exceptions import MaxTurnsExceeded
@@ -13,10 +14,31 @@ from agents.exceptions import MaxTurnsExceeded
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
 from research_agents.agents.research_agent import create_research_agent
 from research_agents.project import ResearchContext, resolve_project
+from research_agents.tracing import enable_local_tracing
 
 
-def run_research_query(context: ResearchContext, question: str, model: str):
-    """Run the agent on a single question and print the result."""
+def run_research_query(
+    context: ResearchContext,
+    question: str,
+    model: str,
+    trace: bool = False,
+):
+    """Run the agent on a single question and print the result.
+
+    When ``trace`` is True, every span and trace event produced by the
+    SDK is written to ``runs/<run-id>/trace.jsonl`` for post-mortem
+    inspection.  The path is printed at the end of the run.  When
+    False (the default), tracing follows whatever the SDK is
+    configured to do — which is the OpenAI cloud dashboard by default.
+    """
+    # Enable local tracing BEFORE the agent is constructed so every
+    # span — including the outer trace wrapper the SDK creates around
+    # Runner.run_sync — is captured.  Wiring this later would miss
+    # the first few events.
+    trace_path: Path | None = None
+    if trace:
+        trace_path = enable_local_tracing(context.run_dir / "trace.jsonl")
+
     agent = create_research_agent(model=model)
 
     # Announce the run parameters up-front — mirrored into the log files so
@@ -58,6 +80,11 @@ def run_research_query(context: ResearchContext, question: str, model: str):
     print(f"\nAnswer:\n{output.answer}")
     print(f"\nReasoning:\n{output.reasoning}")
     print(f"\nSources: {', '.join(output.sources)}")
+    # Surface execution_attempted explicitly so readers (and the future
+    # batch grader) can tell "no code was ever run" apart from "code
+    # was run and every attempt failed" — both scenarios can produce
+    # empty or all-failing experiments lists.
+    print(f"\nExecution attempted: {output.execution_attempted}")
 
     if output.experiments:
         print(f"\n{'=' * 60}")
@@ -87,6 +114,12 @@ def run_research_query(context: ResearchContext, question: str, model: str):
     if output.reproducibility_assessment:
         print(f"\nReproducibility Assessment:\n{output.reproducibility_assessment}")
 
+    # Printed last so it's the final line of normal output and easy to
+    # copy into a follow-up `cat` / `jq` invocation.  Only emitted when
+    # --trace was set; otherwise this block is silent.
+    if trace_path is not None:
+        print(f"\nTrace log: {trace_path}")
+
 
 def main():
     """Parse CLI args and kick off the agent."""
@@ -103,6 +136,17 @@ def main():
         choices=[DEFAULT_MODEL, ALTERNATE_MODEL],
         help=f"Model to use (default: {DEFAULT_MODEL})",
     )
+    # Opt-in local tracing.  Off by default because the SDK's built-in
+    # tracing goes to platform.openai.com/traces — which requires an
+    # OpenAI dashboard login not everyone has.  When --trace is set,
+    # the default processor is replaced with a JSONL writer under the
+    # run dir, and no traces leave the local machine.
+    parser.add_argument(
+        "--trace",
+        action="store_true",
+        help="Write a local trace log (runs/<run-id>/trace.jsonl) "
+        "instead of sending traces to the OpenAI dashboard.",
+    )
     args = parser.parse_args()
 
     # Fail fast on missing API key: the SDK would raise a cryptic 401 later.
@@ -118,7 +162,7 @@ def main():
         print(f"Error: {exc}", file=sys.stderr)
         sys.exit(1)
 
-    run_research_query(context, args.question, args.model)
+    run_research_query(context, args.question, args.model, trace=args.trace)
 
 
 if __name__ == "__main__":

@@ -118,6 +118,19 @@ class ResearchAnswer(BaseModel):
         default_factory=list,
         description="Per-experiment results. Empty for read-only questions.",
     )
+
+    # Required boolean so downstream grading can tell apart "agent did
+    # not run code because the question didn't call for it" from "agent
+    # tried to run code and everything failed" — both produce an empty
+    # or all-failing experiments list, but only the second should count
+    # against reproduction accuracy.  True if any shell command was run
+    # toward answering the question; False for pure read-only answers.
+    execution_attempted: bool = Field(
+        description="True if the agent ran at least one shell command while "
+        "answering; False only for read-only questions where execution "
+        "was never intended.",
+    )
+
     overall_interpretation: str | None = Field(
         default=None,
         description="Cross-experiment synthesis when multiple experiments were run",
@@ -147,6 +160,11 @@ Your workflow has six phases:
    - Use list_repo_files, search_repo, and read_repo_file to explore the
      repository.  Understand the methodology, available data, dependencies,
      and how scripts are meant to be run.
+   - Paths copied from the user's question may be prefixed with the
+     repository's own name (e.g. the question says "grf/notebooks/foo.csv"
+     but the repo root IS "grf", so the real path is "notebooks/foo.csv").
+     If a path fails to resolve as written, retry with the first segment
+     stripped before concluding the file does not exist.
    - If the user asks a read-only question (no execution required), skip to
      phase 6 and answer directly.
 
@@ -215,6 +233,10 @@ Your workflow has six phases:
    - List all relevant file paths in sources.
    - Fill in one ExperimentResult per experiment (both successes and
      failures).
+   - Set execution_attempted to True if you ran any shell command
+     (execute_command) while answering, even if every command failed.
+     Set it to False only for pure read-only questions where execution
+     was never part of the plan.
    - If experiments were run, fill in overall_interpretation with a
      cross-experiment synthesis.
    - Fill in reproducibility_assessment with your overall judgement on
