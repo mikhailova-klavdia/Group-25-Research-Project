@@ -81,6 +81,7 @@ def _build_record(
     biorxiv_url: str,
     question: str,
     ground_truth: str,
+    result: Runner.Result,
     output: ReActAnswer,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
@@ -101,6 +102,11 @@ def _build_record(
         ],
         "final_answer": output.final_answer,
         "correct": correct,
+        "token_usage": {
+            "input_tokens": result.usage.input_tokens,
+            "output_tokens": result.usage.output_tokens,
+            "total_tokens": result.usage.input_tokens + result.usage.output_tokens,
+        },
     }
 
 
@@ -139,7 +145,14 @@ def run_react_query(
         sys.exit(1)
 
     output = result.final_output
-    record = _build_record(entry_id, biorxiv_url, question, ground_truth, output)
+    
+    # --- Token usage ---
+    usage = result.usage
+    print(f"\nToken usage:")
+    print(f"  Input tokens:  {usage.input_tokens}")
+    print(f"  Output tokens: {usage.output_tokens}")
+    print(f"  Total tokens:  {usage.input_tokens + usage.output_tokens}")
+    record = _build_record(entry_id, biorxiv_url, question, ground_truth, result, output)
 
     # --- Print chain to stdout ---
     print(f"\nReAct Chain ({len(output.chain)} steps):")

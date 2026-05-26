@@ -90,6 +90,12 @@ def run_research_query(
         sys.exit(1)
 
     output = result.final_output
+    # --- Token usage ---
+    usage = result.usage
+    print(f"\nToken usage:")
+    print(f"  Input tokens:  {usage.input_tokens}")
+    print(f"  Output tokens: {usage.output_tokens}")
+    print(f"  Total tokens:  {usage.input_tokens + usage.output_tokens}")
     print(f"\nAnswer:\n{output.answer}")
     print(f"\nReasoning:\n{output.reasoning}")
     print(f"\nSources: {', '.join(output.sources)}")
