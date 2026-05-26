@@ -45,6 +45,10 @@ def _is_correct(final_answer: str, ground_truth: str) -> bool:
          contains the right value, e.g. "The AUROC is 0.97" vs "0.97").
       3. Final answer is a contiguous substring of the ground truth
          (handles abbreviated answers vs long ground truths).
+      4. Numeric tolerance: if both strings parse as floats and agree to
+         a 1e-5 relative tolerance, treat as a match.  Catches the case
+         where the agent rounds to fewer sig figs than the ground truth
+         (e.g. "0.9431089" vs "0.94310874" — same number, just truncated).
 
     This is intentionally permissive — downstream reviewers should
     validate the 'correct' field; it is a convenience flag, not a
@@ -59,7 +63,17 @@ def _is_correct(final_answer: str, ground_truth: str) -> bool:
     fa = norm(final_answer)
     gt = norm(ground_truth)
 
-    return fa == gt or gt in fa or fa in gt
+    if fa == gt or gt in fa or fa in gt:
+        return True
+
+    try:
+        fa_num, gt_num = float(fa), float(gt)
+        if abs(fa_num - gt_num) <= 1e-5 * max(abs(gt_num), 1.0):
+            return True
+    except ValueError:
+        pass
+
+    return False
 
 
 def _build_record(
