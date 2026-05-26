@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from agents import Runner
-from agents.exceptions import MaxTurnsExceeded
+from agents.exceptions import MaxTurnsExceeded, ModelRefusalError
 
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
 from research_agents.agents.research_agent import create_research_agent
@@ -66,12 +66,25 @@ def run_research_query(
     # default for batch benchmarking: a timed-out run is a failure, and
     # downstream scripts can distinguish it from a successful run by the
     # exit code.
+    #
+    # ModelRefusalError is treated the same way. Since openai-agents 0.15,
+    # a model refusal on a structured-output agent (i.e. one with
+    # output_type=) raises immediately instead of silently retrying until
+    # the turn limit. A refusal still produces no ResearchAnswer, so it
+    # gets the same non-zero exit so the batch harness sees it as a failed
+    # run rather than a successful empty one.
     try:
         result = Runner.run_sync(agent, question, context=context, max_turns=150)
     except MaxTurnsExceeded:
         print(
             "\nError: Agent did not finish within 150 turns. "
             "The task may be too complex or the agent may be stuck in a loop.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    except ModelRefusalError as exc:
+        print(
+            f"\nError: Model refused to answer the question: {exc}",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -98,7 +111,7 @@ def run_research_query(
             print(f"  Commands:       {', '.join(exp.commands_run)}")
             print(f"  Attempts:       {exp.attempts}")
             if exp.key_findings:
-                print(f"  Key findings:")
+                print("  Key findings:")
                 for finding in exp.key_findings:
                     print(f"    - {finding}")
             if exp.output_files:

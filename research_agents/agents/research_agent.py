@@ -42,21 +42,16 @@ class ExperimentResult(BaseModel):
     # paper this experiment corresponds to.  Helps the user verify that
     # the agent is not hallucinating experiments that don't exist.
     paper_reference: str = Field(
-        description="Where this experiment is described in the paper, "
-        "e.g. 'Section 4.2, Table 1'"
+        description="Where this experiment is described in the paper, e.g. 'Section 4.2, Table 1'"
     )
 
     # Scripts actually invoked — either from the staged repo contents or
     # helpers the agent wrote into the workspace.
-    scripts_used: list[str] = Field(
-        description="Scripts executed (repo scripts or agent-created)"
-    )
+    scripts_used: list[str] = Field(description="Scripts executed (repo scripts or agent-created)")
 
     # Full shell commands run for this experiment, so the user can
     # reproduce the exact invocation outside the agent if they want to.
-    commands_run: list[str] = Field(
-        description="All shell commands executed for this experiment"
-    )
+    commands_run: list[str] = Field(description="All shell commands executed for this experiment")
 
     # True only if the experiment produced usable results.  A setup step
     # that installs a dependency is NOT an experiment; success=False
@@ -66,8 +61,7 @@ class ExperimentResult(BaseModel):
     # Results the agent *produced itself* — metrics, counts, logs.  The
     # prompt explicitly forbids copying paper-reported numbers in here.
     key_findings: list[str] = Field(
-        description="Quantitative or qualitative results, "
-        "e.g. ['Accuracy: 0.95', 'AUC: 0.87']"
+        description="Quantitative or qualitative results, e.g. ['Accuracy: 0.95', 'AUC: 0.87']"
     )
 
     # Paths (relative to workspace/) of files the experiment produced.
@@ -81,9 +75,7 @@ class ExperimentResult(BaseModel):
 
     # What the findings mean relative to the paper's claim.  Required,
     # because raw numbers without interpretation are close to useless.
-    interpretation: str = Field(
-        description="What the results mean in the context of the paper"
-    )
+    interpretation: str = Field(description="What the results mean in the context of the paper")
 
     # Optional because some experiments have nothing paper-reported to
     # compare against (e.g. the paper only gives qualitative claims).
@@ -271,9 +263,14 @@ def create_research_agent(model: str = DEFAULT_MODEL) -> Agent[ResearchContext]:
         instructions=INSTRUCTIONS,
         tools=[
             read_paper,
-            list_repo_files, search_repo, read_repo_file,
-            write_file, stage_repo_path, execute_command,
-            list_workspace_files, read_workspace_file,
+            list_repo_files,
+            search_repo,
+            read_repo_file,
+            write_file,
+            stage_repo_path,
+            execute_command,
+            list_workspace_files,
+            read_workspace_file,
         ],
         model=model,
         output_type=ResearchAnswer,

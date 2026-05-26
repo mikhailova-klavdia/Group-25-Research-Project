@@ -35,7 +35,7 @@ MAX_OUTPUT_BYTES = 50_000  # truncate stdout/stderr beyond this
 
 # Cap for `read_workspace_file`.  Matches the repo-side limit so the
 # agent has the same mental model for "readable size" on either side.
-MAX_READ_BYTES = 200_000   # truncate workspace file reads beyond this
+MAX_READ_BYTES = 200_000  # truncate workspace file reads beyond this
 
 # Default subprocess timeout.  120 seconds covers most small-scale
 # experiments (loading a model, running a handful of predictions) while
