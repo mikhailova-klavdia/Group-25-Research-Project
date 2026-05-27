@@ -193,12 +193,9 @@
 
 ## Repo evidence
 - Step-by-step examination:
-- `Step 1`: 
-- `Step 2`: 
-- `Step 3`: 
+- `Step 1`: Reading the paper is harmless, but it does not verify any executable path or model interface.
+- `Step 2`: Acceptable under the benchmark-path assumption. The chain proceeds from the paths supplied in the question.
+- `Step 3`: Acceptable under the benchmark-path assumption. The issue is not that the chain references notebook-style tooling, but that it never grounds the later execution in a verified implementation interface.
 - `Step 4`: 
 - `Step 5`: 
 - `Step 6`: 
-- `Step 7`: 
-- `Step 8`: 
-- `Step 9`: 
