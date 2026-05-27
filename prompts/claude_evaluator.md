@@ -79,7 +79,7 @@ Apply this error taxonomy (flag any that apply; add new types if you discover th
 - E6: Numeric Overconfidence — specific value stated without running the experiment
 - E7: Premature Termination — agent stops before fully answering
 - E8: Missing Path Verification — file assumed to exist without confirmation
-- [Add any new types discovered]
+- [Add any new types discovered as E9+]
 
 ### B. Frequency table
 Produce a table with one row per error type: error ID, name, and the number of chains
@@ -107,12 +107,41 @@ Identify:
 - Prompt/instruction gaps that explain observed failures
 - Concrete changes to address the top 3 failure modes
 
+### F. Human-annotator-format output
+For every chain, produce a JSON object matching exactly the format the human annotators
+fill in. This allows direct comparison between LLM-judge and human scores.
+
+Output a JSON array of 22 objects, one per chain, with these fields:
+
+  {
+    "id": "<chain ID, e.g. PPLM_001>",
+    "question": "<full question text>",
+    "ground_truth": "<ground truth answer>",
+    "score": <integer 1-4>,
+    "error_types": ["E1", "E2", ...],
+    "problematic_steps": [<step numbers where failures first occur>],
+    "final_answer_assessment": "<one sentence: correct / partially correct / wrong and why>",
+    "summary": "<2-3 sentence overall assessment of the chain quality>"
+  }
+
+Scoring rubric:
+  4 — Correct answer, well-grounded reasoning, all observations verifiable against repo/paper
+  3 — Mostly correct, minor reasoning gaps or one unverified observation
+  2 — Partially correct or significant reasoning flaws, answer likely wrong
+  1 — Severe failure: fabricated observations, wrong answer, or premature termination
+
+Write this JSON array to a file named claude_annotations.json alongside the report.
+
 ---
 
 ## Output
 
-Write the full Phase 3 report (sections A–E) to:
+Write the full Phase 3 report (sections A–F) to:
 C:\Users\32472\Desktop\MaastrichtUni\MscAI\ProjectSem2\Phase3\ClaudeEvalReport.md
 
-Include a short executive summary at the top (5–8 bullet points, most critical findings).
+Write the annotations JSON to:
+C:\Users\32472\Desktop\MaastrichtUni\MscAI\ProjectSem2\Phase3\claude_annotations.json
+
+Include a short executive summary at the top of the report (5–8 bullet points, most
+critical findings).
 ```

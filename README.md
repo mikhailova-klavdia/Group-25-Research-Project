@@ -189,9 +189,12 @@ Each question generates one JSON file under `papers/<slug>/runs/<run-id>/<ID>.js
 
 `prompts/claude_evaluator.md` contains a self-contained prompt to run in a fresh Claude Code
 session. It independently attempts all 22 questions, compares its answers against the stored
-GPT-4.1-mini chains, categorises errors per chain, produces a frequency table, and inspects
-the OpenAI Agents SDK for structural failure causes. Re-run at the start of each iteration
-to get updated diagnostics. Output is written to `ClaudeEvalReport.md` outside the repo.
+GPT-4.1-mini chains, categorises errors per chain, produces a frequency table, inspects the
+OpenAI Agents SDK for structural failure causes, and outputs a `claude_annotations.json` file
+in the same format as the human annotator templates (score 1–4, error\_types, problematic\_steps,
+final\_answer\_assessment, summary). Re-run at the start of each iteration to get updated
+diagnostics. Report written to `ClaudeEvalReport.md`, annotations to `claude_annotations.json`,
+both outside the repo.
 
 ## Project Structure
 
