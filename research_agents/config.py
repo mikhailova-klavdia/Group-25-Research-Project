@@ -24,3 +24,15 @@ DEFAULT_MODEL = "gpt-4.1-mini-2025-04-14"
 # Alternate: stronger reasoning; picked via `--model` for papers with
 # involved multi-step plans, long repos, or ambiguous instructions.
 ALTERNATE_MODEL = "gpt-5-mini-2025-08-07"
+
+# Pricing per 1M tokens
+MODEL_COSTS = {
+    DEFAULT_MODEL: {
+        "input_per_million":  0.40,
+        "output_per_million": 1.60,
+    },
+    ALTERNATE_MODEL: {
+        "input_per_million":  0.25,
+        "output_per_million": 2.00,
+    },
+}

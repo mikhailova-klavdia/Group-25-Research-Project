@@ -15,6 +15,9 @@ from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODE
 from research_agents.agents.research_agent import create_research_agent
 from research_agents.project import ResearchContext, resolve_project
 from research_agents.tracing import enable_local_tracing
+from research_agents.token_utils import append_cost_log, estimate_tokens, print_token_report
+from research_agents.agents.research_agent import INSTRUCTIONS
+from research_agents.token_utils import estimate_tokens, print_token_report, append_cost_log, calculate_cost
 
 
 def run_research_query(
@@ -73,6 +76,9 @@ def run_research_query(
     # the turn limit. A refusal still produces no ResearchAnswer, so it
     # gets the same non-zero exit so the batch harness sees it as a failed
     # run rather than a successful empty one.
+    pre_estimate = estimate_tokens(INSTRUCTIONS, question, model)
+    print(f"Pre-run token estimate (tiktoken): ~{pre_estimate:,}")
+    print("-" * 60)
     try:
         result = Runner.run_sync(agent, question, context=context, max_turns=150)
     except MaxTurnsExceeded:
@@ -90,12 +96,23 @@ def run_research_query(
         sys.exit(1)
 
     output = result.final_output
+    append_cost_log(
+        project_dir=context.project_dir,
+        run_id=context.run_id,
+        question=question,
+        model=model,
+        pre_estimate=pre_estimate,
+        input_tokens=result.usage.input_tokens,
+        output_tokens=result.usage.output_tokens,
+    )
+    print_token_report(
+        pre_estimate,
+        result.usage.input_tokens,
+        result.usage.output_tokens,
+        model,
+        project_dir=context.project_dir,
+    )
     # --- Token usage ---
-    usage = result.usage
-    print(f"\nToken usage:")
-    print(f"  Input tokens:  {usage.input_tokens}")
-    print(f"  Output tokens: {usage.output_tokens}")
-    print(f"  Total tokens:  {usage.input_tokens + usage.output_tokens}")
     print(f"\nAnswer:\n{output.answer}")
     print(f"\nReasoning:\n{output.reasoning}")
     print(f"\nSources: {', '.join(output.sources)}")

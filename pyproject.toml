@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2.12.5",
     "pypdf>=4.0.0",
     "python-dotenv>=1.2.2",
+    "tiktoken>=0.9.0",
 ]
 
 [dependency-groups]

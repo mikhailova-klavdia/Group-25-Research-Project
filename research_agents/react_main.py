@@ -33,7 +33,9 @@ from agents.exceptions import MaxTurnsExceeded
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
 from research_agents.agents.react_agent import ReActAnswer, create_react_agent
 from research_agents.project import ResearchContext, resolve_project
-
+from research_agents.token_utils import append_cost_log, calculate_cost, estimate_tokens, print_token_report
+from research_agents.agents.react_agent import REACT_INSTRUCTIONS
+from research_agents.token_utils import estimate_tokens, print_token_report, append_cost_log, calculate_cost
 
 def _is_correct(final_answer: str, ground_truth: str) -> bool:
     """Heuristic correctness check used for the 'correct' field.
@@ -81,8 +83,10 @@ def _build_record(
     biorxiv_url: str,
     question: str,
     ground_truth: str,
-    result: Runner.Result,
     output: ReActAnswer,
+    model: str,           
+    pre_estimate: int,
+    result,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
     return {
@@ -103,9 +107,13 @@ def _build_record(
         "final_answer": output.final_answer,
         "correct": correct,
         "token_usage": {
-            "input_tokens": result.usage.input_tokens,
-            "output_tokens": result.usage.output_tokens,
-            "total_tokens": result.usage.input_tokens + result.usage.output_tokens,
+            "pre_run_estimate": pre_estimate,
+            "input_tokens":     result.usage.input_tokens,
+            "output_tokens":    result.usage.output_tokens,
+            "total_tokens":     result.usage.input_tokens + result.usage.output_tokens,
+            "estimated_cost_usd": calculate_cost(
+            result.usage.input_tokens, result.usage.output_tokens, model
+            ),
         },
     }
 
@@ -134,6 +142,9 @@ def run_react_query(
     print(f"Ground truth: {ground_truth or '(none)'}")
     print("-" * 60)
 
+    pre_estimate = estimate_tokens(REACT_INSTRUCTIONS, question, model)
+    print(f"Pre-run token estimate (tiktoken): ~{pre_estimate:,}")
+    print("-" * 60)
     try:
         result = Runner.run_sync(agent, question, context=context, max_turns=150)
     except MaxTurnsExceeded:
@@ -152,8 +163,8 @@ def run_react_query(
     print(f"  Input tokens:  {usage.input_tokens}")
     print(f"  Output tokens: {usage.output_tokens}")
     print(f"  Total tokens:  {usage.input_tokens + usage.output_tokens}")
-    record = _build_record(entry_id, biorxiv_url, question, ground_truth, result, output)
-
+    record = _build_record(entry_id, biorxiv_url, question, ground_truth, output=output, model=model, pre_estimate=pre_estimate, result=result)
+    
     # --- Print chain to stdout ---
     print(f"\nReAct Chain ({len(output.chain)} steps):")
     for step in output.chain:
@@ -177,7 +188,22 @@ def run_react_query(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nSaved chain to: {output_path}")
-
+    append_cost_log(
+        project_dir=context.project_dir,
+        run_id=context.run_id,
+        question=question,
+        model=model,
+        pre_estimate=pre_estimate,
+        input_tokens=result.usage.input_tokens,
+        output_tokens=result.usage.output_tokens,
+    )
+    print_token_report(
+        pre_estimate,
+        result.usage.input_tokens,
+        result.usage.output_tokens,
+        model,
+        project_dir=context.project_dir,
+    )
     return record
 
 
