@@ -1,0 +1,22 @@
+[
+  {
+    "repo": "PPLM",
+    "paper_url": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1",
+    "github_url": "https://github.com/junliu621/PPLM/tree/main"
+  },
+  {
+    "repo": "CrossPPI",
+    "paper_url": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1.full.pdf",
+    "github_url": "https://github.com/drugparadigm/CrossPPI"
+  },
+  {
+    "repo": "metapointfinder",
+    "paper_url": "https://www.biorxiv.org/content/10.64898/2025.12.04.691125v1.full.pdf",
+    "github_url": "https://github.com/aldertzomer/metapointfinder/tree/main"
+  },
+  {
+    "repo": "SKiM-GPT",
+    "paper_url": "https://www.biorxiv.org/content/10.1101/2025.07.28.664797v1.full.pdf",
+    "github_url": "https://github.com/stewart-lab/skimgpt"
+  }
+]
