@@ -1,0 +1,18 @@
+[project]
+name = "research-agents"
+version = "0.1.0"
+description = "Research agents powered by OpenAI Agents SDK for analyzing scientific papers"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "openai-agents>=0.13.6",
+    "pydantic>=2.12.5",
+    "pypdf>=4.0.0",
+    "python-dotenv>=1.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "fpdf2>=2.8.7",
+    "pytest>=9.0.3",
+]
