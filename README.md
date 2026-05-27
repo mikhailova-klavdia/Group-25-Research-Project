@@ -185,6 +185,14 @@ Each question generates one JSON file under `papers/<slug>/runs/<run-id>/<ID>.js
 | `gpt-4.1-mini-2025-04-14` | Default. Faster and cheaper for development. |
 | `gpt-5-mini-2025-08-07` | More capable. Use for complex analysis. |
 
+## Independent Chain Evaluation (LLM-as-Judge)
+
+`prompts/claude_evaluator.md` contains a self-contained prompt to run in a fresh Claude Code
+session. It independently attempts all 22 questions, compares its answers against the stored
+GPT-4.1-mini chains, categorises errors per chain, produces a frequency table, and inspects
+the OpenAI Agents SDK for structural failure causes. Re-run at the start of each iteration
+to get updated diagnostics. Output is written to `ClaudeEvalReport.md` outside the repo.
+
 ## Project Structure
 
 ```
