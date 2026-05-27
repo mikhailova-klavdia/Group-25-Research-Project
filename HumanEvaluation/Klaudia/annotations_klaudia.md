@@ -61,3 +61,75 @@
 - The final answer does not provide `Favorable`; it says the answer cannot be determined from the current execution environment.
 - Under the guide's rubric, this is an honest failure with major issues rather than a fabricated chain, so it scores `2`.
 
+
+# PPLM_003 Annotation
+
+## Overall assessment
+
+- `ID`: `PPLM_003`
+- `Score`: ``
+- `Final answer assessment`: ``
+
+
+## Problematic steps
+
+
+## Error types
+
+
+## Repo evidence
+
+
+# PPLM_004 Annotation
+
+## Overall assessment
+
+- `ID`: `PPLM_004`
+- `Score`: ``
+- `Final answer assessment`: ``
+
+
+## Problematic steps
+
+
+## Error types
+
+
+## Repo evidence
+
+
+# PPLM_005 Annotation
+
+## Overall assessment
+
+- `ID`: `PPLM_005`
+- `Score`: ``
+- `Final answer assessment`: ``
+
+
+## Problematic steps
+
+
+## Error types
+
+
+## Repo evidence
+
+
+
+# PPLM_006 Annotation
+
+## Overall assessment
+
+- `ID`: `PPLM_006`
+- `Score`: ``
+- `Final answer assessment`: ``
+
+
+## Problematic steps
+
+
+## Error types
+
+
+## Repo evidence
