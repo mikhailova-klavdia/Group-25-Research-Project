@@ -54,7 +54,7 @@ Do NOT read the stored chains in papers/<slug>/runs/ until all 22 are attempted.
 
 ## Phase 2 — Chain Comparison
 
-Now read the 22 stored chain JSON files.
+Now read the 22 stored chain JSON files from papers/<slug>/runs/.
 
 For each chain compare:
 - The GPT agent's reasoning path vs. your own attempt
@@ -107,11 +107,10 @@ Identify:
 - Prompt/instruction gaps that explain observed failures
 - Concrete changes to address the top 3 failure modes
 
-### F. Human-annotator-format output
-For every chain, produce a JSON object matching exactly the format the human annotators
-fill in. This allows direct comparison between LLM-judge and human scores.
-
-Output a JSON array of 22 objects, one per chain, with these fields:
+### F. Annotations output (human-annotator format)
+For every chain produce a JSON object matching exactly the format the human annotators use,
+so all four annotators (Sapan, Mihaela, Klaudia, Claude) share the same schema for kappa
+computation:
 
   {
     "id": "<chain ID, e.g. PPLM_001>",
@@ -130,18 +129,17 @@ Scoring rubric:
   2 — Partially correct or significant reasoning flaws, answer likely wrong
   1 — Severe failure: fabricated observations, wrong answer, or premature termination
 
-Write this JSON array to a file named claude_annotations.json alongside the report.
-
 ---
 
 ## Output
 
+Create the folder ClaudeEval/ at the project root if it does not exist.
+
 Write the full Phase 3 report (sections A–F) to:
-C:\Users\32472\Desktop\MaastrichtUni\MscAI\ProjectSem2\Phase3\ClaudeEvalReport.md
+  ClaudeEval/report.md
 
-Write the annotations JSON to:
-C:\Users\32472\Desktop\MaastrichtUni\MscAI\ProjectSem2\Phase3\claude_annotations.json
+Write the 22-entry annotations JSON array to:
+  ClaudeEval/annotations.json
 
-Include a short executive summary at the top of the report (5–8 bullet points, most
-critical findings).
+Include a short executive summary at the top of the report (5–8 bullet points).
 ```

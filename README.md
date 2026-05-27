@@ -193,8 +193,10 @@ GPT-4.1-mini chains, categorises errors per chain, produces a frequency table, i
 OpenAI Agents SDK for structural failure causes, and outputs a `claude_annotations.json` file
 in the same format as the human annotator templates (score 1–4, error\_types, problematic\_steps,
 final\_answer\_assessment, summary). Re-run at the start of each iteration to get updated
-diagnostics. Report written to `ClaudeEvalReport.md`, annotations to `claude_annotations.json`,
-both outside the repo.
+diagnostics. Report written to `ClaudeEval/report.md` and annotations to `ClaudeEval/annotations.json`
+at the repo root (`ClaudeEval/` is gitignored). The annotations file uses the same schema
+as the human annotator templates so all four annotators (Sapan, Mihaela, Klaudia, Claude)
+can be compared directly for Cohen's kappa.
 
 ## Project Structure
 
