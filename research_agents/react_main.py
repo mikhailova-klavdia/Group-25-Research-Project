@@ -36,6 +36,14 @@ from research_agents.project import ResearchContext, resolve_project
 from research_agents.token_utils import append_cost_log, calculate_cost, estimate_tokens, print_token_report
 from research_agents.agents.react_agent import REACT_INSTRUCTIONS
 from research_agents.token_utils import estimate_tokens, print_token_report, append_cost_log, calculate_cost
+from agents import RunHooks
+
+class ToolOutputCapture(RunHooks): # Record actual tool outputs in order as they fire
+    def __init__(self):
+        self.outputs: list[str] = []
+
+    async def on_tool_end(self, context, agent, tool, result: str) -> None:
+        self.outputs.append(result)
 
 def _is_correct(final_answer: str, ground_truth: str) -> bool:
     """Heuristic correctness check used for the 'correct' field.
@@ -61,7 +69,15 @@ def _is_correct(final_answer: str, ground_truth: str) -> bool:
 
     def norm(s: str) -> str:
         return s.strip().lower()
-
+    
+    FAILURE_PHRASES = { # guard to detect if model admits failure before substring check of fa to gt
+        "execution_required", "cannot determine", "could not",
+        "execution failed", "unable to", "not determined",
+        "i could not", "did not successfully",
+    }
+    if any(p in fa for p in FAILURE_PHRASES):
+        return False
+    
     fa = norm(final_answer)
     gt = norm(ground_truth)
 
@@ -84,26 +100,37 @@ def _build_record(
     question: str,
     ground_truth: str,
     output: ReActAnswer,
-    model: str,           
+    model: str,
     pre_estimate: int,
     result,
+    capture: ToolOutputCapture,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
+
+    if len(capture.outputs) != len(output.chain):
+        print(
+            f"[WARNING] Tool calls captured ({len(capture.outputs)}) != "
+            f"chain steps ({len(output.chain)}). "
+            "Injecting real observations where counts align; remainder use LLM-written text."
+        )
+
+    chain_steps = []
+    for i, s in enumerate(output.chain):
+        real_obs = capture.outputs[i] if i < len(capture.outputs) else s.observation
+        chain_steps.append({
+            "step": s.step,
+            "thought": s.thought,
+            "action": s.action,
+            "observation": real_obs,
+            "reflection": s.reflection,
+        })
+
     return {
         "id": entry_id,
         "repo_link": biorxiv_url,
         "question": question,
         "ground_truth": ground_truth,
-        "chain": [
-            {
-                "step": s.step,
-                "thought": s.thought,
-                "action": s.action,
-                "observation": s.observation,
-                "reflection": s.reflection,
-            }
-            for s in output.chain
-        ],
+        "chain": chain_steps,
         "final_answer": output.final_answer,
         "correct": correct,
         "token_usage": {
@@ -146,7 +173,8 @@ def run_react_query(
     print(f"Pre-run token estimate (tiktoken): ~{pre_estimate:,}")
     print("-" * 60)
     try:
-        result = Runner.run_sync(agent, question, context=context, max_turns=150)
+        capture = ToolOutputCapture()
+        result = Runner.run_sync(agent, question, context=context, max_turns=150, hooks=capture)
     except MaxTurnsExceeded:
         print(
             "\nError: Agent did not finish within 150 turns. "
@@ -163,7 +191,7 @@ def run_react_query(
     print(f"  Input tokens:  {usage.input_tokens}")
     print(f"  Output tokens: {usage.output_tokens}")
     print(f"  Total tokens:  {usage.input_tokens + usage.output_tokens}")
-    record = _build_record(entry_id, biorxiv_url, question, ground_truth, output=output, model=model, pre_estimate=pre_estimate, result=result)
+    record = _build_record(entry_id, biorxiv_url, question, ground_truth, output=output, model=model, pre_estimate=pre_estimate, result=result, capture=capture)
     
     # --- Print chain to stdout ---
     print(f"\nReAct Chain ({len(output.chain)} steps):")

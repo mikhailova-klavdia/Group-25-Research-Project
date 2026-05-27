@@ -105,8 +105,14 @@ def stage_repo_path_text(
     except ValueError as exc:
         raise ValueError("Requested source path is outside the repo/ directory") from exc
 
-    if not source.exists():
-        raise ValueError(f"Requested source path does not exist: {relative_path}")
+    if not source.exists(): # more detailed error to warning agent to not hallucinate paths
+          filename = Path(relative_path).name
+          return (
+              f"ERROR: '{relative_path}' does not exist in the repo. "
+              f"Do NOT proceed with staging. "
+              f"Call search_repo('{filename}') to find if this file exists "
+              f"at a different path, then stage the correct path instead."
+          )
     if any(part in IGNORED_DIRS for part in source.relative_to(repo_root).parts):
         raise ValueError(f"Requested source path is not available for staging: {relative_path}")
 

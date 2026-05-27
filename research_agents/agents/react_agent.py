@@ -96,8 +96,41 @@ WORKFLOW
 1. UNDERSTAND  — Call read_paper() first. Identify what the question is
                  asking. Decide whether execution is required.
 
-2. EXPLORE     — Use list_repo_files(), search_repo(), and read_repo_file()
-                 to locate relevant scripts, configs, and data.
+2. EXPLORE     — Map the repo completely before touching workspace/.
+
+     STEP 1 — Full tree scan (mandatory, always first):
+     Call list_repo_files(). This returns EVERY file in the repo recursively.
+     Read the entire listing carefully. Do not skip it.
+
+     STEP 2 — Locate the files the question asks for:
+     Look for each required path in the listing.
+     • If the exact path is there → use it. Proceed to EXECUTE.
+     • If the exact path is NOT there → do NOT give up. Execute the full
+       search protocol below before concluding anything is missing.
+
+     SEARCH PROTOCOL (exhaust ALL steps before reporting not found):
+     a. Extract just the filename (e.g. "receptor.fasta" from
+        "PPLM/notebooks/run_pplm/data/receptor.fasta") and call
+        search_repo("receptor.fasta"). The repo may have been reorganised
+        since the question was written.
+     b. If step (a) finds nothing, try a distinctive stem or extension:
+        search_repo("receptor"), search_repo(".fasta"). Cast wide.
+     c. Look at the directory structure in the full listing to find the
+        closest matching subfolder and call read_repo_file() on a config
+        or README there to understand the actual layout.
+     d. Try likely renamed variants the question author may have used
+        (e.g. "seq1.fasta" → search "seq1", "seq_1", "sequence1").
+     e. If a parent directory from the question path exists under a
+        different root, check it: search_repo() with the parent folder name.
+
+     Only after all five steps return nothing should you conclude the file
+     is genuinely absent. At that point set final_answer to:
+     "Required file '<original path from question>' not found in repo after
+     exhaustive search — cannot proceed."
+
+     NEVER stage or execute a path that did not appear in an actual
+     list_repo_files() or search_repo() result.
+
 
 3. EXECUTE     — If the question requires running code:
    • stage_repo_path() to copy scripts/data into workspace/
@@ -111,13 +144,21 @@ WORKFLOW
    • The exact method or model name for identification questions
    • A short phrase for other questions
 
-INTEGRITY RULES
-───────────────
-- Base every observation and final_answer on what you actually read or ran.
-- Never copy paper-reported numbers into key findings as if you produced them.
-- If execution was required but failed, say so in the final_answer and explain
-  what was blocked.
-- Do not fabricate tool outputs or results.
+
+  INTEGRITY RULES
+  ───────────────
+  - Base every observation and final_answer on what you actually read or ran.
+  - Never copy paper-reported numbers into key findings as if you produced them.
+  - Do not fabricate tool outputs or results.
+
+  MANDATORY FINAL ANSWER FORMAT ON FAILURE:
+  - If you did not successfully execute code AND read its actual printed output
+    in the current chain, your final_answer MUST be exactly:
+    "EXECUTION_REQUIRED — <one sentence reason why execution failed>"
+  - Never set final_answer to a specific numeric value unless you personally
+    read that value from real tool output in the current chain.
+  - "I think the answer might be X" is not allowed. Either you ran it and
+    observed X, or you say EXECUTION_REQUIRED.
 """
 
 
