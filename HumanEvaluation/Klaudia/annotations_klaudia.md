@@ -67,9 +67,9 @@
 ## Overall assessment
 
 - `ID`: `PPLM_003`
-- `Score`: ``
+- `Score`: `1`
 - `Final answer assessment`: ``
-
+ 
 
 ## Problematic steps
 
@@ -77,7 +77,20 @@
 ## Error types
 
 
+
 ## Repo evidence
+
+- Step-by-step examination:
+- `Step 1`: 
+- `Step 2`: 
+- `Step 3`: 
+- `Step 4`: 
+- `Step 5`: 
+- `Step 6`: 
+- `Step 7`: 
+- `Step 8`: 
+- `Step 9`: 
+
 
 
 # PPLM_004 Annotation
@@ -96,6 +109,17 @@
 
 
 ## Repo evidence
+- Step-by-step examination:
+- `Step 1`: 
+- `Step 2`: 
+- `Step 3`: 
+- `Step 4`: 
+- `Step 5`: 
+- `Step 6`: 
+- `Step 7`: 
+- `Step 8`: 
+- `Step 9`: 
+
 
 
 # PPLM_005 Annotation
@@ -114,6 +138,16 @@
 
 
 ## Repo evidence
+- Step-by-step examination:
+- `Step 1`: 
+- `Step 2`: 
+- `Step 3`: 
+- `Step 4`: 
+- `Step 5`: 
+- `Step 6`: 
+- `Step 7`: 
+- `Step 8`: 
+- `Step 9`: 
 
 
 
@@ -133,3 +167,13 @@
 
 
 ## Repo evidence
+- Step-by-step examination:
+- `Step 1`: 
+- `Step 2`: 
+- `Step 3`: 
+- `Step 4`: 
+- `Step 5`: 
+- `Step 6`: 
+- `Step 7`: 
+- `Step 8`: 
+- `Step 9`: 
