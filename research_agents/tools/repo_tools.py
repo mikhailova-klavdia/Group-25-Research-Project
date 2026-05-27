@@ -231,8 +231,18 @@ def read_repo_file_text(repo_path: str | Path, relative_path: str) -> str:
 
     if not resolved.exists():
         raise ValueError(f"Requested file does not exist: {relative_path}")
+    # Directory paths get their own error branch because the agent
+    # sometimes passes a directory when it meant to explore it — the
+    # generic "not a file" message was observed to confuse the model
+    # into giving up; pointing it at list_repo_files is the recovery
+    # path we want it to take.
+    if resolved.is_dir():
+        raise ValueError(
+            f"Requested path is a directory, not a file: {relative_path}. "
+            f"Use list_repo_files to see which files exist under repo/."
+        )
     if not resolved.is_file():
-        raise ValueError(f"Requested path is not a file: {relative_path}")
+        raise ValueError(f"Requested path is not a regular file: {relative_path}")
     if _should_skip_file(resolved):
         raise ValueError(f"Requested file is not available for reading: {relative_path}")
 

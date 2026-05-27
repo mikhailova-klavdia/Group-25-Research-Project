@@ -78,6 +78,14 @@ class RepoToolTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "does not exist"):
             read_repo_file_text(str(self.repo_root), "no_such_file.py")
 
+    def test_read_repo_file_rejects_directory_with_actionable_hint(self):
+        # The agent occasionally hands a directory path to read_repo_file
+        # when it meant to list it.  We want the error to tell it
+        # explicitly (a) that the path is a directory and (b) which tool
+        # to call instead, so it can recover on the next turn.
+        with self.assertRaisesRegex(ValueError, "directory.*list_repo_files"):
+            read_repo_file_text(str(self.repo_root), "src")
+
     def test_tool_schemas_do_not_expose_repo_path_or_paper_path(self):
         self.assertEqual(repo_tools.list_repo_files.params_json_schema["properties"], {})
         self.assertEqual(repo_tools.list_repo_files.params_json_schema["required"], [])

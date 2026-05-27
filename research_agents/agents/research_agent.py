@@ -42,21 +42,16 @@ class ExperimentResult(BaseModel):
     # paper this experiment corresponds to.  Helps the user verify that
     # the agent is not hallucinating experiments that don't exist.
     paper_reference: str = Field(
-        description="Where this experiment is described in the paper, "
-        "e.g. 'Section 4.2, Table 1'"
+        description="Where this experiment is described in the paper, e.g. 'Section 4.2, Table 1'"
     )
 
     # Scripts actually invoked — either from the staged repo contents or
     # helpers the agent wrote into the workspace.
-    scripts_used: list[str] = Field(
-        description="Scripts executed (repo scripts or agent-created)"
-    )
+    scripts_used: list[str] = Field(description="Scripts executed (repo scripts or agent-created)")
 
     # Full shell commands run for this experiment, so the user can
     # reproduce the exact invocation outside the agent if they want to.
-    commands_run: list[str] = Field(
-        description="All shell commands executed for this experiment"
-    )
+    commands_run: list[str] = Field(description="All shell commands executed for this experiment")
 
     # True only if the experiment produced usable results.  A setup step
     # that installs a dependency is NOT an experiment; success=False
@@ -66,8 +61,7 @@ class ExperimentResult(BaseModel):
     # Results the agent *produced itself* — metrics, counts, logs.  The
     # prompt explicitly forbids copying paper-reported numbers in here.
     key_findings: list[str] = Field(
-        description="Quantitative or qualitative results, "
-        "e.g. ['Accuracy: 0.95', 'AUC: 0.87']"
+        description="Quantitative or qualitative results, e.g. ['Accuracy: 0.95', 'AUC: 0.87']"
     )
 
     # Paths (relative to workspace/) of files the experiment produced.
@@ -81,9 +75,7 @@ class ExperimentResult(BaseModel):
 
     # What the findings mean relative to the paper's claim.  Required,
     # because raw numbers without interpretation are close to useless.
-    interpretation: str = Field(
-        description="What the results mean in the context of the paper"
-    )
+    interpretation: str = Field(description="What the results mean in the context of the paper")
 
     # Optional because some experiments have nothing paper-reported to
     # compare against (e.g. the paper only gives qualitative claims).
@@ -118,6 +110,19 @@ class ResearchAnswer(BaseModel):
         default_factory=list,
         description="Per-experiment results. Empty for read-only questions.",
     )
+
+    # Required boolean so downstream grading can tell apart "agent did
+    # not run code because the question didn't call for it" from "agent
+    # tried to run code and everything failed" — both produce an empty
+    # or all-failing experiments list, but only the second should count
+    # against reproduction accuracy.  True if any shell command was run
+    # toward answering the question; False for pure read-only answers.
+    execution_attempted: bool = Field(
+        description="True if the agent ran at least one shell command while "
+        "answering; False only for read-only questions where execution "
+        "was never intended.",
+    )
+
     overall_interpretation: str | None = Field(
         default=None,
         description="Cross-experiment synthesis when multiple experiments were run",
@@ -147,6 +152,11 @@ Your workflow has six phases:
    - Use list_repo_files, search_repo, and read_repo_file to explore the
      repository.  Understand the methodology, available data, dependencies,
      and how scripts are meant to be run.
+   - Paths copied from the user's question may be prefixed with the
+     repository's own name (e.g. the question says "grf/notebooks/foo.csv"
+     but the repo root IS "grf", so the real path is "notebooks/foo.csv").
+     If a path fails to resolve as written, retry with the first segment
+     stripped before concluding the file does not exist.
    - If the user asks a read-only question (no execution required), skip to
      phase 6 and answer directly.
 
@@ -215,6 +225,10 @@ Your workflow has six phases:
    - List all relevant file paths in sources.
    - Fill in one ExperimentResult per experiment (both successes and
      failures).
+   - Set execution_attempted to True if you ran any shell command
+     (execute_command) while answering, even if every command failed.
+     Set it to False only for pure read-only questions where execution
+     was never part of the plan.
    - If experiments were run, fill in overall_interpretation with a
      cross-experiment synthesis.
    - Fill in reproducibility_assessment with your overall judgement on
@@ -249,9 +263,14 @@ def create_research_agent(model: str = DEFAULT_MODEL) -> Agent[ResearchContext]:
         instructions=INSTRUCTIONS,
         tools=[
             read_paper,
-            list_repo_files, search_repo, read_repo_file,
-            write_file, stage_repo_path, execute_command,
-            list_workspace_files, read_workspace_file,
+            list_repo_files,
+            search_repo,
+            read_repo_file,
+            write_file,
+            stage_repo_path,
+            execute_command,
+            list_workspace_files,
+            read_workspace_file,
         ],
         model=model,
         output_type=ResearchAnswer,
