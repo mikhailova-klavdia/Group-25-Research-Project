@@ -12,6 +12,8 @@
 #     --id REPO_001 \
 #     --biorxiv-url "https://biorxiv.org/..."
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 from agents import Agent
@@ -19,13 +21,23 @@ from agents import Agent
 from research_agents.config import DEFAULT_MODEL
 from research_agents.project import ResearchContext
 from research_agents.tools.paper_tools import read_paper
-from research_agents.tools.repo_tools import list_repo_files, read_repo_file, search_repo
+from research_agents.tools.repo_tools import (
+    find_repo_files,
+    list_repo_files,
+    read_repo_file,
+    resolve_repo_path,
+    search_repo,
+)
 from research_agents.tools.exec_tools import (
+    cache_workspace_artifact,
     write_file,
     stage_repo_path,
     execute_command,
     list_workspace_files,
+    list_paper_artifacts,
     read_workspace_file,
+    stage_paper_artifact,
+    venv_status,
 )
 
 
@@ -37,8 +49,7 @@ class ReActStep(BaseModel):
 
     step: int = Field(description="Step number, starting from 1")
     thought: str = Field(
-        description="What you intend to do in this step and why, "
-        "written BEFORE calling the tool"
+        description="What you intend to do in this step and why, written BEFORE calling the tool"
     )
     action: str = Field(
         description="The exact tool call or command you executed, "
@@ -48,8 +59,7 @@ class ReActStep(BaseModel):
         description="Concise summary of what the tool returned (truncate long outputs)"
     )
     reflection: str = Field(
-        description="What you conclude from this observation and "
-        "how it shapes the next step"
+        description="What you conclude from this observation and how it shapes the next step"
     )
 
 
@@ -65,6 +75,42 @@ class ReActAnswer(BaseModel):
         "For yes/no questions use 'Yes' or 'No'. "
         "For numeric questions include the value and units. "
         "For name/method questions give the exact name from the paper."
+    )
+    # Set to "blocked" when the benchmark question could not be answered
+    # from the available repo, environment, or generated outputs.
+    answer_status: Literal["answered", "blocked"] = Field(
+        default="answered",
+        description="Whether the question was answered or blocked by an external/local issue.",
+    )
+    # Machine-readable category for blocked answers; "none" is used for
+    # successful answers so downstream summaries do not need to infer it
+    # from free-form text.
+    blocker_type: Literal[
+        "none",
+        "missing_input",
+        "missing_weights",
+        "missing_dependency",
+        "external_download",
+        "gpu_required",
+        "runtime_error",
+        "ambiguous_question",
+        "unknown",
+    ] = Field(
+        default="none",
+        description="Primary blocker category when answer_status is blocked.",
+    )
+    # Human-readable explanation of why the answer is blocked.  This is
+    # intentionally separate from final_answer, which stays concise for
+    # benchmark scoring.
+    blocker_explanation: str | None = Field(
+        default=None,
+        description="Clear explanation of why the worker could not answer.",
+    )
+    # Short evidence snippets from real observations, such as exact missing
+    # paths, checkpoint names, timeout messages, or import errors.
+    blocker_evidence: list[str] = Field(
+        default_factory=list,
+        description="Observed evidence supporting the blocker classification.",
     )
 
 
@@ -99,19 +145,23 @@ WORKFLOW
 2. EXPLORE     — Map the repo completely before touching workspace/.
 
      STEP 1 — Full tree scan (mandatory, always first):
-     Call list_repo_files(). This returns EVERY file in the repo recursively.
-     Read the entire listing carefully. Do not skip it.
+     Call list_repo_files(). This returns readable text files in the repo
+     recursively. Then call find_repo_files() for artifact suffixes relevant
+     to the question (.pth, .pt, .pkl, .npy, .npz, .fasta, .fa, .tsv, .csv,
+     .xlsx). Read both listings carefully. Do not skip binary artifacts.
 
      STEP 2 — Locate the files the question asks for:
-     Look for each required path in the listing.
-     • If the exact path is there → use it. Proceed to EXECUTE.
-     • If the exact path is NOT there → do NOT give up. Execute the full
-       search protocol below before concluding anything is missing.
+     For every path copied from the question, first call resolve_repo_path()
+     with the original path string.
+     • If resolve_repo_path returns an exact or prefix-stripped match → use it.
+     • If it returns candidates → inspect the most relevant candidate(s).
+     • If it returns no candidates → do NOT give up. Execute the full search
+       protocol below before concluding anything is missing.
 
      SEARCH PROTOCOL (exhaust ALL steps before reporting not found):
      a. Extract just the filename (e.g. "receptor.fasta" from
         "PPLM/notebooks/run_pplm/data/receptor.fasta") and call
-        search_repo("receptor.fasta"). The repo may have been reorganised
+        find_repo_files("receptor.fasta"). The repo may have been reorganised
         since the question was written.
      b. If step (a) finds nothing, try a distinctive stem or extension:
         search_repo("receptor"), search_repo(".fasta"). Cast wide.
@@ -121,7 +171,12 @@ WORKFLOW
      d. Try likely renamed variants the question author may have used
         (e.g. "seq1.fasta" → search "seq1", "seq_1", "sequence1").
      e. If a parent directory from the question path exists under a
-        different root, check it: search_repo() with the parent folder name.
+        different root, check it: find_repo_files() and search_repo() with
+        the parent folder name.
+
+     For pretrained weights or generated artifacts, use find_repo_files(),
+     not search_repo(). Content grep cannot see large/binary files like
+     .pth, .pt, .pkl, .npy, .npz, or .xlsx.
 
      Only after all five steps return nothing should you conclude the file
      is genuinely absent. At that point set final_answer to:
@@ -129,12 +184,24 @@ WORKFLOW
      exhaustive search — cannot proceed."
 
      NEVER stage or execute a path that did not appear in an actual
-     list_repo_files() or search_repo() result.
+     list_repo_files(), find_repo_files(), resolve_repo_path(), or
+     search_repo() result.
 
 
 3. EXECUTE     — If the question requires running code:
    • stage_repo_path() to copy scripts/data into workspace/
+   • Before downloading weights or regenerating expensive outputs, call
+     list_paper_artifacts(). If a reusable artifact is already cached, call
+     stage_paper_artifact() instead of downloading/regenerating it.
+   • Before installing dependencies, call venv_status() to see what is
+     already available in the shared per-paper venv.
    • execute_command() to install dependencies and run experiments
+   • If you download a model weight, produce a pickle/NumPy array, or create
+     any output that another question for this paper could reuse, call
+     cache_workspace_artifact() after verifying it exists.
+   • If a Python import fails with `ModuleNotFoundError`, run
+     `pip install <package>` with `timeout=3600` before rewriting
+     the script or giving up.
    • read_workspace_file() to inspect output files
    • Retry failures up to 5 times per experiment; record each attempt.
 
@@ -143,18 +210,36 @@ WORKFLOW
    • The exact numeric value (with units) for numeric questions
    • The exact method or model name for identification questions
    • A short phrase for other questions
+   • Set answer_status="answered" and blocker_type="none" when you answered.
+
+   If you cannot answer, set:
+   • answer_status="blocked"
+   • blocker_type to exactly one of:
+     missing_input, missing_weights, missing_dependency, external_download,
+     gpu_required, runtime_error, ambiguous_question, unknown
+   • blocker_explanation to 1-3 sentences explaining the real blocker.
+   • blocker_evidence to short direct evidence from tool output, such as the
+     missing path, missing checkpoint filename, timeout, or import error.
 
 
   INTEGRITY RULES
   ───────────────
   - Base every observation and final_answer on what you actually read or ran.
   - Never copy paper-reported numbers into key findings as if you produced them.
+  - If a question says run, process, merge, predict, or generate, README
+    examples are not sufficient evidence. You must execute or read a
+    generated artifact in the current chain, otherwise say EXECUTION_REQUIRED.
+  - For ESM/ESM-2 embeddings, raw token embeddings often include BOS/EOS
+    special tokens. When the question asks for per-residue rows or sequence
+    length, strip special tokens or use the original residue count.
   - Do not fabricate tool outputs or results.
 
   MANDATORY FINAL ANSWER FORMAT ON FAILURE:
   - If you did not successfully execute code AND read its actual printed output
-    in the current chain, your final_answer MUST be exactly:
+    or generated artifact in the current chain, your final_answer MUST be exactly:
     "EXECUTION_REQUIRED — <one sentence reason why execution failed>"
+    Also set answer_status="blocked", blocker_type, blocker_explanation,
+    and blocker_evidence.
   - Never set final_answer to a specific numeric value unless you personally
     read that value from real tool output in the current chain.
   - "I think the answer might be X" is not allowed. Either you ran it and
@@ -169,9 +254,20 @@ def create_react_agent(model: str = DEFAULT_MODEL) -> Agent[ResearchContext]:
         instructions=REACT_INSTRUCTIONS,
         tools=[
             read_paper,
-            list_repo_files, search_repo, read_repo_file,
-            write_file, stage_repo_path, execute_command,
-            list_workspace_files, read_workspace_file,
+            list_repo_files,
+            find_repo_files,
+            resolve_repo_path,
+            search_repo,
+            read_repo_file,
+            write_file,
+            stage_repo_path,
+            execute_command,
+            list_workspace_files,
+            read_workspace_file,
+            list_paper_artifacts,
+            stage_paper_artifact,
+            cache_workspace_artifact,
+            venv_status,
         ],
         model=model,
         output_type=ReActAnswer,

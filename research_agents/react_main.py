@@ -19,6 +19,7 @@
 #     "chain": [{"step": 1, "thought": ..., "action": ...,
 #                "observation": ..., "reflection": ...}, ...],
 #     "final_answer": "...",
+#     "failure_analysis": {"answer_status": ..., "blocker_type": ...},
 #     "correct": true/false
 #   }
 
@@ -28,22 +29,19 @@ import sys
 from pathlib import Path
 
 from agents import Runner
-from agents.exceptions import MaxTurnsExceeded
+from agents.exceptions import MaxTurnsExceeded, ModelRefusalError
 
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
-from research_agents.agents.react_agent import ReActAnswer, create_react_agent
+from research_agents.agents.react_agent import REACT_INSTRUCTIONS, ReActAnswer, create_react_agent
+from research_agents.orchestration import ToolOutputCapture, run_with_critic
 from research_agents.project import ResearchContext, resolve_project
-from research_agents.token_utils import append_cost_log, calculate_cost, estimate_tokens, print_token_report
-from research_agents.agents.react_agent import REACT_INSTRUCTIONS
-from research_agents.token_utils import estimate_tokens, print_token_report, append_cost_log, calculate_cost
-from agents import RunHooks
+from research_agents.token_utils import (
+    append_cost_log,
+    calculate_cost,
+    estimate_tokens,
+    print_token_report,
+)
 
-class ToolOutputCapture(RunHooks): # Record actual tool outputs in order as they fire
-    def __init__(self):
-        self.outputs: list[str] = []
-
-    async def on_tool_end(self, context, agent, tool, result: str) -> None:
-        self.outputs.append(result)
 
 def _is_correct(final_answer: str, ground_truth: str) -> bool:
     """Heuristic correctness check used for the 'correct' field.
@@ -69,17 +67,28 @@ def _is_correct(final_answer: str, ground_truth: str) -> bool:
 
     def norm(s: str) -> str:
         return s.strip().lower()
-    
-    FAILURE_PHRASES = { # guard to detect if model admits failure before substring check of fa to gt
-        "execution_required", "cannot determine", "could not",
-        "execution failed", "unable to", "not determined",
-        "i could not", "did not successfully",
+
+    fa = norm(final_answer)
+    gt = norm(ground_truth)
+
+    # Guard against the empty-string false positive: "" is a substring of
+    # everything, so `fa in gt` would otherwise be True and mark any
+    # 1-step chain with a missing final_answer as correct.
+    if not fa:
+        return False
+
+    FAILURE_PHRASES = {
+        "execution_required",
+        "cannot determine",
+        "could not",
+        "execution failed",
+        "unable to",
+        "not determined",
+        "i could not",
+        "did not successfully",
     }
     if any(p in fa for p in FAILURE_PHRASES):
         return False
-    
-    fa = norm(final_answer)
-    gt = norm(ground_truth)
 
     if fa == gt or gt in fa or fa in gt:
         return True
@@ -94,6 +103,44 @@ def _is_correct(final_answer: str, ground_truth: str) -> bool:
     return False
 
 
+def _failure_analysis(output: ReActAnswer) -> dict:
+    """Build structured blocked-answer metadata for the saved JSON.
+
+    The worker now fills these fields directly, but older/incomplete model
+    outputs may only provide an EXECUTION_REQUIRED final_answer.  Treat
+    those as blocked with an unknown category so downstream analysis still
+    has a consistent shape.
+    """
+    final_lower = output.final_answer.strip().lower()
+    looks_blocked = final_lower.startswith("execution_required") or any(
+        phrase in final_lower
+        for phrase in (
+            "required file",
+            "not found",
+            "could not",
+            "unable to",
+            "cannot proceed",
+            "execution failed",
+        )
+    )
+    status = output.answer_status
+    blocker_type = output.blocker_type
+    if status == "answered" and looks_blocked:
+        status = "blocked"
+        blocker_type = "unknown" if blocker_type == "none" else blocker_type
+
+    explanation = output.blocker_explanation
+    if status == "blocked" and not explanation:
+        explanation = output.final_answer
+
+    return {
+        "answer_status": status,
+        "blocker_type": blocker_type if status == "blocked" else "none",
+        "blocker_explanation": explanation if status == "blocked" else None,
+        "blocker_evidence": output.blocker_evidence if status == "blocked" else [],
+    }
+
+
 def _build_record(
     entry_id: str,
     biorxiv_url: str,
@@ -104,6 +151,8 @@ def _build_record(
     pre_estimate: int,
     result,
     capture: ToolOutputCapture,
+    critic_reviews: list | None = None,
+    install_events: list | None = None,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
 
@@ -117,13 +166,15 @@ def _build_record(
     chain_steps = []
     for i, s in enumerate(output.chain):
         real_obs = capture.outputs[i] if i < len(capture.outputs) else s.observation
-        chain_steps.append({
-            "step": s.step,
-            "thought": s.thought,
-            "action": s.action,
-            "observation": real_obs,
-            "reflection": s.reflection,
-        })
+        chain_steps.append(
+            {
+                "step": s.step,
+                "thought": s.thought,
+                "action": s.action,
+                "observation": real_obs,
+                "reflection": s.reflection,
+            }
+        )
 
     return {
         "id": entry_id,
@@ -132,14 +183,36 @@ def _build_record(
         "ground_truth": ground_truth,
         "chain": chain_steps,
         "final_answer": output.final_answer,
+        "failure_analysis": _failure_analysis(output),
         "correct": correct,
+        "critic_reviews": [
+            review.model_dump() if hasattr(review, "model_dump") else review
+            for review in critic_reviews or []
+        ],
+        "install_events": [
+            {
+                "attempt": event.attempt,
+                "modules": event.modules,
+                "packages": event.packages,
+                "command": event.command,
+                "exit_code": event.exit_code,
+                "output": event.output,
+                "succeeded": event.succeeded,
+            }
+            for event in install_events or []
+        ],
         "token_usage": {
             "pre_run_estimate": pre_estimate,
-            "input_tokens":     result.usage.input_tokens,
-            "output_tokens":    result.usage.output_tokens,
-            "total_tokens":     result.usage.input_tokens + result.usage.output_tokens,
+            "input_tokens": result.context_wrapper.usage.input_tokens,
+            "output_tokens": result.context_wrapper.usage.output_tokens,
+            "total_tokens": (
+                result.context_wrapper.usage.input_tokens
+                + result.context_wrapper.usage.output_tokens
+            ),
             "estimated_cost_usd": calculate_cost(
-            result.usage.input_tokens, result.usage.output_tokens, model
+                result.context_wrapper.usage.input_tokens,
+                result.context_wrapper.usage.output_tokens,
+                model,
             ),
         },
     }
@@ -153,6 +226,7 @@ def run_react_query(
     biorxiv_url: str,
     ground_truth: str,
     output_path: Path | None = None,
+    use_critic: bool = True,
 ) -> dict:
     """Run the ReAct agent and return the output record as a dict.
 
@@ -171,10 +245,28 @@ def run_react_query(
 
     pre_estimate = estimate_tokens(REACT_INSTRUCTIONS, question, model)
     print(f"Pre-run token estimate (tiktoken): ~{pre_estimate:,}")
+    print(f"Critic enabled: {use_critic}")
     print("-" * 60)
     try:
-        capture = ToolOutputCapture()
-        result = Runner.run_sync(agent, question, context=context, max_turns=150, hooks=capture)
+        if use_critic:
+            team_result = run_with_critic(
+                context=context,
+                question=question,
+                ground_truth=ground_truth,
+                entry_id=entry_id,
+                worker_model=model,
+            )
+            result = team_result.worker_result
+            output = team_result.answer
+            capture = team_result.final_capture
+            critic_reviews = team_result.reviews
+            install_events = team_result.install_events
+        else:
+            capture = ToolOutputCapture()
+            result = Runner.run_sync(agent, question, context=context, max_turns=150, hooks=capture)
+            output = result.final_output
+            critic_reviews = []
+            install_events = []
     except MaxTurnsExceeded:
         print(
             "\nError: Agent did not finish within 150 turns. "
@@ -182,30 +274,63 @@ def run_react_query(
             file=sys.stderr,
         )
         sys.exit(1)
+    except ModelRefusalError as exc:
+        print(
+            f"\nError: Model refused to answer the question: {exc}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
-    output = result.final_output
-    
     # --- Token usage ---
-    usage = result.usage
-    print(f"\nToken usage:")
+    usage = result.context_wrapper.usage
+    print("\nToken usage:")
     print(f"  Input tokens:  {usage.input_tokens}")
     print(f"  Output tokens: {usage.output_tokens}")
     print(f"  Total tokens:  {usage.input_tokens + usage.output_tokens}")
-    record = _build_record(entry_id, biorxiv_url, question, ground_truth, output=output, model=model, pre_estimate=pre_estimate, result=result, capture=capture)
-    
+    record = _build_record(
+        entry_id,
+        biorxiv_url,
+        question,
+        ground_truth,
+        output=output,
+        model=model,
+        pre_estimate=pre_estimate,
+        result=result,
+        capture=capture,
+        critic_reviews=critic_reviews,
+        install_events=install_events,
+    )
+
     # --- Print chain to stdout ---
     print(f"\nReAct Chain ({len(output.chain)} steps):")
-    for step in output.chain:
-        obs_preview = step.observation
+    for step in record["chain"]:
+        obs_preview = step["observation"]
         if len(obs_preview) > 200:
             obs_preview = obs_preview[:200] + "…"
-        print(f"\n[Step {step.step}]")
-        print(f"  Thought:     {step.thought}")
-        print(f"  Action:      {step.action}")
+        print(f"\n[Step {step['step']}]")
+        print(f"  Thought:     {step['thought']}")
+        print(f"  Action:      {step['action']}")
         print(f"  Observation: {obs_preview}")
-        print(f"  Reflection:  {step.reflection}")
+        print(f"  Reflection:  {step['reflection']}")
+
+    if critic_reviews:
+        print(f"\nCritic reviews ({len(critic_reviews)}):")
+        for review in critic_reviews:
+            print(f"  Verdict: {review.verdict}")
+            print(f"  Reasoning: {review.reasoning}")
+
+    if install_events:
+        print(f"\nDependency installs ({len(install_events)}):")
+        for event in install_events:
+            status = "ok" if event.succeeded else "failed"
+            print(f"  Attempt {event.attempt}: {event.packages} [{status}]")
 
     print(f"\nFinal Answer: {output.final_answer}")
+    failure = record["failure_analysis"]
+    if failure["answer_status"] == "blocked":
+        print(f"Blocked:      {failure['blocker_type']}")
+        if failure["blocker_explanation"]:
+            print(f"Why:          {failure['blocker_explanation']}")
     if ground_truth:
         print(f"Ground Truth: {ground_truth}")
         print(f"Correct:      {record['correct']}")
@@ -222,13 +347,13 @@ def run_react_query(
         question=question,
         model=model,
         pre_estimate=pre_estimate,
-        input_tokens=result.usage.input_tokens,
-        output_tokens=result.usage.output_tokens,
+        input_tokens=result.context_wrapper.usage.input_tokens,
+        output_tokens=result.context_wrapper.usage.output_tokens,
     )
     print_token_report(
         pre_estimate,
-        result.usage.input_tokens,
-        result.usage.output_tokens,
+        result.context_wrapper.usage.input_tokens,
+        result.context_wrapper.usage.output_tokens,
         model,
         project_dir=context.project_dir,
     )
@@ -272,6 +397,19 @@ Examples:
         metavar="URL",
         help="BioRxiv URL stored in repo_link (single mode only)",
     )
+    parser.add_argument(
+        "--use-critic",
+        dest="use_critic",
+        action="store_true",
+        default=True,
+        help="Run worker + critic orchestration (default).",
+    )
+    parser.add_argument(
+        "--no-critic",
+        dest="use_critic",
+        action="store_false",
+        help="Run the legacy single-agent ReAct path without critic retry.",
+    )
 
     # --- single mode ---
     single = parser.add_argument_group("single question")
@@ -313,10 +451,10 @@ Examples:
         ]
 
     total = len(entries)
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Project:   {args.project}")
     print(f"Questions: {total}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     saved = []
 
@@ -325,9 +463,9 @@ Examples:
         question = entry["question"]
         ground_truth = entry.get("ground_truth", "")
 
-        print(f"\n[{i}/{total}] ID={entry_id} — fresh run")
+        print(f"\n[{i}/{total}] ID={entry_id} — fresh workspace")
 
-        # Fresh context per question: own workspace, own venv, no bleed-over.
+        # Fresh workspace per question; the paper-level venv is reused.
         try:
             context = resolve_project(args.project)
         except ValueError as exc:
@@ -341,14 +479,15 @@ Examples:
             entry_id=entry_id,
             biorxiv_url=args.biorxiv_url,
             ground_truth=ground_truth,
+            use_critic=args.use_critic,
         )
         saved.append(context.run_dir / f"{entry_id}.json")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("All chains saved:")
     for path in saved:
         print(f"  {path}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
 
 if __name__ == "__main__":

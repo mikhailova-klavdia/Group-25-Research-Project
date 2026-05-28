@@ -1,11 +1,15 @@
 # Tools for writing files and executing commands.
 #
-# Five tools are exposed to the agent:
-#   write_file           — create or overwrite a file in workspace/
-#   stage_repo_path      — copy a repo file or directory into workspace/
-#   execute_command      — run a shell command in workspace/
-#   list_workspace_files — see what files exist in workspace/
-#   read_workspace_file  — read a file the agent produced in workspace/
+# Nine tools are exposed to the agent:
+#   write_file             — create or overwrite a file in workspace/
+#   stage_repo_path        — copy a repo file or directory into workspace/
+#   execute_command        — run a shell command in workspace/
+#   list_workspace_files   — see what files exist in workspace/
+#   read_workspace_file    — read a file the agent produced in workspace/
+#   list_paper_artifacts   — see reusable files cached for this paper
+#   stage_paper_artifact   — copy a cached artifact into workspace/
+#   cache_workspace_artifact — save reusable workspace output for later runs
+#   venv_status            — inspect the shared per-paper venv before installs
 #
 # New files are always written to workspace/. Commands always run from the
 # current run workspace, never from the shared repo. The shared repo stays
@@ -20,7 +24,7 @@ from pathlib import Path
 
 from agents import RunContextWrapper, function_tool
 
-from research_agents.project import ResearchContext
+from research_agents.project import ResearchContext, _find_python_in_venv, _venv_bin_name
 from research_agents.tools.repo_tools import IGNORED_DIRS
 
 # Cap for `write_file`.  Paper-reproducing helpers are usually small
@@ -42,11 +46,11 @@ MAX_READ_BYTES = 200_000  # truncate workspace file reads beyond this
 # still catching runaway commands quickly during development.
 DEFAULT_TIMEOUT = 120
 
-# Hard upper bound on timeout the agent can request.  The Runner itself
-# has a turn limit and the benchmark harness expects bounded wall-clock
-# per run; 600 s is a generous ceiling for training loops or downloads
-# without allowing a single command to dominate the overall run time.
-MAX_TIMEOUT = 600
+# Hard upper bound on timeout the agent can request.  Dependency installs
+# for torch/ESM-style research stacks can take 3-15 minutes on a cold
+# cache, so the ceiling is one hour while the default stays short for
+# ordinary commands.
+MAX_TIMEOUT = 3600
 
 # Matches repo_tools.MAX_LISTED_FILES; see that comment for rationale.
 MAX_LISTED_FILES = 400
@@ -105,14 +109,17 @@ def stage_repo_path_text(
     except ValueError as exc:
         raise ValueError("Requested source path is outside the repo/ directory") from exc
 
-    if not source.exists(): # more detailed error to warning agent to not hallucinate paths
-          filename = Path(relative_path).name
-          return (
-              f"ERROR: '{relative_path}' does not exist in the repo. "
-              f"Do NOT proceed with staging. "
-              f"Call search_repo('{filename}') to find if this file exists "
-              f"at a different path, then stage the correct path instead."
-          )
+    if not source.exists():
+        # The detailed error is model-facing: it nudges the agent to search
+        # instead of hallucinating a path after a failed stage attempt.
+        filename = Path(relative_path).name
+        return (
+            f"ERROR: '{relative_path}' does not exist in the repo. "
+            f"Do NOT proceed with staging. "
+            f"Call resolve_repo_path('{relative_path}') or find_repo_files('{filename}') "
+            f"to find if this file exists at a different path, then stage "
+            f"the correct path instead."
+        )
     if any(part in IGNORED_DIRS for part in source.relative_to(repo_root).parts):
         raise ValueError(f"Requested source path is not available for staging: {relative_path}")
 
@@ -147,6 +154,37 @@ def stage_repo_path_text(
     return f"Staged {copied_kind} {relative_path} into workspace/{relative_destination}"
 
 
+def _resolve_relative_root(root: Path, relative_path: str, root_label: str) -> Path:
+    """Resolve a relative path under root and reject traversal/absolute paths."""
+    candidate = Path(relative_path)
+    if candidate.is_absolute():
+        raise ValueError(f"relative_path must be relative to the {root_label}/ directory")
+
+    resolved = (root / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(f"Requested path is outside the {root_label}/ directory") from exc
+    return resolved
+
+
+def _copy_file_or_directory(source: Path, destination: Path) -> str:
+    """Copy source to destination and return whether it was a file or directory."""
+    if source.is_dir():
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(
+            source,
+            destination,
+            dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns(*IGNORED_DIRS),
+        )
+        return "directory"
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, destination)
+    return "file"
+
+
 def execute_command_text(
     workspace_path: str | Path,
     command: str,
@@ -156,8 +194,8 @@ def execute_command_text(
 ) -> str:
     """Run a shell command with cwd set to the given directory.
 
-    If venv_path is provided, its bin/ directory is prepended to PATH
-    so that python/pip resolve to the isolated venv.
+    If venv_path is provided, its platform-specific scripts directory is
+    prepended to PATH so that python/pip resolve to the isolated venv.
     """
     root = Path(workspace_path).resolve()
     if not root.is_dir():
@@ -175,7 +213,7 @@ def execute_command_text(
     # VIRTUAL_ENV is also set for packaging tools that check for it (uv,
     # pip itself) to recognise the activated env.
     if venv_path is not None:
-        venv_bin = str(Path(venv_path).resolve() / "bin")
+        venv_bin = str(Path(venv_path).resolve() / _venv_bin_name())
         env["PATH"] = venv_bin + os.pathsep + env.get("PATH", "")
         env["VIRTUAL_ENV"] = str(Path(venv_path).resolve())
     # env_vars carries the RESEARCH_* locators plus a PYTHONPATH that
@@ -286,6 +324,113 @@ def list_workspace_files_text(workspace_path: str | Path) -> str:
     return "\n".join(lines)
 
 
+def list_paper_artifacts_text(artifacts_path: str | Path) -> str:
+    """List reusable paper-level artifacts available to this run.
+
+    The artifact cache intentionally includes binary and large files,
+    because its main purpose is to persist weights, pickles, arrays, and
+    similar assets across per-question workspaces.
+    """
+    root = Path(artifacts_path).resolve()
+    if not root.is_dir():
+        return f"Paper artifact directory does not exist: {artifacts_path}"
+
+    files = []
+    omitted = 0
+    for current_root, dirnames, filenames in root.walk():
+        dirnames[:] = [d for d in dirnames if not d.startswith(".") and d not in IGNORED_DIRS]
+        current_path = Path(current_root)
+        for filename in sorted(filenames):
+            if filename.startswith("."):
+                continue
+            path = current_path / filename
+            relative = path.relative_to(root).as_posix()
+            size = path.stat().st_size
+            line = f"{relative} ({size} bytes)"
+            if len(files) >= MAX_LISTED_FILES:
+                omitted += 1
+                continue
+            files.append(line)
+
+    if not files:
+        return "Paper artifact cache is empty."
+
+    lines = ["Paper artifacts:"]
+    lines.extend(files)
+    if omitted:
+        lines.append(f"... {omitted} additional files omitted")
+    return "\n".join(lines)
+
+
+def stage_paper_artifact_text(
+    artifacts_path: str | Path,
+    workspace_path: str | Path,
+    relative_path: str,
+    destination_path: str | None = None,
+) -> str:
+    """Copy a reusable paper artifact into the current workspace."""
+    artifacts_root = Path(artifacts_path).resolve()
+    workspace_root = Path(workspace_path).resolve()
+    if not artifacts_root.is_dir():
+        raise ValueError(f"Paper artifact directory does not exist: {artifacts_path}")
+    if not workspace_root.is_dir():
+        raise ValueError(f"Workspace directory does not exist: {workspace_path}")
+
+    source = _resolve_relative_root(artifacts_root, relative_path, ".artifacts")
+    if not source.exists():
+        return (
+            f"ERROR: artifact '{relative_path}' does not exist. Call list_paper_artifacts() first."
+        )
+
+    if destination_path is None:
+        destination_candidate = Path(relative_path)
+    else:
+        destination_candidate = Path(destination_path)
+        if destination_candidate.is_absolute():
+            raise ValueError("destination_path must be relative to the workspace/ directory")
+    destination = _resolve_relative_root(
+        workspace_root, destination_candidate.as_posix(), "workspace"
+    )
+
+    copied_kind = _copy_file_or_directory(source, destination)
+    relative_destination = destination.relative_to(workspace_root).as_posix()
+    return f"Staged artifact {copied_kind} {relative_path} into workspace/{relative_destination}"
+
+
+def cache_workspace_artifact_text(
+    workspace_path: str | Path,
+    artifacts_path: str | Path,
+    relative_path: str,
+    destination_path: str | None = None,
+) -> str:
+    """Copy a reusable workspace output into the paper-level artifact cache."""
+    workspace_root = Path(workspace_path).resolve()
+    artifacts_root = Path(artifacts_path).resolve()
+    if not workspace_root.is_dir():
+        raise ValueError(f"Workspace directory does not exist: {workspace_path}")
+    artifacts_root.mkdir(parents=True, exist_ok=True)
+
+    source = _resolve_relative_root(workspace_root, relative_path, "workspace")
+    if not source.exists():
+        return f"ERROR: workspace path '{relative_path}' does not exist. Call list_workspace_files() first."
+
+    if destination_path is None:
+        destination_candidate = Path(relative_path)
+    else:
+        destination_candidate = Path(destination_path)
+        if destination_candidate.is_absolute():
+            raise ValueError("destination_path must be relative to the .artifacts/ directory")
+    destination = _resolve_relative_root(
+        artifacts_root,
+        destination_candidate.as_posix(),
+        ".artifacts",
+    )
+
+    copied_kind = _copy_file_or_directory(source, destination)
+    relative_destination = destination.relative_to(artifacts_root).as_posix()
+    return f"Cached workspace {copied_kind} {relative_path} into .artifacts/{relative_destination}"
+
+
 def read_workspace_file_text(workspace_path: str | Path, relative_path: str) -> str:
     """Read a file from the workspace directory."""
     root = Path(workspace_path).resolve()
@@ -314,6 +459,62 @@ def read_workspace_file_text(workspace_path: str | Path, relative_path: str) -> 
         content = content[:MAX_READ_BYTES] + f"\n[truncated at {MAX_READ_BYTES} bytes]"
 
     return f"Contents of workspace/{relative_path}:\n{content}"
+
+
+def venv_status_text(venv_path: str | Path) -> str:
+    """Summarise the shared per-paper venv for dependency planning.
+
+    The ReAct worker calls this before installing packages so it can
+    reuse already-installed dependencies across questions for the same
+    paper.  Output is intentionally compact: Python version, disk free
+    space, and a capped freeze-style package list.
+    """
+    root = Path(venv_path).resolve()
+    python_exe = _find_python_in_venv(root)
+    if python_exe is None:
+        return f"Venv does not exist or has no Python interpreter: {root}"
+
+    try:
+        version = subprocess.run(
+            [str(python_exe), "--version"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        python_version = (version.stdout or version.stderr).strip() or "unknown"
+    except (OSError, subprocess.TimeoutExpired):
+        python_version = "unknown"
+
+    try:
+        packages = subprocess.run(
+            [str(python_exe), "-m", "pip", "list", "--format=freeze"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        package_lines = sorted(line for line in packages.stdout.splitlines() if line.strip())
+    except (OSError, subprocess.TimeoutExpired):
+        package_lines = []
+
+    disk_root = root if root.exists() else root.parent
+    usage = shutil.disk_usage(disk_root)
+    free_gib = usage.free / (1024**3)
+
+    lines = [
+        f"Venv path: {root}",
+        f"Python: {python_version}",
+        f"Free disk: {free_gib:.1f} GiB",
+        f"Installed packages: {len(package_lines)}",
+    ]
+    if package_lines:
+        shown = package_lines[:120]
+        lines.extend(shown)
+        omitted = len(package_lines) - len(shown)
+        if omitted > 0:
+            lines.append(f"... {omitted} additional packages omitted")
+    return "\n".join(lines)
 
 
 # --- SDK tool wrappers ---
@@ -365,7 +566,7 @@ def execute_command(
 
     Args:
         command: The shell command to run (e.g. "python run_experiment.py").
-        timeout: Max seconds to wait (default 120, max 600).
+        timeout: Max seconds to wait (default 120, max 3600).
     """
     repo_path = context.context.repo_path.resolve()
     # Expose the key paths as RESEARCH_* env vars so commands the agent
@@ -378,6 +579,7 @@ def execute_command(
         "RESEARCH_PAPER_PATH": str(context.context.paper_path.resolve()),
         "RESEARCH_RUN_PATH": str(context.context.run_dir.resolve()),
         "RESEARCH_WORKSPACE_PATH": str(context.context.workspace_path.resolve()),
+        "RESEARCH_ARTIFACTS_PATH": str(context.context.artifacts_path.resolve()),
     }
 
     # Prepend the repo root to PYTHONPATH so `import <repo-package>` works
@@ -416,3 +618,55 @@ def read_workspace_file(
         relative_path: Path relative to workspace/ (e.g. "results/output.csv").
     """
     return read_workspace_file_text(context.context.workspace_path, relative_path)
+
+
+@function_tool
+def list_paper_artifacts(context: RunContextWrapper[ResearchContext]) -> str:
+    """List reusable paper-level artifacts cached across question runs."""
+    return list_paper_artifacts_text(context.context.artifacts_path)
+
+
+@function_tool
+def stage_paper_artifact(
+    context: RunContextWrapper[ResearchContext],
+    relative_path: str,
+    destination_path: str | None = None,
+) -> str:
+    """Copy a cached paper artifact into the current run workspace.
+
+    Args:
+        relative_path: Path relative to .artifacts/.
+        destination_path: Optional path relative to workspace/.
+    """
+    return stage_paper_artifact_text(
+        context.context.artifacts_path,
+        context.context.workspace_path,
+        relative_path,
+        destination_path,
+    )
+
+
+@function_tool
+def cache_workspace_artifact(
+    context: RunContextWrapper[ResearchContext],
+    relative_path: str,
+    destination_path: str | None = None,
+) -> str:
+    """Save a reusable workspace output into the paper artifact cache.
+
+    Args:
+        relative_path: Path relative to workspace/.
+        destination_path: Optional path relative to .artifacts/.
+    """
+    return cache_workspace_artifact_text(
+        context.context.workspace_path,
+        context.context.artifacts_path,
+        relative_path,
+        destination_path,
+    )
+
+
+@function_tool
+def venv_status(context: RunContextWrapper[ResearchContext]) -> str:
+    """Inspect the shared per-paper venv before installing dependencies."""
+    return venv_status_text(context.context.venv_path)

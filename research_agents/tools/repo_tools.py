@@ -1,9 +1,11 @@
 # Read-only tools for inspecting a local repository.
 #
-# Three tools are exposed to the agent:
-#   list_repo_files  — see what files exist
-#   search_repo      — grep for a term across readable files
-#   read_repo_file   — read a single file by relative path
+# Five tools are exposed to the agent:
+#   list_repo_files    — see readable text files
+#   find_repo_files    — search filenames, including binary/large artifacts
+#   resolve_repo_path  — map question paths to real repo paths/candidates
+#   search_repo        — grep for a term across readable files
+#   read_repo_file     — read a single file by relative path
 #
 # All tools get the repo path from the SDK context, so the LLM
 # only ever works with relative paths inside repo/.
@@ -86,6 +88,11 @@ MAX_LISTED_FILES = 400
 # 50 and instruct the agent to refine the query when it hits the ceiling.
 MAX_MATCHES = 50
 
+# Upper bound for filename/artifact searches.  This can be slightly larger
+# than content grep because one filename line is cheap, but still bounded so
+# checkpoint-heavy or generated-output-heavy repos do not drown the worker.
+MAX_FILE_MATCHES = 100
+
 # Preview trimmed per matching line.  240 chars fits most single-line code
 # or prose matches without forcing the reader to scroll horizontally and
 # without swamping the result list.
@@ -154,6 +161,68 @@ def _iter_repo_files(root: Path):
             yield path
 
 
+def _iter_repo_paths(root: Path):
+    """Walk repo files, including binary and large artifacts.
+
+    `list_repo_files` and `search_repo` intentionally hide large/binary
+    files because the worker cannot read them as text.  Filename discovery
+    has the opposite goal: surface weights, pickles, spreadsheets, FASTA,
+    and generated arrays so the worker can stage or execute against them.
+    """
+    for current_root, dirnames, filenames in root.walk():
+        dirnames[:] = [dirname for dirname in dirnames if dirname not in IGNORED_DIRS]
+
+        current_path = Path(current_root)
+        for filename in sorted(filenames):
+            if filename == ".DS_Store":
+                continue
+            yield current_path / filename
+
+
+def _format_size(num_bytes: int) -> str:
+    """Return a compact human-readable byte size for artifact listings."""
+    units = ["B", "KB", "MB", "GB"]
+    size = float(num_bytes)
+    for unit in units:
+        if size < 1024 or unit == units[-1]:
+            return f"{size:.1f} {unit}" if unit != "B" else f"{int(size)} B"
+        size /= 1024
+    return f"{num_bytes} B"
+
+
+def _artifact_line(root: Path, path: Path) -> str:
+    """Format one repo artifact candidate with size and readability hints."""
+    relative = path.relative_to(root).as_posix()
+    try:
+        size = path.stat().st_size
+    except OSError:
+        size = 0
+    try:
+        readable_text = _is_text_file(path) and size <= MAX_FILE_BYTES
+    except ValueError:
+        readable_text = False
+    kind = "text" if readable_text else "artifact"
+    return f"{relative} [{kind}, {_format_size(size)}]"
+
+
+def _path_exists_inside(root: Path, relative_path: str) -> Path | None:
+    """Return a resolved repo path if relative_path exists inside root."""
+    candidate = Path(relative_path)
+    if candidate.is_absolute():
+        return None
+    resolved = (root / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        return None
+    return resolved if resolved.exists() else None
+
+
+def _normalise_question_path(question_path: str) -> str:
+    """Clean common quoting and separator noise from a path in a prompt."""
+    return question_path.strip().strip("\"'`").replace("\\", "/").strip("/")
+
+
 # --- Pure functions (used directly by tests) ---
 
 
@@ -216,6 +285,116 @@ def search_repo_text(repo_path: str | Path, query: str) -> str:
     return "\n".join([f"Search results for {query!r} under {root}:", *matches])
 
 
+def find_repo_files_text(
+    repo_path: str | Path,
+    pattern: str,
+    include_binary: bool = True,
+) -> str:
+    """Search repo filenames/paths, including large and binary artifacts.
+
+    This complements `search_repo_text`, which greps only readable text
+    files.  Research repos often keep the answerability-critical assets as
+    `.pth`, `.pt`, `.pkl`, `.npy`, `.xlsx`, or FASTA/TSV files; those must
+    be visible even when they are too large or binary to read directly.
+    """
+    root = _resolve_repo_root(repo_path)
+    needle = pattern.strip().lower()
+    if not needle:
+        raise ValueError("File search pattern must not be empty")
+
+    matches: list[str] = []
+    for path in _iter_repo_paths(root):
+        relative = path.relative_to(root).as_posix()
+        if needle not in relative.lower() and needle not in path.name.lower():
+            continue
+        if not include_binary:
+            try:
+                if not _is_text_file(path):
+                    continue
+            except ValueError:
+                continue
+        matches.append(_artifact_line(root, path))
+        if len(matches) >= MAX_FILE_MATCHES:
+            return "\n".join(
+                [
+                    f"Filename results for {pattern!r} under {root}:",
+                    *matches,
+                    f"... search truncated after {MAX_FILE_MATCHES} matches",
+                ]
+            )
+
+    if not matches:
+        return f"No filenames matched {pattern!r} under {root}"
+
+    return "\n".join([f"Filename results for {pattern!r} under {root}:", *matches])
+
+
+def resolve_repo_path_text(repo_path: str | Path, question_path: str) -> str:
+    """Resolve a path copied from a benchmark question to repo candidates.
+
+    Benchmark prompts often include abstract notebook paths or prefix paths
+    with the repo/package name.  This helper performs deterministic recovery
+    before the worker gives up: exact path, one-segment prefix strip,
+    basename match, and stem match.  It returns evidence, not a guess.
+    """
+    root = _resolve_repo_root(repo_path)
+    raw = _normalise_question_path(question_path)
+    if not raw:
+        raise ValueError("question_path must not be empty")
+
+    lines = [f"Resolving question path {question_path!r} under {root}:"]
+
+    exact = _path_exists_inside(root, raw)
+    if exact is not None:
+        lines.append(f"exact: {_artifact_line(root, exact)}")
+        return "\n".join(lines)
+
+    parts = Path(raw).parts
+    stripped = "/".join(parts[1:]) if len(parts) > 1 else ""
+    if stripped:
+        stripped_match = _path_exists_inside(root, stripped)
+        if stripped_match is not None:
+            lines.append(f"prefix-stripped: {_artifact_line(root, stripped_match)}")
+            return "\n".join(lines)
+
+    basename = Path(raw).name
+    stem = Path(raw).stem
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    for path in _iter_repo_paths(root):
+        relative = path.relative_to(root).as_posix()
+        if path.name == basename:
+            seen.add(relative)
+            candidates.append(f"basename: {_artifact_line(root, path)}")
+        if len(candidates) >= MAX_FILE_MATCHES:
+            break
+
+    if not candidates and stem:
+        for path in _iter_repo_paths(root):
+            relative = path.relative_to(root).as_posix()
+            if relative in seen:
+                continue
+            if stem.lower() in path.stem.lower() or stem.lower() in path.name.lower():
+                seen.add(relative)
+                candidates.append(f"stem: {_artifact_line(root, path)}")
+            if len(candidates) >= MAX_FILE_MATCHES:
+                break
+
+    if candidates:
+        lines.extend(candidates)
+        if len(candidates) >= MAX_FILE_MATCHES:
+            lines.append(f"... candidates truncated after {MAX_FILE_MATCHES} matches")
+        return "\n".join(lines)
+
+    tried = [raw]
+    if stripped:
+        tried.append(stripped)
+    lines.append(f"No repo path resolved. Tried exact/prefix paths: {', '.join(tried)}")
+    lines.append(f"No filename or stem candidates found for basename {basename!r}.")
+    return "\n".join(lines)
+
+
 def read_repo_file_text(repo_path: str | Path, relative_path: str) -> str:
     root = _resolve_repo_root(repo_path)
     candidate = Path(relative_path)
@@ -261,6 +440,31 @@ def read_repo_file_text(repo_path: str | Path, relative_path: str) -> str:
 def list_repo_files(context: RunContextWrapper[ResearchContext]) -> str:
     """List readable text files in the local project repository."""
     return list_repo_files_text(context.context.repo_path)
+
+
+@function_tool
+def find_repo_files(
+    context: RunContextWrapper[ResearchContext],
+    pattern: str,
+    include_binary: bool = True,
+) -> str:
+    """Search repo filenames/paths, including binary and large artifacts.
+
+    Args:
+        pattern: Filename, suffix, stem, or path fragment to search for.
+        include_binary: Whether to include binary/large files in results.
+    """
+    return find_repo_files_text(context.context.repo_path, pattern, include_binary)
+
+
+@function_tool
+def resolve_repo_path(context: RunContextWrapper[ResearchContext], question_path: str) -> str:
+    """Resolve a path from the question to real repo path candidates.
+
+    Args:
+        question_path: Path string copied from the benchmark question.
+    """
+    return resolve_repo_path_text(context.context.repo_path, question_path)
 
 
 @function_tool
