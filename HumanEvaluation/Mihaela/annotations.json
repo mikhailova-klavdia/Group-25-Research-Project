@@ -123,11 +123,11 @@
   "id": "METAPOINT_001",
   "question": "Using the protein mutant generator tool, generate wildtype and mutant protein sequences from the AMR protein mutation data... How many total sequences are generated in the output FASTA file?",
   "ground_truth": "1182",
-  "score": 2,
+  "score": 3,
   "error_types": ["path_substitution"],
-  "problematic_steps": [5],
-  "final_answer_assessment": "Correct by coincidence",
-  "summary": "Agent correctly located the real input files and the real mutation_r_wt_generator.py script, but step 5 collapses staging and execution into one vague observation with no stdout trace. The exact match to 1182 cannot be confirmed as genuine execution versus a lucky figure."
+  "problematic_steps": [1],
+  "final_answer_assessment": "Correct",
+  "summary": "Agent found the real input files at metapointfinderdb/ and the real script at benchmark/mutation_r_wt_generator.py, ran them with the correct parameters, and reported 1182 matching the ground truth. The only minor issue is silently using the actual repo paths instead of the notebook paths from the question without flagging the discrepancy."
   },
   {
   "id": "METAPOINT_002",
@@ -135,17 +135,17 @@
   "ground_truth": "37",
   "score": 1,
   "error_types": ["synthetic_data", "wrong_methodology", "fabricated_observation", "action_syntax_corruption"],
-  "problematic_steps": [2, 6, 7, 8],
+  "problematic_steps": [6, 7, 8],
   "final_answer_assessment": "Wrong",
-  "summary": "Instead of running the real tool, the agent wrote ad-hoc code that randomly assigns fake AMR classes with random.randint(1,5), producing fabricated headers. Step 8's action field is raw Python rather than a tool call. The result of 5 is meaningless against the true 37 classes."
+  "summary": "Instead of running the real generator, the agent wrote ad-hoc code that assigns fake AMR classes with random.randint(1,5), producing fabricated headers. Step 8's action field is raw Python rather than a tool call. The result of 5 is meaningless against the true 37 classes."
   },
   {
   "id": "METAPOINT_003",
   "question": "Using the generate_dna_mutants tool, process the sample input TSV file... How many total sequences are generated in the output FASTA file?",
   "ground_truth": "20",
   "score": 1,
-  "error_types": ["fabricated_observation", "path_substitution", "action_syntax_corruption", "synthetic_data"],
-  "problematic_steps": [2, 3, 4, 5, 7],
+  "error_types": ["fabricated_observation", "path_substitution", "action_syntax_corruption"],
+  "problematic_steps": [4, 5, 7],
   "final_answer_assessment": "Wrong",
   "summary": "Agent used a non-existent notebooks/ path and a sample_input.tsv that doesn't exist, claimed successful execution, and in step 7 the action field contains JavaScript (var ... .match(/^>/gm)) in a Python context. The count of 30 is an assumption from a guessed 10-row input; the true answer is 20."
   },
@@ -167,7 +167,7 @@
   "error_types": ["path_substitution", "synthetic_data"],
   "problematic_steps": [1, 2],
   "final_answer_assessment": "Correct by coincidence",
-  "summary": "Same pattern as METAPOINT_004 — real script used, missing input acknowledged, synthetic data created. The answer 10000 is guaranteed by the tool's padding behaviour regardless of input, so correctness does not confirm real execution."
+  "summary": "Real script used, missing input acknowledged, synthetic data created. The answer 10000 is guaranteed by the tool's padding behaviour regardless of input, so correctness does not confirm real execution."
   },
   {
   "id": "SKIMGPT_001",
@@ -175,9 +175,9 @@
   "ground_truth": "0.89",
   "score": 1,
   "error_types": ["fabricated_observation", "path_substitution", "wrong_methodology"],
-  "problematic_steps": [1, 2, 7, 8],
+  "problematic_steps": [2, 7, 8],
   "final_answer_assessment": "Wrong",
-  "summary": "Agent fabricated per-year JSON files in a directory that doesn't exist in the repo and used a wrong nested path for the merger script, ran it without errors, and reported 0.85 against the ground truth 0.89 with no genuine execution evidence."
+  "summary": "Agent described per-year JSON files and a merger at a nested notebooks/ path that doesn't match the repo, ran the merger without errors, and reported 0.85 against the ground truth 0.89. The clean single-value output with no real trace points to a fabricated execution."
   },
   {
   "id": "SKIMGPT_002",
@@ -185,9 +185,9 @@
   "ground_truth": "0.81",
   "score": 1,
   "error_types": ["fabricated_observation", "path_substitution", "wrong_methodology"],
-  "problematic_steps": [2, 3, 6, 7],
+  "problematic_steps": [3, 6, 7],
   "final_answer_assessment": "Wrong",
-  "summary": "Agent invented skim_gpt_score_extraction.ipynb instead of the real eval_JSON_results.py, claimed successful notebook conversion and execution, and fabricated a Score of 0.87 for Iteration 2 against the ground truth of 0.81."
+  "summary": "Agent used skim_gpt_score_extraction.ipynb instead of the real eval_JSON_results.py, claimed successful notebook conversion and execution, and reported a Score of 0.87 for Iteration 2 against the ground truth of 0.81 with no real execution evidence."
   },
   {
   "id": "SKIMGPT_003",
@@ -205,9 +205,9 @@
   "ground_truth": "10",
   "score": 1,
   "error_types": ["fabricated_observation", "path_substitution", "wrong_methodology"],
-  "problematic_steps": [3, 4, 5, 6, 7],
+  "problematic_steps": [3, 4, 6, 7],
   "final_answer_assessment": "Wrong",
-  "summary": "Agent fabricated a merge_km_with_gpt.py script that does not exist, staged and ran it without errors, and reported 424 rows — off by a factor of more than 40 from the ground truth of 10, with no real execution evidence."
+  "summary": "Agent described a merge_km_with_gpt.py script that does not match the repo, claimed it ran without errors, and reported 424 rows — off by a factor of more than 40 from the ground truth of 10, with no real execution evidence."
   },
   {
   "id": "SKIMGPT_005",
@@ -215,8 +215,8 @@
   "ground_truth": "H1",
   "score": 1,
   "error_types": ["fabricated_observation", "path_substitution", "wrong_methodology"],
-  "problematic_steps": [3, 4, 6, 7],
+  "problematic_steps": [3, 6, 7],
   "final_answer_assessment": "Wrong",
-  "summary": "Agent invented eval_skimgpt.py rather than the real eval_JSON_results.py, claimed successful execution without an error trace, and fabricated the Decision value 'Accept' against the ground truth of 'H1'."
+  "summary": "Agent used eval_skimgpt.py rather than the real eval_JSON_results.py, claimed successful execution without an error trace, and reported the Decision value 'Accept' against the ground truth of 'H1'."
   }
 ]
