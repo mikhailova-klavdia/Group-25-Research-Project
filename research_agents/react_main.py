@@ -28,13 +28,13 @@ import json
 import sys
 from pathlib import Path
 
-from agents import Runner
 from agents.exceptions import MaxTurnsExceeded, ModelRefusalError
 
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
-from research_agents.agents.react_agent import REACT_INSTRUCTIONS, ReActAnswer, create_react_agent
-from research_agents.orchestration import ToolOutputCapture, run_with_critic
+from research_agents.agents.react_agent import REACT_INSTRUCTIONS, ReActAnswer
+from research_agents.orchestration import ToolOutputCapture
 from research_agents.project import ResearchContext, resolve_project
+from research_agents.teams import DEFAULT_TEAM, TEAMS, TeamSpec
 from research_agents.token_utils import (
     append_cost_log,
     calculate_cost,
@@ -151,6 +151,7 @@ def _build_record(
     pre_estimate: int,
     result,
     capture: ToolOutputCapture,
+    team_name: str,
     critic_reviews: list | None = None,
     install_events: list | None = None,
 ) -> dict:
@@ -176,8 +177,12 @@ def _build_record(
             }
         )
 
+    # ``team`` lives at the top of the record so a comparison script can
+    # bucket chains by team without parsing internals.  Schema version is
+    # incremented when downstream tools need to detect new chain fields.
     return {
         "id": entry_id,
+        "team": team_name,
         "repo_link": biorxiv_url,
         "question": question,
         "ground_truth": ground_truth,
@@ -225,48 +230,36 @@ def run_react_query(
     entry_id: str,
     biorxiv_url: str,
     ground_truth: str,
+    team: TeamSpec,
     output_path: Path | None = None,
-    use_critic: bool = True,
 ) -> dict:
-    """Run the ReAct agent and return the output record as a dict.
+    """Run the selected agent team and return the output record as a dict.
 
     Also writes the record as JSON to output_path (default:
-    <run_dir>/react_chain.json).
+    ``<run_dir>/<entry_id>.json``).  The dispatch goes through
+    ``team.run`` so every team is invoked the same way — adding a new
+    team means registering a ``TeamSpec`` in ``research_agents.teams``,
+    not editing this function.
     """
-    agent = create_react_agent(model=model)
-
-    print(f"Running ReAct Research Assistant with {model}...")
+    print(f"Running team '{team.name}' with worker model {model}...")
     print(f"ID:           {entry_id}")
     print(f"Project:      {context.project_dir}")
     print(f"Run dir:      {context.run_dir}")
     print(f"Question:     {question}")
     print(f"Ground truth: {ground_truth or '(none)'}")
+    print(f"Team:         {team.name}  ({team.description})")
     print("-" * 60)
 
     pre_estimate = estimate_tokens(REACT_INSTRUCTIONS, question, model)
     print(f"Pre-run token estimate (tiktoken): ~{pre_estimate:,}")
-    print(f"Critic enabled: {use_critic}")
     print("-" * 60)
     try:
-        if use_critic:
-            team_result = run_with_critic(
-                context=context,
-                question=question,
-                ground_truth=ground_truth,
-                entry_id=entry_id,
-                worker_model=model,
-            )
-            result = team_result.worker_result
-            output = team_result.answer
-            capture = team_result.final_capture
-            critic_reviews = team_result.reviews
-            install_events = team_result.install_events
-        else:
-            capture = ToolOutputCapture()
-            result = Runner.run_sync(agent, question, context=context, max_turns=150, hooks=capture)
-            output = result.final_output
-            critic_reviews = []
-            install_events = []
+        team_result = team.run(context, question, ground_truth, entry_id, model)
+        result = team_result.worker_result
+        output = team_result.answer
+        capture = team_result.final_capture
+        critic_reviews = team_result.reviews
+        install_events = team_result.install_events
     except MaxTurnsExceeded:
         print(
             "\nError: Agent did not finish within 150 turns. "
@@ -297,6 +290,7 @@ def run_react_query(
         pre_estimate=pre_estimate,
         result=result,
         capture=capture,
+        team_name=team.name,
         critic_reviews=critic_reviews,
         install_events=install_events,
     )
@@ -361,23 +355,39 @@ def run_react_query(
 
 
 def main():
-    """Parse CLI arguments and run the ReAct agent (single or batch)."""
+    """Parse CLI arguments and run the ReAct agent (single or batch).
+
+    The CLI exposes the team registry via ``--team <name>`` so adding a
+    new team in ``research_agents/teams/`` immediately makes it
+    available here — this function never has to grow.
+    """
+    team_help = "Agent team to run. Choices:\n" + "\n".join(
+        f"  {spec.name:<22} {spec.description}" for spec in TEAMS.values()
+    )
+
     parser = argparse.ArgumentParser(
         description="ReAct Research Agent — Paper2AgentBench evaluation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
+        epilog=f"""
 Examples:
-  # Single question
+  # Single question, default team ({DEFAULT_TEAM})
   uv run python -m research_agents.react_main \\
       --project papers/PPLM \\
       --question "What is the AUROC for human PPI prediction?" \\
       --ground-truth "0.97" \\
       --id Q001
 
-  # Batch (questions.json = [{"id":"Q001","question":"...","ground_truth":"..."},...]
+  # Same question, the colleague's 2-agent baseline
+  uv run python -m research_agents.react_main \\
+      --project papers/PPLM --id Q001 \\
+      --question "..." --ground-truth "0.97" \\
+      --team worker-critic
+
+  # Batch with the improved variant (setup scripts + improved prompt)
   uv run python -m research_agents.react_main \\
       --project papers/PPLM \\
-      --questions-file questions.json
+      --questions-file question-answers/PPLM.json \\
+      --team worker-critic-plus
         """,
     )
     parser.add_argument(
@@ -398,17 +408,20 @@ Examples:
         help="BioRxiv URL stored in repo_link (single mode only)",
     )
     parser.add_argument(
-        "--use-critic",
-        dest="use_critic",
-        action="store_true",
-        default=True,
-        help="Run worker + critic orchestration (default).",
+        "--team",
+        default=DEFAULT_TEAM,
+        choices=list(TEAMS.keys()),
+        help=team_help,
     )
+    # Deprecated alias kept so existing scripts that pass --no-critic
+    # still resolve to the single-worker path.  Selecting --team and
+    # --no-critic together raises a clear error rather than silently
+    # picking one.
     parser.add_argument(
         "--no-critic",
-        dest="use_critic",
-        action="store_false",
-        help="Run the legacy single-agent ReAct path without critic retry.",
+        dest="no_critic",
+        action="store_true",
+        help="Deprecated alias for --team solo (kept for backward compatibility).",
     )
 
     # --- single mode ---
@@ -438,6 +451,19 @@ Examples:
     if not args.questions_file and not args.question:
         parser.error("Provide either --question (single) or --questions-file (batch).")
 
+    # Resolve --no-critic into --team selection.  Refuse to silently
+    # honor a mismatch — the user should pick one.
+    if args.no_critic:
+        if args.team != DEFAULT_TEAM and args.team != "solo":
+            parser.error("--no-critic conflicts with --team " + args.team)
+        team = TEAMS["solo"]
+        print(
+            "[warning] --no-critic is deprecated; pass --team solo instead.",
+            file=sys.stderr,
+        )
+    else:
+        team = TEAMS[args.team]
+
     # Build the list of entries to run
     if args.questions_file:
         entries = json.loads(Path(args.questions_file).read_text(encoding="utf-8"))
@@ -453,6 +479,7 @@ Examples:
     total = len(entries)
     print(f"\n{'=' * 60}")
     print(f"Project:   {args.project}")
+    print(f"Team:      {team.name}")
     print(f"Questions: {total}")
     print(f"{'=' * 60}\n")
 
@@ -466,8 +493,10 @@ Examples:
         print(f"\n[{i}/{total}] ID={entry_id} — fresh workspace")
 
         # Fresh workspace per question; the paper-level venv is reused.
+        # The team's ``apply_setup`` flag decides whether resolve_project
+        # honors the paper's ``[setup]`` table (PPLM weight download, etc.).
         try:
-            context = resolve_project(args.project)
+            context = resolve_project(args.project, apply_setup=team.apply_setup)
         except ValueError as exc:
             print(f"Error resolving project: {exc}", file=sys.stderr)
             sys.exit(1)
@@ -479,7 +508,7 @@ Examples:
             entry_id=entry_id,
             biorxiv_url=args.biorxiv_url,
             ground_truth=ground_truth,
-            use_critic=args.use_critic,
+            team=team,
         )
         saved.append(context.run_dir / f"{entry_id}.json")
 

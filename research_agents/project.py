@@ -5,12 +5,28 @@
 #   repo/      — the cloned repository for that paper
 #
 # Optionally a `.research_config.toml` at the paper root pins the Python
-# version and seed packages for the per-paper shared venv:
+# version and seed packages for the per-paper shared venv, and lists
+# one-time setup scripts / Python warmups that should run once during venv
+# creation (e.g. to fetch model weights up-front so they don't eat into
+# each question's execution budget):
 #
 #   [venv]
 #   python_version = "3.9"
 #   seed_packages = ["torch==1.13.1"]
+#
+#   [setup]
+#   # Bash scripts run once from <project_dir>/repo/ after the venv is
+#   # created, with the venv on PATH.  Use for weight downloads.
+#   download_scripts = ["weights/download.sh"]
+#   # Python one-liners run via the venv's interpreter.  Use to pre-warm
+#   # framework caches (e.g. ESM-2 pretrained weights).
+#   warmup_imports = [
+#       "from esm.pretrained import esm2_t33_650M_UR50D; esm2_t33_650M_UR50D()",
+#   ]
+#   # Seconds.  Defaults to 3600 (the same MAX_TIMEOUT as execute_command).
+#   download_timeout = 3600
 
+import os
 import subprocess
 import sys
 import tomllib
@@ -18,6 +34,13 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
+
+
+# Default cap on each setup-step subprocess.  Weight downloads are the
+# motivating use case (PPLM pulls ~hundreds of MB of Google Drive blobs
+# via gdown), and 1 hour is the same ceiling execute_command applies to
+# arbitrary agent-run commands — keeping them aligned avoids surprises.
+_DEFAULT_SETUP_TIMEOUT = 3600
 
 
 @dataclass
@@ -140,7 +163,112 @@ def _create_run_id() -> str:
     return f"{timestamp}-{uuid4().hex[:8]}"
 
 
-def _ensure_venv(venv_path: Path, config: dict | None = None) -> None:
+def _run_setup_scripts(venv_path: Path, repo_path: Path | None, config: dict | None) -> None:
+    """Run one-time setup commands after a venv is freshly created.
+
+    The ``[setup]`` table of ``.research_config.toml`` exposes two lists:
+
+      * ``download_scripts`` — relative paths (relative to ``repo_path``)
+        to bash scripts that fetch model weights or other heavyweight
+        artifacts.  We invoke ``bash <script>`` from ``cwd=repo_path``
+        with the venv's binary directory prepended to ``PATH`` and
+        ``VIRTUAL_ENV`` set, so the script can ``pip install gdown`` /
+        ``python -m gdown ...`` without first finding the venv itself.
+      * ``warmup_imports`` — Python one-liners run via the venv's
+        interpreter to pre-populate caches (e.g. ``fair-esm`` downloads
+        ESM-2 weights on first call, and we'd rather pay that cost once
+        at setup time than once per question).
+
+    Failures are deliberately non-fatal: a flaky download or a missing
+    optional script must not brick the entire eval.  We print a clear
+    warning to stderr so the operator can investigate, and the per-
+    question loop's own retry logic still has a chance to recover.
+
+    ``repo_path`` may be ``None`` when the helper is called outside the
+    full ``resolve_project`` flow (e.g. some unit tests).  In that case
+    ``download_scripts`` is skipped because their interpretation depends
+    on the repo root.
+    """
+    config = config or {}
+    setup_cfg = config.get("setup", {}) or {}
+    download_scripts: list[str] = list(setup_cfg.get("download_scripts", []))
+    warmup_imports: list[str] = list(setup_cfg.get("warmup_imports", []))
+    timeout = int(setup_cfg.get("download_timeout", _DEFAULT_SETUP_TIMEOUT))
+
+    if not download_scripts and not warmup_imports:
+        return
+
+    # Compose the env the subprocesses run under so a fresh shell finds
+    # the venv first on PATH and tools like `python` / `pip` route into
+    # it without absolute paths.
+    venv_bin = venv_path / _venv_bin_name()
+    env = os.environ.copy()
+    env["VIRTUAL_ENV"] = str(venv_path)
+    env["PATH"] = f"{venv_bin}{os.pathsep}{env.get('PATH', '')}"
+
+    for script in download_scripts:
+        if repo_path is None:
+            print(
+                f"Warning: skipping setup.download_scripts entry '{script}' "
+                "because no repo_path was provided.",
+                file=sys.stderr,
+            )
+            continue
+        script_path = (repo_path / script).resolve()
+        if not script_path.is_file():
+            print(
+                f"Warning: setup.download_scripts entry '{script}' does not exist "
+                f"under {repo_path}; skipping.",
+                file=sys.stderr,
+            )
+            continue
+        try:
+            subprocess.run(
+                ["bash", str(script_path)],
+                cwd=str(repo_path),
+                env=env,
+                check=True,
+                timeout=timeout,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
+            print(
+                f"Warning: setup.download_scripts entry '{script}' failed: {exc}. "
+                "Continuing — the per-question loop may still recover.",
+                file=sys.stderr,
+            )
+
+    python_exe = _find_python_in_venv(venv_path)
+    if warmup_imports and python_exe is None:
+        print(
+            f"Warning: cannot run setup.warmup_imports because no python interpreter "
+            f"was found in {venv_path}.",
+            file=sys.stderr,
+        )
+        return
+
+    for oneliner in warmup_imports:
+        try:
+            subprocess.run(
+                [str(python_exe), "-c", oneliner],
+                cwd=str(repo_path) if repo_path is not None else None,
+                env=env,
+                check=True,
+                timeout=timeout,
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
+            print(
+                f"Warning: setup.warmup_imports entry failed ({oneliner!r}): {exc}. "
+                "Continuing — the per-question loop may still recover.",
+                file=sys.stderr,
+            )
+
+
+def _ensure_venv(
+    venv_path: Path,
+    config: dict | None = None,
+    repo_path: Path | None = None,
+    apply_setup: bool = True,
+) -> None:
     """Idempotently create or reuse a per-paper venv.
 
     Behavior:
@@ -210,8 +338,22 @@ def _ensure_venv(venv_path: Path, config: dict | None = None) -> None:
             timeout=1800,
         )
 
+    # One-time setup steps (weight downloads, framework cache warmups).
+    # These run AFTER the seed-package install so a setup script can
+    # rely on, e.g., `gdown` already being available in the venv.  Any
+    # failure here is logged as a warning rather than raised — the
+    # agent's per-question loop has its own retry, and we don't want a
+    # transient download glitch to brick the whole eval.
+    #
+    # Gated by ``apply_setup`` so teams that want the colleague's exact
+    # baseline behavior (``worker-critic``) can skip the setup step even
+    # when a paper's config has a ``[setup]`` block.  Only the
+    # ``worker-critic-plus`` team passes ``apply_setup=True``.
+    if apply_setup:
+        _run_setup_scripts(venv_path, repo_path, config)
 
-def resolve_project(project_dir: str) -> ResearchContext:
+
+def resolve_project(project_dir: str, apply_setup: bool = False) -> ResearchContext:
     """Validate a project directory and return a ResearchContext.
 
     The venv now lives at ``<project_dir>/.venv/`` (per-paper, shared
@@ -222,6 +364,12 @@ def resolve_project(project_dir: str) -> ResearchContext:
 
     A sibling ``<project_dir>/.artifacts/`` directory is also created for
     reusable files that future runs can stage back into their workspace.
+
+    Setting ``apply_setup=True`` opts into the per-paper
+    ``.research_config.toml`` ``[setup]`` table (download scripts +
+    warmup imports run once at venv-creation time).  Default ``False``
+    so callers that haven't opted in see the colleague's baseline venv-
+    setup behavior — only the ``worker-critic-plus`` team passes True.
 
     Raises ValueError if the directory is missing, or if paper.pdf
     or repo/ are not where they should be.
@@ -257,10 +405,13 @@ def resolve_project(project_dir: str) -> ResearchContext:
     artifacts_path.mkdir(exist_ok=True)
 
     # Per-paper shared venv.  Read optional config first so we can pin
-    # the Python version and pre-install paper-specific packages.
+    # the Python version and pre-install paper-specific packages.  The
+    # repo path is passed through so [setup] scripts (e.g. PPLM's
+    # weights/download.sh) can run from the correct cwd, but they only
+    # actually fire when the caller passed apply_setup=True.
     config = _read_paper_config(root)
     venv_path = root / ".venv"
-    _ensure_venv(venv_path, config=config)
+    _ensure_venv(venv_path, config=config, repo_path=repo_path, apply_setup=apply_setup)
 
     return ResearchContext(
         project_dir=root,

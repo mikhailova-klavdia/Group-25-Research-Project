@@ -1,0 +1,68 @@
+[
+  {
+    "timestamp": "2026-05-28T14:05:46.945848+00:00",
+    "run_id": "20260528T140056-27dd9486",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use the CrossPPI binding affinity predictor to analyze a RAS-RAF protein interaction. The ligand sequence is MTEYKLVVVGA",
+    "pre_estimate_tokens": 1737,
+    "input_tokens": 193095,
+    "output_tokens": 5091,
+    "total_tokens": 198186,
+    "cost_usd": 0.058456
+  },
+  {
+    "timestamp": "2026-05-28T14:06:15.110087+00:00",
+    "run_id": "20260528T140546-8f42b1ef",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Compare the binding affinity predictions for two protein pairs using CrossPPI. Pair 1: ligand MGDKPIWEQIGSSFIQHYYQLFDNDR",
+    "pre_estimate_tokens": 1910,
+    "input_tokens": 17084,
+    "output_tokens": 1109,
+    "total_tokens": 18193,
+    "cost_usd": 0.006489
+  },
+  {
+    "timestamp": "2026-05-28T14:08:46.044255+00:00",
+    "run_id": "20260528T140615-0cefbb3a",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use the CrossPPI binding affinity predictor to predict the pKD value for a protein-protein interaction. The ligand prote",
+    "pre_estimate_tokens": 1764,
+    "input_tokens": 338689,
+    "output_tokens": 6059,
+    "total_tokens": 344748,
+    "cost_usd": 0.09679
+  },
+  {
+    "timestamp": "2026-05-28T14:12:49.434064+00:00",
+    "run_id": "20260528T140846-861c3994",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the KRAS protein sequence MTEYKLVVVGAGGVGKSALTIQLIQNHF",
+    "pre_estimate_tokens": 1650,
+    "input_tokens": 497123,
+    "output_tokens": 13765,
+    "total_tokens": 510888,
+    "cost_usd": 0.151811
+  },
+  {
+    "timestamp": "2026-05-28T14:14:08.535325+00:00",
+    "run_id": "20260528T141249-5060251f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate a binary contact map for the KRAS protein (complex ID: TEST003) with sequence MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYD",
+    "pre_estimate_tokens": 1637,
+    "input_tokens": 194780,
+    "output_tokens": 4583,
+    "total_tokens": 199363,
+    "cost_usd": 0.057861
+  },
+  {
+    "timestamp": "2026-05-28T14:15:24.617758+00:00",
+    "run_id": "20260528T141408-4a2d5c01",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the RAC1 receptor protein sequence MAAQGEPQVQFKLVLVGDG",
+    "pre_estimate_tokens": 1693,
+    "input_tokens": 190323,
+    "output_tokens": 4406,
+    "total_tokens": 194729,
+    "cost_usd": 0.056393
+  }
+]

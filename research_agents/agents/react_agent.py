@@ -248,10 +248,120 @@ WORKFLOW
 
 
 def create_react_agent(model: str = DEFAULT_MODEL) -> Agent[ResearchContext]:
-    """Build the ReAct research agent."""
+    """Build the ReAct research agent (baseline prompt)."""
     return Agent(
         name="ReAct Research Assistant",
         instructions=REACT_INSTRUCTIONS,
+        tools=[
+            read_paper,
+            list_repo_files,
+            find_repo_files,
+            resolve_repo_path,
+            search_repo,
+            read_repo_file,
+            write_file,
+            stage_repo_path,
+            execute_command,
+            list_workspace_files,
+            read_workspace_file,
+            list_paper_artifacts,
+            stage_paper_artifact,
+            cache_workspace_artifact,
+            venv_status,
+        ],
+        model=model,
+        output_type=ReActAnswer,
+    )
+
+
+# Improved-variant prompt: same skeleton as REACT_INSTRUCTIONS plus two
+# targeted bullets the baseline lacks.  Kept here so the diff against the
+# baseline is one search-and-replace per bullet rather than an entire
+# duplicate prompt — anyone curious about what "improved" really means
+# can compare these inserts directly against the baseline.
+_ESM_STRIP_BULLET = """\
+   • If a Python import fails with `ModuleNotFoundError`, run
+     `pip install <package>` with `timeout=3600` before rewriting
+     the script or giving up.
+   • For ESM-2 / fair-esm embeddings: the per-token tensor returned by the
+     model has shape `(L+2, D)` where `L` is the input sequence length;
+     positions `0` and `L+1` are the BOS and EOS special tokens. When the
+     question asks for a per-residue row, the residue count, or anything
+     that should match the FASTA length, slice with `embeddings[1:-1]`
+     before computing the answer. Sanity-check the stripped row count
+     against the FASTA's residue count before reporting."""
+
+_SYNTHESIS_CARVEOUT = """\
+  - For ESM/ESM-2 embeddings, raw token embeddings often include BOS/EOS
+    special tokens. When the question asks for per-residue rows or sequence
+    length, strip special tokens or use the original residue count.
+  - Tool-deterministic synthesis carve-out: if a question describes a tool
+    whose output is fully determined by ANY valid input that exercises the
+    requested behavior (e.g. a padding tool whose output length depends only
+    on the target length, or a generator that produces a fixed number of
+    sequences regardless of seed content), and the literal input file
+    referenced in the question text is missing from the repo after the
+    exhaustive search protocol, you MAY synthesize a minimal valid input
+    that exercises the requested behavior. Stage the synthesized file at
+    the workspace path the question requests, run the tool, and report the
+    output it produced. Record the synthesis in your reflection. This
+    carve-out does NOT apply to ML inference, statistics, benchmarks, or
+    any output whose value depends on the specific content of the input."""
+
+
+def _build_improved_instructions() -> str:
+    """Return REACT_INSTRUCTIONS with the two improved-variant bullets spliced in.
+
+    Computed at import time so the constant below is just a string the rest
+    of the code can read like REACT_INSTRUCTIONS.  Asserts the splice points
+    actually exist — a future refactor of REACT_INSTRUCTIONS that drops one
+    of the anchor lines will fail loudly here instead of silently producing
+    a prompt identical to the baseline.
+    """
+    text = REACT_INSTRUCTIONS
+    esm_anchor = (
+        "   • If a Python import fails with `ModuleNotFoundError`, run\n"
+        "     `pip install <package>` with `timeout=3600` before rewriting\n"
+        "     the script or giving up."
+    )
+    integrity_anchor = (
+        "  - For ESM/ESM-2 embeddings, raw token embeddings often include BOS/EOS\n"
+        "    special tokens. When the question asks for per-residue rows or sequence\n"
+        "    length, strip special tokens or use the original residue count."
+    )
+    if esm_anchor not in text:
+        raise RuntimeError(
+            "REACT_INSTRUCTIONS no longer contains the ESM-strip anchor; "
+            "update _ESM_STRIP_BULLET in react_agent.py."
+        )
+    if integrity_anchor not in text:
+        raise RuntimeError(
+            "REACT_INSTRUCTIONS no longer contains the integrity-rules anchor; "
+            "update _SYNTHESIS_CARVEOUT in react_agent.py."
+        )
+    text = text.replace(esm_anchor, _ESM_STRIP_BULLET, 1)
+    text = text.replace(integrity_anchor, _SYNTHESIS_CARVEOUT, 1)
+    return text
+
+
+REACT_INSTRUCTIONS_IMPROVED = _build_improved_instructions()
+
+
+def create_react_agent_improved(model: str = DEFAULT_MODEL) -> Agent[ResearchContext]:
+    """Build the ReAct research agent with the improved-variant prompt.
+
+    Identical tool registration to ``create_react_agent``; the only
+    difference is the system prompt, which adds:
+      * an explicit ESM-2 BOS/EOS stripping rule under EXECUTE, and
+      * a tool-deterministic synthesis carve-out under INTEGRITY RULES.
+
+    Used by the ``worker-critic-plus`` team.  Pair with
+    ``resolve_project(apply_setup=True)`` so up-front weight downloads
+    (e.g. PPLM's ``weights/download.sh``) also run.
+    """
+    return Agent(
+        name="ReAct Research Assistant (improved)",
+        instructions=REACT_INSTRUCTIONS_IMPROVED,
         tools=[
             read_paper,
             list_repo_files,

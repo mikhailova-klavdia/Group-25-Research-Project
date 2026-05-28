@@ -11,16 +11,25 @@ then retries the worker once.
 import json
 import re
 import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
-from agents import RunHooks, Runner
+from agents import Agent, RunHooks, Runner
 
 from research_agents.agents.critic_agent import CriticReview, create_critic_agent
 from research_agents.agents.react_agent import ReActAnswer, create_react_agent
 from research_agents.config import DEFAULT_MODEL
 from research_agents.project import ResearchContext, _find_python_in_venv
 from research_agents.tools.exec_tools import MAX_TIMEOUT
+
+
+# Type alias for a worker-agent factory: takes a model name, returns an
+# Agent producing a ReActAnswer.  Teams pass either ``create_react_agent``
+# (baseline) or ``create_react_agent_improved`` (the worker-critic-plus
+# variant with the extra ESM-2 and synthesis bullets) without needing to
+# change orchestration internals.
+WorkerFactory = Callable[[str], Agent[ResearchContext]]
 
 
 _MISSING_MODULE_RE = re.compile(
@@ -211,8 +220,16 @@ def run_with_critic(
     worker_model: str,
     critic_model: str = DEFAULT_MODEL,
     max_retries: int = 1,
+    worker_factory: WorkerFactory = create_react_agent,
 ) -> TeamRunResult:
-    """Run worker, review with critic, and optionally retry once."""
+    """Run worker, review with critic, and optionally retry once.
+
+    ``worker_factory`` defaults to the baseline ``create_react_agent`` so
+    existing callers (and the colleague's ``worker-critic`` team) keep
+    their exact behavior.  The ``worker-critic-plus`` team supplies
+    ``create_react_agent_improved`` here to swap in the improved-variant
+    prompt without forking the orchestration logic.
+    """
     reviews: list[CriticReview] = []
     captures: list[ToolOutputCapture] = []
     install_events: list[InstallEvent] = []
@@ -222,7 +239,7 @@ def run_with_critic(
     last_worker_result: Any = None
 
     for attempt_index in range(max_retries + 1):
-        worker = create_react_agent(model=worker_model)
+        worker = worker_factory(worker_model)
         capture = ToolOutputCapture()
         worker_input = question
         if feedback_for_retry:

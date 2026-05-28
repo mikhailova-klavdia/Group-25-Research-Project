@@ -162,3 +162,52 @@ def test_run_with_critic_installs_missing_module_then_retries(tmp_path):
     assert install.called
     assert team_result.answer.final_answer == "EXECUTION_REQUIRED — weights missing"
     assert team_result.reviews[0].verdict == "pass"
+
+
+def test_run_with_critic_uses_injected_worker_factory(tmp_path):
+    """The worker_factory kwarg lets a team swap in a custom agent factory.
+
+    This is the seam ``worker-critic-plus`` uses to plug in
+    ``create_react_agent_improved`` without touching orchestration
+    internals.  Verify the kwarg is honored by counting how many times
+    a custom factory gets called.
+    """
+    context = _context(tmp_path)
+    call_count = 0
+    seen_models: list[str] = []
+
+    sentinel_agent = SimpleNamespace(name="sentinel-worker")
+
+    def custom_factory(model: str):
+        nonlocal call_count
+        call_count += 1
+        seen_models.append(model)
+        return sentinel_agent
+
+    worker_result = _result("EXECUTION_REQUIRED — weights missing")
+    critic_pass = SimpleNamespace(
+        final_output=CriticReview(verdict="pass", reasoning="Honest blocker.")
+    )
+
+    def fake_run_sync(agent, prompt, **kwargs):
+        # The worker call always passes hooks; the critic call doesn't.
+        if kwargs.get("hooks") is not None:
+            # Verify the injected factory's agent is what gets run.
+            assert agent is sentinel_agent
+            kwargs["hooks"].outputs.append("FileNotFoundError: weights missing")
+            return worker_result
+        return critic_pass
+
+    with patch("research_agents.orchestration.Runner.run_sync", side_effect=fake_run_sync):
+        result = run_with_critic(
+            context=context,
+            question="Run the script.",
+            ground_truth=None,
+            entry_id="Q001",
+            worker_model="gpt-5-mini-2025-08-07",
+            worker_factory=custom_factory,
+        )
+
+    assert call_count == 1
+    assert seen_models == ["gpt-5-mini-2025-08-07"]
+    assert result.answer.final_answer == "EXECUTION_REQUIRED — weights missing"
