@@ -1,0 +1,3 @@
+[
+  {"id": "FOLDCONFBENCH_001", "question": "The FoldConfBench input directory at FoldConfBench/notebooks/run_foldconfbench/input contains alignment files for protein 6KWC_1. What is the total file size in bytes of the alignments/6KWC_1 subdirectory (including all alignment files)?", "ground_truth": "6841118"}
+]
