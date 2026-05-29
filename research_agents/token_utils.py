@@ -38,9 +38,10 @@ def estimate_tokens(system_prompt: str, question: str, model: str = DEFAULT_MODE
 def calculate_cost(input_tokens: int, output_tokens: int, model: str = DEFAULT_MODEL) -> float:
     """Calculate estimated cost in USD from real post-run token counts."""
     prices = MODEL_COSTS.get(model, MODEL_COSTS[DEFAULT_MODEL])
-    input_cost  = (input_tokens  / 1_000_000) * prices["input_per_million"]
+    input_cost = (input_tokens / 1_000_000) * prices["input_per_million"]
     output_cost = (output_tokens / 1_000_000) * prices["output_per_million"]
     return input_cost + output_cost
+
 
 def load_cost_log(project_dir: Path) -> list:
     """Load existing cost log entries from the project folder."""
@@ -67,17 +68,19 @@ def append_cost_log(
     entries = load_cost_log(project_dir)
 
     cost = calculate_cost(input_tokens, output_tokens, model)
-    entries.append({
-        "timestamp":   datetime.now(UTC).isoformat(),
-        "run_id":      run_id,
-        "model":       model,
-        "question":    question[:120],   # truncate so the file stays readable
-        "pre_estimate_tokens": pre_estimate,
-        "input_tokens":        input_tokens,
-        "output_tokens":       output_tokens,
-        "total_tokens":        input_tokens + output_tokens,
-        "cost_usd":            round(cost, 6),
-    })
+    entries.append(
+        {
+            "timestamp": datetime.now(UTC).isoformat(),
+            "run_id": run_id,
+            "model": model,
+            "question": question[:120],  # truncate so the file stays readable
+            "pre_estimate_tokens": pre_estimate,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": input_tokens + output_tokens,
+            "cost_usd": round(cost, 6),
+        }
+    )
 
     log_path.write_text(
         json.dumps(entries, indent=2, ensure_ascii=False),
@@ -90,14 +93,14 @@ def print_token_report(
     input_tokens: int,
     output_tokens: int,
     model: str = DEFAULT_MODEL,
-    project_dir: Path | None = None,   # add this parameter
+    project_dir: Path | None = None,  # add this parameter
 ) -> None:
     """Print a tidy token and cost summary, with accumulated totals if available."""
     total = input_tokens + output_tokens
-    cost  = calculate_cost(input_tokens, output_tokens, model)
+    cost = calculate_cost(input_tokens, output_tokens, model)
 
     print(f"\n{'─' * 40}")
-    print(f"Token usage — this run")
+    print("Token usage — this run")
     print(f"  Pre-run estimate (tiktoken): ~{pre_estimate:,} tokens")
     print(f"  Actual input tokens:          {input_tokens:,}")
     print(f"  Actual output tokens:         {output_tokens:,}")
@@ -109,7 +112,7 @@ def print_token_report(
         entries = load_cost_log(project_dir)
         if entries:
             total_tokens_all = sum(e["total_tokens"] for e in entries)
-            total_cost_all   = sum(e["cost_usd"]     for e in entries)
+            total_cost_all = sum(e["cost_usd"] for e in entries)
             print(f"\nAccumulated ({len(entries)} runs on this project)")
             print(f"  Total tokens spent:  {total_tokens_all:,}")
             print(f"  Total cost:         ${total_cost_all:.4f}")

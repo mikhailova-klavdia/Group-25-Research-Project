@@ -7,8 +7,10 @@ from fpdf import FPDF
 from research_agents.tools import paper_tools, repo_tools
 from research_agents.tools.paper_tools import read_paper_text
 from research_agents.tools.repo_tools import (
+    find_repo_files_text,
     list_repo_files_text,
     read_repo_file_text,
+    resolve_repo_path_text,
     search_repo_text,
 )
 
@@ -36,6 +38,10 @@ class RepoToolTests(unittest.TestCase):
             encoding="utf-8",
         )
         (self.repo_root / "large.txt").write_text("x" * 210_000, encoding="utf-8")
+        (self.repo_root / "save").mkdir()
+        (self.repo_root / "save" / "model_cv_1.pth").write_bytes(b"\x00\x01weights")
+        (self.repo_root / "example").mkdir()
+        (self.repo_root / "example" / "receptor.fasta").write_text(">r\nACD\n", encoding="utf-8")
 
     def tearDown(self):
         self.tmpdir.cleanup()
@@ -59,6 +65,35 @@ class RepoToolTests(unittest.TestCase):
         result = search_repo_text(str(self.repo_root), "nonexistent_term_xyz")
 
         self.assertIn("No matches found", result)
+
+    def test_find_repo_files_includes_binary_and_large_artifacts(self):
+        result = find_repo_files_text(str(self.repo_root), ".pth")
+
+        self.assertIn("save/model_cv_1.pth", result)
+        self.assertIn("artifact", result)
+
+    def test_find_repo_files_can_filter_to_text_only(self):
+        result = find_repo_files_text(str(self.repo_root), ".pth", include_binary=False)
+
+        self.assertIn("No filenames matched", result)
+
+    def test_resolve_repo_path_strips_prefix_when_path_exists(self):
+        (self.repo_root / "notebooks").mkdir()
+        (self.repo_root / "notebooks" / "input.tsv").write_text("a\tb\n", encoding="utf-8")
+
+        result = resolve_repo_path_text(str(self.repo_root), "skimgpt/notebooks/input.tsv")
+
+        self.assertIn("prefix-stripped", result)
+        self.assertIn("notebooks/input.tsv", result)
+
+    def test_resolve_repo_path_finds_basename_candidates(self):
+        result = resolve_repo_path_text(
+            str(self.repo_root),
+            "PPLM/notebooks/run_pplm-affinity/data/receptor.fasta",
+        )
+
+        self.assertIn("basename", result)
+        self.assertIn("example/receptor.fasta", result)
 
     def test_read_repo_file_returns_contents(self):
         result = read_repo_file_text(str(self.repo_root), "src/main.py")
@@ -89,6 +124,16 @@ class RepoToolTests(unittest.TestCase):
     def test_tool_schemas_do_not_expose_repo_path_or_paper_path(self):
         self.assertEqual(repo_tools.list_repo_files.params_json_schema["properties"], {})
         self.assertEqual(repo_tools.list_repo_files.params_json_schema["required"], [])
+        self.assertEqual(
+            set(repo_tools.find_repo_files.params_json_schema["properties"].keys()),
+            {"pattern", "include_binary"},
+        )
+        self.assertNotIn("repo_path", repo_tools.find_repo_files.params_json_schema["properties"])
+        self.assertEqual(
+            set(repo_tools.resolve_repo_path.params_json_schema["properties"].keys()),
+            {"question_path"},
+        )
+        self.assertNotIn("repo_path", repo_tools.resolve_repo_path.params_json_schema["properties"])
         self.assertEqual(
             set(repo_tools.search_repo.params_json_schema["properties"].keys()),
             {"query"},

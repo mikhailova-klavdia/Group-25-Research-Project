@@ -12,12 +12,11 @@ from agents import Runner
 from agents.exceptions import MaxTurnsExceeded, ModelRefusalError
 
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
+from research_agents.agents.research_agent import INSTRUCTIONS
 from research_agents.agents.research_agent import create_research_agent
 from research_agents.project import ResearchContext, resolve_project
-from research_agents.tracing import enable_local_tracing
 from research_agents.token_utils import append_cost_log, estimate_tokens, print_token_report
-from research_agents.agents.research_agent import INSTRUCTIONS
-from research_agents.token_utils import estimate_tokens, print_token_report, append_cost_log, calculate_cost
+from research_agents.tracing import enable_local_tracing
 
 
 def run_research_query(
@@ -102,13 +101,13 @@ def run_research_query(
         question=question,
         model=model,
         pre_estimate=pre_estimate,
-        input_tokens=result.usage.input_tokens,
-        output_tokens=result.usage.output_tokens,
+        input_tokens=result.context_wrapper.usage.input_tokens,
+        output_tokens=result.context_wrapper.usage.output_tokens,
     )
     print_token_report(
         pre_estimate,
-        result.usage.input_tokens,
-        result.usage.output_tokens,
+        result.context_wrapper.usage.input_tokens,
+        result.context_wrapper.usage.output_tokens,
         model,
         project_dir=context.project_dir,
     )

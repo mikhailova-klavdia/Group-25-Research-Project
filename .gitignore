@@ -10,6 +10,9 @@
 # Local paper workspaces
 papers/
 
+# LLM-as-judge evaluation output (generated; not tracked)
+ClaudeEval/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

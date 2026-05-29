@@ -4,10 +4,14 @@ from pathlib import Path
 
 from research_agents.tools import exec_tools
 from research_agents.tools.exec_tools import (
+    cache_workspace_artifact_text,
     execute_command_text,
+    list_paper_artifacts_text,
     list_workspace_files_text,
     read_workspace_file_text,
+    stage_paper_artifact_text,
     stage_repo_path_text,
+    venv_status_text,
     write_file_text,
 )
 
@@ -189,6 +193,9 @@ class ExecuteCommandTests(unittest.TestCase):
         self.assertIn("Exit code: 0", result)
         self.assertIn("/tmp/example-repo", result)
 
+    def test_timeout_is_clamped_to_one_hour(self):
+        self.assertEqual(exec_tools.MAX_TIMEOUT, 3600)
+
 
 class ListWorkspaceFilesTests(unittest.TestCase):
     def setUp(self):
@@ -261,6 +268,87 @@ class ReadWorkspaceFileTests(unittest.TestCase):
             read_workspace_file_text(self.workspace, "nope.txt")
 
 
+class PaperArtifactTests(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        root = Path(self.tmpdir.name)
+        self.workspace = root / "workspace"
+        self.artifacts = root / ".artifacts"
+        self.workspace.mkdir()
+        self.artifacts.mkdir()
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+
+    def test_lists_cached_artifacts(self):
+        (self.artifacts / "weights").mkdir()
+        (self.artifacts / "weights" / "model.pt").write_bytes(b"weights")
+
+        result = list_paper_artifacts_text(self.artifacts)
+
+        self.assertIn("weights/model.pt", result)
+
+    def test_empty_artifact_cache(self):
+        result = list_paper_artifacts_text(self.artifacts)
+
+        self.assertIn("empty", result.lower())
+
+    def test_cache_workspace_artifact_then_stage_it(self):
+        (self.workspace / "outputs").mkdir()
+        (self.workspace / "outputs" / "seq.pkl").write_bytes(b"pickle")
+
+        cached = cache_workspace_artifact_text(
+            self.workspace,
+            self.artifacts,
+            "outputs/seq.pkl",
+            "pplm/seq.pkl",
+        )
+        staged = stage_paper_artifact_text(
+            self.artifacts,
+            self.workspace,
+            "pplm/seq.pkl",
+            "reused/seq.pkl",
+        )
+
+        self.assertIn(".artifacts/pplm/seq.pkl", cached)
+        self.assertIn("workspace/reused/seq.pkl", staged)
+        self.assertEqual((self.workspace / "reused" / "seq.pkl").read_bytes(), b"pickle")
+
+    def test_cache_workspace_artifact_rejects_traversal(self):
+        with self.assertRaisesRegex(ValueError, "outside the workspace"):
+            cache_workspace_artifact_text(self.workspace, self.artifacts, "../bad")
+
+    def test_stage_paper_artifact_rejects_traversal(self):
+        with self.assertRaisesRegex(ValueError, "outside the .artifacts"):
+            stage_paper_artifact_text(self.artifacts, self.workspace, "../bad")
+
+
+class VenvStatusTests(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.venv = Path(self.tmpdir.name) / "venv"
+        _make_fake_executable(
+            self.venv / "bin" / "python",
+            "#!/bin/sh\n"
+            'if [ "$1" = "--version" ]; then echo \'Python 3.12.0\'; exit 0; fi\n'
+            'if [ "$1" = "-m" ]; then echo \'torch==1.13.1\'; exit 0; fi\n',
+        )
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+
+    def test_reports_python_and_installed_packages(self):
+        result = venv_status_text(self.venv)
+
+        self.assertIn("Python 3.12.0", result)
+        self.assertIn("torch==1.13.1", result)
+
+    def test_reports_missing_venv(self):
+        result = venv_status_text(Path(self.tmpdir.name) / "missing")
+
+        self.assertIn("does not exist", result)
+
+
 class ToolSchemaTests(unittest.TestCase):
     def test_write_file_does_not_expose_workspace_path(self):
         props = exec_tools.write_file.params_json_schema["properties"]
@@ -290,3 +378,25 @@ class ToolSchemaTests(unittest.TestCase):
         props = exec_tools.read_workspace_file.params_json_schema["properties"]
         self.assertNotIn("workspace_path", props)
         self.assertIn("relative_path", props)
+
+    def test_list_paper_artifacts_has_no_params(self):
+        self.assertEqual(exec_tools.list_paper_artifacts.params_json_schema["properties"], {})
+        self.assertEqual(exec_tools.list_paper_artifacts.params_json_schema["required"], [])
+
+    def test_stage_paper_artifact_does_not_expose_runtime_paths(self):
+        props = exec_tools.stage_paper_artifact.params_json_schema["properties"]
+        self.assertNotIn("artifacts_path", props)
+        self.assertNotIn("workspace_path", props)
+        self.assertIn("relative_path", props)
+        self.assertIn("destination_path", props)
+
+    def test_cache_workspace_artifact_does_not_expose_runtime_paths(self):
+        props = exec_tools.cache_workspace_artifact.params_json_schema["properties"]
+        self.assertNotIn("artifacts_path", props)
+        self.assertNotIn("workspace_path", props)
+        self.assertIn("relative_path", props)
+        self.assertIn("destination_path", props)
+
+    def test_venv_status_has_no_params(self):
+        self.assertEqual(exec_tools.venv_status.params_json_schema["properties"], {})
+        self.assertEqual(exec_tools.venv_status.params_json_schema["required"], [])

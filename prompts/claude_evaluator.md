@@ -54,7 +54,7 @@ Do NOT read the stored chains in papers/<slug>/runs/ until all 22 are attempted.
 
 ## Phase 2 — Chain Comparison
 
-Now read the 22 stored chain JSON files.
+Now read the 22 stored chain JSON files from papers/<slug>/runs/.
 
 For each chain compare:
 - The GPT agent's reasoning path vs. your own attempt
@@ -79,7 +79,7 @@ Apply this error taxonomy (flag any that apply; add new types if you discover th
 - E6: Numeric Overconfidence — specific value stated without running the experiment
 - E7: Premature Termination — agent stops before fully answering
 - E8: Missing Path Verification — file assumed to exist without confirmation
-- [Add any new types discovered]
+- [Add any new types discovered as E9+]
 
 ### B. Frequency table
 Produce a table with one row per error type: error ID, name, and the number of chains
@@ -107,12 +107,39 @@ Identify:
 - Prompt/instruction gaps that explain observed failures
 - Concrete changes to address the top 3 failure modes
 
+### F. Annotations output (human-annotator format)
+For every chain produce a JSON object matching exactly the format the human annotators use,
+so all four annotators (Sapan, Mihaela, Klaudia, Claude) share the same schema for kappa
+computation:
+
+  {
+    "id": "<chain ID, e.g. PPLM_001>",
+    "question": "<full question text>",
+    "ground_truth": "<ground truth answer>",
+    "score": <integer 1-4>,
+    "error_types": ["E1", "E2", ...],
+    "problematic_steps": [<step numbers where failures first occur>],
+    "final_answer_assessment": "<one sentence: correct / partially correct / wrong and why>",
+    "summary": "<2-3 sentence overall assessment of the chain quality>"
+  }
+
+Scoring rubric:
+  4 — Correct answer, well-grounded reasoning, all observations verifiable against repo/paper
+  3 — Mostly correct, minor reasoning gaps or one unverified observation
+  2 — Partially correct or significant reasoning flaws, answer likely wrong
+  1 — Severe failure: fabricated observations, wrong answer, or premature termination
+
 ---
 
 ## Output
 
-Write the full Phase 3 report (sections A–E) to:
-C:\Users\32472\Desktop\MaastrichtUni\MscAI\ProjectSem2\Phase3\ClaudeEvalReport.md
+Create the folder ClaudeEval/ at the project root if it does not exist.
 
-Include a short executive summary at the top (5–8 bullet points, most critical findings).
+Write the full Phase 3 report (sections A–F) to:
+  ClaudeEval/report.md
+
+Write the 22-entry annotations JSON array to:
+  ClaudeEval/annotations.json
+
+Include a short executive summary at the top of the report (5–8 bullet points).
 ```

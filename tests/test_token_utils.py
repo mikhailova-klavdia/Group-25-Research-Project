@@ -1,4 +1,3 @@
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -29,7 +28,9 @@ class CostLogTests(unittest.TestCase):
         self.tmpdir.cleanup()
 
     def test_log_is_created_on_first_run(self):
-        append_cost_log(self.project_dir, "run-001", "What is X?", "gpt-4.1-mini-2025-04-14", 100, 500, 50)
+        append_cost_log(
+            self.project_dir, "run-001", "What is X?", "gpt-4.1-mini-2025-04-14", 100, 500, 50
+        )
         self.assertTrue((self.project_dir / "costs.json").exists())
 
     def test_entries_accumulate(self):
@@ -60,5 +61,5 @@ class TiktokenEstimateTests(unittest.TestCase):
 
     def test_longer_text_gives_higher_count(self):
         short = estimate_tokens("short prompt", "short question")
-        long  = estimate_tokens("short prompt", "question " * 100)
+        long = estimate_tokens("short prompt", "question " * 100)
         self.assertGreater(long, short)
