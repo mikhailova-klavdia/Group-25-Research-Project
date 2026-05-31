@@ -16,14 +16,20 @@ from research_agents.agents.react_agent import (
 )
 from research_agents.orchestration import TeamRunResult
 from research_agents.teams import DEFAULT_TEAM, TEAMS, TeamSpec
+from research_agents.teams.human_in_the_loop import run_human_in_the_loop
 from research_agents.teams.solo import run_solo
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
 
 
-def test_registry_contains_three_initial_teams():
-    """All three shipped teams are registered by name."""
-    assert set(TEAMS.keys()) == {"solo", "worker-critic", "worker-critic-plus"}
+def test_registry_contains_all_shipped_teams():
+    """All shipped teams are registered by name."""
+    assert set(TEAMS.keys()) == {
+        "solo",
+        "worker-critic",
+        "worker-critic-plus",
+        "human-in-the-loop",
+    }
 
 
 def test_default_team_is_solo():
@@ -48,6 +54,9 @@ def test_only_plus_team_applies_setup():
     assert TEAMS["solo"].apply_setup is False
     assert TEAMS["worker-critic"].apply_setup is False
     assert TEAMS["worker-critic-plus"].apply_setup is True
+    # The human-in-the-loop team deliberately does NOT use the config file;
+    # it sets up the venv interactively instead.
+    assert TEAMS["human-in-the-loop"].apply_setup is False
 
 
 @pytest.mark.parametrize(
@@ -56,6 +65,7 @@ def test_only_plus_team_applies_setup():
         ("solo", run_solo),
         ("worker-critic", run_worker_critic),
         ("worker-critic-plus", run_worker_critic_plus),
+        ("human-in-the-loop", run_human_in_the_loop),
     ],
 )
 def test_team_run_fn_matches_module(name, run_fn):
@@ -65,7 +75,7 @@ def test_team_run_fn_matches_module(name, run_fn):
 
 @pytest.mark.parametrize(
     "run_fn",
-    [run_solo, run_worker_critic, run_worker_critic_plus],
+    [run_solo, run_worker_critic, run_worker_critic_plus, run_human_in_the_loop],
 )
 def test_team_run_signatures_are_uniform(run_fn):
     """Dispatcher relies on every team having the same call signature.
@@ -118,7 +128,7 @@ def test_team_run_result_type_is_shared():
     """All teams must return the same TeamRunResult so the dispatcher works."""
     # We can't easily call the run functions without an LLM, but we can
     # check the type-annotation surface matches.
-    for run_fn in (run_solo, run_worker_critic, run_worker_critic_plus):
+    for run_fn in (run_solo, run_worker_critic, run_worker_critic_plus, run_human_in_the_loop):
         sig = inspect.signature(run_fn)
         ret = sig.return_annotation
         assert ret is TeamRunResult, f"{run_fn.__name__} returns {ret}, expected TeamRunResult"

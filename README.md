@@ -188,6 +188,23 @@ uv run python -m research_agents.react_main \
 
 Each question generates one JSON file under `papers/<slug>/runs/<run-id>/<ID>.json` with the full ReAct chain (thought / action / observation / reflection per step), final answer, heuristic `correct` flag, token usage, and any `critic_reviews` / dependency `install_events`.
 
+## Interactive human-in-the-loop CLI
+
+The `human-in-the-loop` team adds a **chat REPL** where the agents ask *you* for help when they're stuck (a token, a workaround, a go/no-go) and stream what they're doing as they work. It's a three-stage crew: a **triage scout** decides whether a question needs code execution; **read-only** questions ("What is this paper about?") are answered straight from the paper/repo text with no environment setup; execution questions go through an interactive **setup engineer** (which prepares the venv with no config file — it discovers deps from the repo and asks you when stuck) and then a worker + integrity critic.
+
+```bash
+uv run python -m research_agents.hitl_main --project papers/tabpfn
+```
+
+Type a question or task at the `you>` prompt:
+
+- **Read-only** — answers in seconds, no setup: `In one sentence, what is the key idea behind this paper?`
+- **Execution** — the agents set up and run; if they hit a wall (e.g. TabPFN's license-gated weights) they ask you, and you suggest a fix inline (e.g. "use the open V2 model"), then they apply it and continue.
+
+REPL commands: `verbose on|off` (full reasoning-chain dump), `help`, `exit`. Defaults to `gpt-5-mini-2025-08-07` (the agents must reliably decide to ask for help); pass `--model gpt-4.1-mini-2025-04-14` for the cheaper one. Each task saves a chain JSON under `papers/<slug>/runs/<run-id>/`.
+
+The same team is selectable headlessly via `react_main --team human-in-the-loop`; with no operator attached, `ask_human` degrades to "proceed autonomously".
+
 ## Available Models
 
 | Model | Description |
@@ -215,16 +232,22 @@ research_agents/
 ├── agents/
 │   ├── research_agent.py   # Structured single-agent definition
 │   ├── react_agent.py      # ReAct worker definition
-│   └── critic_agent.py     # Dependency/integrity critic definition
+│   ├── critic_agent.py     # Dependency/integrity critic definition
+│   └── hitl_agents.py      # Triage, read-only, setup & execution HITL agents
+├── teams/                  # Composable agent teams (selected via --team)
+│   ├── solo.py / worker_critic.py / worker_critic_plus.py
+│   └── human_in_the_loop.py  # Triage → read-only | setup → execution + integrity guard
 ├── tools/
 │   ├── paper_tools.py      # Local paper text extraction tool
 │   ├── repo_tools.py       # Read-only repository inspection tools
 │   └── exec_tools.py       # File writing, command execution, workspace I/O
 ├── orchestration.py        # Worker + critic retry loop
+├── hitl.py                 # Human channel + ask_human tool + progress reporter + integrity guard
 ├── project.py              # Local project resolution and venv setup
 ├── config.py               # API key and model settings
 ├── main.py                 # Structured-agent CLI entry point
-└── react_main.py           # ReAct/Paper2AgentBench CLI entry point
+├── react_main.py           # ReAct/Paper2AgentBench CLI entry point
+└── hitl_main.py            # Interactive human-in-the-loop chat CLI
 ```
 
 ## How It Works
@@ -238,6 +261,8 @@ The structured agent has nine tools, and the ReAct worker has the same set plus 
 Every paper gets one shared isolated Python virtual environment (created automatically via `uv venv --seed`) under `papers/<slug>/.venv`. The `--seed` flag pre-installs `pip`, `setuptools`, and `wheel` so the agent can `pip install` dependencies immediately without affecting the system Python. Each CLI run still gets a fresh `runs/<run-id>/workspace/` for scripts and outputs.
 
 The ReAct CLI defaults to a simple multi-agent team: a worker answers the question, host code captures real tool outputs, a narrow critic reviews dependency/integrity issues, and the worker may retry once with deterministic dependency installs or a critic hint. Use `--no-critic` for the old single-worker behavior.
+
+The `human-in-the-loop` team (run via `hitl_main`, see above) goes further: a triage scout routes read-only questions to a direct paper/repo answer (skipping environment setup entirely), while execution questions get an interactive setup engineer plus the worker + critic — and any agent can pause to ask the operator for help via `ask_human`. A deterministic integrity guard then downgrades any "answered" result that no successful command actually produced.
 
 The agent follows a six-phase workflow: **understand** the paper and question, **plan** which experiments to reproduce, **setup** the workspace with dependencies and staged files, **execute** each experiment, **interpret** outputs and compare with the paper, and **report** structured results with a reproducibility assessment.
 

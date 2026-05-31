@@ -33,7 +33,13 @@ import tomllib
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    # Type-only import to avoid a runtime cycle: hitl.py imports
+    # ResearchContext from this module at import time.
+    from research_agents.hitl import HumanChannel, Reporter
 
 
 # Default cap on each setup-step subprocess.  Weight downloads are the
@@ -70,6 +76,19 @@ class ResearchContext:
     workspace_path: Path
     venv_path: Path
     artifacts_path: Path
+
+    # Optional human-in-the-loop chat channel.  The interactive CLI
+    # (``hitl_main``) sets this so the ``ask_human`` tool can reach the
+    # operator; it stays ``None`` on headless/batch runs, where ask_human
+    # degrades to "proceed autonomously".  Additive and defaulted, so every
+    # existing construction of ResearchContext is unaffected.
+    human: "HumanChannel | None" = None
+
+    # Optional progress reporter.  The interactive CLI sets this so the team can
+    # stream friendly stage/step updates while it works; ``None`` on
+    # headless/batch runs means total silence (no behaviour change there).
+    # Additive and defaulted, like ``human``.
+    reporter: "Reporter | None" = None
 
 
 def _venv_bin_name() -> str:

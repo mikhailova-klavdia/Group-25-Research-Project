@@ -19,18 +19,21 @@
 #    up front, ``False`` otherwise).
 # 3. Use it from the CLI with ``--team <your-name>``.
 #
-# Three teams ship today, in increasing complexity:
+# Four teams ship today, in increasing complexity:
 #   * ``solo`` — single ReAct worker, no critic, no install retry.
 #   * ``worker-critic`` — the colleague's two-agent system (worker + LLM
 #     critic + deterministic missing-module install retry).
 #   * ``worker-critic-plus`` — same shape as worker-critic but with the
 #     improved-variant prompt and up-front setup-script downloads.
+#   * ``human-in-the-loop`` — two-stage setup-crew → execution-crew that can
+#     ask a human for help (no config file); driven by ``hitl_main``.
 
 from collections.abc import Callable
 from dataclasses import dataclass
 
 from research_agents.orchestration import TeamRunResult
 from research_agents.project import ResearchContext
+from research_agents.teams.human_in_the_loop import run_human_in_the_loop
 from research_agents.teams.solo import run_solo
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
@@ -90,6 +93,19 @@ TEAMS: dict[str, TeamSpec] = {
         ),
         run=run_worker_critic_plus,
         apply_setup=True,
+    ),
+    "human-in-the-loop": TeamSpec(
+        name="human-in-the-loop",
+        description=(
+            "Two-stage human-in-the-loop crew: a setup engineer prepares the venv "
+            "interactively (no config file — it discovers deps from the repo and asks "
+            "the operator when stuck), hands a typed EnvReport to a ReAct execution "
+            "worker + integrity critic; both can chat with the human via ask_human. "
+            "Run interactively with `python -m research_agents.hitl_main`. Headless "
+            "runs degrade ask_human to autonomous."
+        ),
+        run=run_human_in_the_loop,
+        apply_setup=False,
     ),
 }
 
