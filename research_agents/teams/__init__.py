@@ -19,14 +19,18 @@
 #    up front, ``False`` otherwise).
 # 3. Use it from the CLI with ``--team <your-name>``.
 #
-# Four teams ship today, in increasing complexity:
+# Five teams ship today, in increasing complexity:
 #   * ``solo`` — single ReAct worker, no critic, no install retry.
-#   * ``worker-critic`` — the colleague's two-agent system (worker + LLM
-#     critic + deterministic missing-module install retry).
+#   * ``worker-critic`` — two-agent system (worker + LLM critic +
+#     deterministic missing-module install retry).
 #   * ``worker-critic-plus`` — same shape as worker-critic but with the
 #     improved-variant prompt and up-front setup-script downloads.
-#   * ``human-in-the-loop`` — two-stage setup-crew → execution-crew that can
-#     ask a human for help (no config file); driven by ``hitl_main``.
+#   * ``worker-verifier-critic`` — three-agent system: worker +
+#     code verifier (bug checklist) + critic. The verifier catches
+#     specific numeric/indexing bugs that the critic misses because the
+#     chain looks real but the script indexing is wrong.
+#   * ``human-in-the-loop`` — two-stage setup-crew → execution-crew that
+#     can ask a human for help (no config file).
 
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -37,6 +41,7 @@ from research_agents.teams.human_in_the_loop import run_human_in_the_loop
 from research_agents.teams.solo import run_solo
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
+from research_agents.teams.worker_verifier_critic import run_worker_verifier_critic
 
 
 # A team's run function takes a context + a question and returns a
@@ -93,6 +98,20 @@ TEAMS: dict[str, TeamSpec] = {
         ),
         run=run_worker_critic_plus,
         apply_setup=True,
+    ),
+    "worker-verifier-critic": TeamSpec(
+        name="worker-verifier-critic",
+        description=(
+            "Three agents: improved ReAct worker + code verifier + LLM critic. "
+            "The verifier checks a finite bug checklist (ESM-2 BOS/EOS indexing, "
+            "numpy 2.x removed aliases, Python 2 pickle encoding, FASTA counting, "
+            "off-by-one after filtering, curl redirect failures) derived from "
+            "annotation of 65 benchmark chains. When it finds a fixable bug it "
+            "rewrites the script, re-executes in the existing workspace, and the "
+            "corrected answer replaces the worker's answer before the critic sees it."
+        ),
+        run=run_worker_verifier_critic,
+        apply_setup=False,
     ),
     "human-in-the-loop": TeamSpec(
         name="human-in-the-loop",
