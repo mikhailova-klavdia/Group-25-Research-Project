@@ -1,0 +1,32 @@
+[
+  {
+    "id": "SVIRLPOOL_001",
+    "question": "Read the FASTA output file at svirlpool/notebooks/svirlpool_cut_reads/output/cut_reads.fasta. What are the genomic coordinates (in the format start-end) listed in the description line for read_0?",
+    "ground_truth": "1000-1020"
+  },
+  {
+    "id": "SVIRLPOOL_002",
+    "question": "Read the FASTA output file at svirlpool/notebooks/svirlpool_cut_reads/output/cut_reads.fasta. How many sequence records are in this file?",
+    "ground_truth": "50"
+  },
+  {
+    "id": "SVIRLPOOL_003",
+    "question": "Using the svirlpool database at svirlpool/notebooks/svirlpool_get_consensus/input/svirltile.db, extract all consensus sequences to a FASTA file with a batch size of 1000. How many total consensus sequences are in the database?",
+    "ground_truth": "5"
+  },
+  {
+    "id": "SVIRLPOOL_004",
+    "question": "Using the svirlpool database at svirlpool/notebooks/svirlpool_get_consensus/input/svirltile.db, extract all consensus sequences. What is the length in base pairs of the shortest consensus sequence?",
+    "ground_truth": "39"
+  },
+  {
+    "id": "SVIRLPOOL_005",
+    "question": "Examine the BAM file at svirlpool/notebooks/svirlpool_cut_reads/input/test_alignments.bam using pysam. What is the reference sequence name defined in the BAM header?",
+    "ground_truth": "chr1"
+  },
+  {
+    "id": "SVIRLPOOL_006",
+    "question": "Using the svirlpool database at svirlpool/notebooks/svirlpool_get_consensus/input/svirltile.db, extract the consensus sequences. What is the full nucleotide sequence of the consensus sequence with ID consensus_chr1_1000_INS?",
+    "ground_truth": "ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG"
+  }
+]

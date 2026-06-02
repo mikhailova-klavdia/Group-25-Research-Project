@@ -30,10 +30,16 @@ import os
 import subprocess
 import sys
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    # Type-only import to avoid a runtime cycle: hitl.py imports
+    # ResearchContext from this module at import time.
+    from research_agents.hitl import HumanChannel, Reporter
 
 
 # Default cap on each setup-step subprocess.  Weight downloads are the
@@ -70,6 +76,14 @@ class ResearchContext:
     workspace_path: Path
     venv_path: Path
     artifacts_path: Path
+    # Optional human-in-the-loop chat channel; None on headless/batch runs.
+    human: "HumanChannel | None" = field(default=None)
+    # Optional progress reporter for streaming output; None on headless/batch runs.
+    reporter: "Reporter | None" = field(default=None)
+    # Cached repo overview from the first triage of a hitl_main session; None
+    # on batch runs and before the first question in an interactive session.
+    # Set by _run_triage_stage so subsequent questions skip re-reading the paper.
+    session_overview: str | None = field(default=None)
 
 
 def _venv_bin_name() -> str:
@@ -297,9 +311,11 @@ def _ensure_venv(
     existing = _find_python_in_venv(venv_path)
     if existing is not None:
         if expected_python is None:
+            print(f"[venv] Reusing existing venv at {venv_path}")
             return  # no version constraint → reuse whatever's there
         actual = _python_major_minor(existing)
         if actual == expected_python:
+            print(f"[venv] Reusing existing venv at {venv_path} (Python {actual})")
             return  # version matches → reuse
         raise ValueError(
             f"Venv at {venv_path} is Python {actual}, but "
@@ -308,6 +324,7 @@ def _ensure_venv(
             "recreate it with the requested version."
         )
 
+    print(f"[venv] Creating new venv at {venv_path}")
     cmd = ["uv", "venv", "--seed"]
     if expected_python:
         # `uv venv --python 3.9` selects the interpreter; uv downloads it
@@ -422,4 +439,30 @@ def resolve_project(project_dir: str, apply_setup: bool = False) -> ResearchCont
         workspace_path=workspace_path,
         venv_path=venv_path,
         artifacts_path=artifacts_path,
+    )
+
+
+def fresh_workspace(base: ResearchContext) -> ResearchContext:
+    """Create a fresh per-question workspace under the same project root.
+
+    Used by ``hitl_main`` to give each session question its own isolated
+    workspace (run_id, run_dir, workspace_path) without recreating the
+    shared venv, re-reading the config, or re-running setup scripts.
+    Human, reporter, and session_overview are NOT carried over — the
+    caller attaches them explicitly after this call.
+    """
+    run_id = _create_run_id()
+    run_dir = base.project_dir / "runs" / run_id
+    run_dir.mkdir(parents=True)
+    workspace_path = run_dir / "workspace"
+    workspace_path.mkdir()
+    return ResearchContext(
+        project_dir=base.project_dir,
+        paper_path=base.paper_path,
+        repo_path=base.repo_path,
+        run_id=run_id,
+        run_dir=run_dir,
+        workspace_path=workspace_path,
+        venv_path=base.venv_path,
+        artifacts_path=base.artifacts_path,
     )

@@ -13,17 +13,27 @@ import pytest
 from research_agents.agents.react_agent import (
     create_react_agent,
     create_react_agent_improved,
+    create_react_agent_plus_plus,
 )
 from research_agents.orchestration import TeamRunResult
 from research_agents.teams import DEFAULT_TEAM, TEAMS, TeamSpec
+from research_agents.teams.human_in_the_loop import run_human_in_the_loop
 from research_agents.teams.solo import run_solo
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
+from research_agents.teams.worker_critic_plus_plus import run_worker_critic_plus_plus
 
 
-def test_registry_contains_three_initial_teams():
-    """All three shipped teams are registered by name."""
-    assert set(TEAMS.keys()) == {"solo", "worker-critic", "worker-critic-plus"}
+def test_registry_contains_all_shipped_teams():
+    """All shipped teams are registered by name."""
+    assert set(TEAMS.keys()) == {
+        "solo",
+        "worker-critic",
+        "worker-critic-plus",
+        "worker-critic-plus-plus",
+        "human-in-the-loop",
+        "worker-critic-plus-plus-hitl",
+    }
 
 
 def test_default_team_is_solo():
@@ -43,11 +53,15 @@ def test_team_spec_shape(name):
     assert isinstance(spec.apply_setup, bool)
 
 
-def test_only_plus_team_applies_setup():
-    """The worker-critic-plus team is the only one that triggers setup scripts."""
+def test_only_plus_teams_apply_setup():
+    """The worker-critic-plus and worker-critic-plus-plus teams trigger setup scripts."""
     assert TEAMS["solo"].apply_setup is False
     assert TEAMS["worker-critic"].apply_setup is False
     assert TEAMS["worker-critic-plus"].apply_setup is True
+    assert TEAMS["worker-critic-plus-plus"].apply_setup is True
+    # The human-in-the-loop team deliberately does NOT use the config file;
+    # it sets up the venv interactively instead.
+    assert TEAMS["human-in-the-loop"].apply_setup is False
 
 
 @pytest.mark.parametrize(
@@ -56,6 +70,8 @@ def test_only_plus_team_applies_setup():
         ("solo", run_solo),
         ("worker-critic", run_worker_critic),
         ("worker-critic-plus", run_worker_critic_plus),
+        ("worker-critic-plus-plus", run_worker_critic_plus_plus),
+        ("human-in-the-loop", run_human_in_the_loop),
     ],
 )
 def test_team_run_fn_matches_module(name, run_fn):
@@ -65,7 +81,7 @@ def test_team_run_fn_matches_module(name, run_fn):
 
 @pytest.mark.parametrize(
     "run_fn",
-    [run_solo, run_worker_critic, run_worker_critic_plus],
+    [run_solo, run_worker_critic, run_worker_critic_plus, run_worker_critic_plus_plus, run_human_in_the_loop],
 )
 def test_team_run_signatures_are_uniform(run_fn):
     """Dispatcher relies on every team having the same call signature.
@@ -92,33 +108,34 @@ def test_worker_critic_plus_uses_improved_factory():
     assert "create_react_agent_improved" in src
 
 
-def test_baseline_and_improved_factories_produce_distinct_prompts():
-    """Sanity: the two factories return agents with different instructions.
+def test_worker_critic_plus_plus_uses_plus_plus_factory():
+    """The worker-critic-plus-plus team must build a worker from create_react_agent_plus_plus."""
+    src = inspect.getsource(run_worker_critic_plus_plus)
+    assert "create_react_agent_plus_plus" in src
 
-    If a future refactor accidentally collapses them, A/B comparisons
-    between worker-critic and worker-critic-plus would be silently
-    pointless.  This test fails loudly in that scenario.
-    """
+
+def test_baseline_and_improved_factories_produce_distinct_prompts():
+    """Sanity: all three prompt variants are genuinely distinct."""
     baseline = create_react_agent()
     improved = create_react_agent_improved()
-    # Agent.instructions is typed as `str | Callable | None` by the SDK;
-    # both factories use the string form, so a static assertion plus an
-    # isinstance check satisfies the type checker AND fails loudly if a
-    # future refactor moves to a callable.
+    plus_plus = create_react_agent_plus_plus()
     assert isinstance(baseline.instructions, str)
     assert isinstance(improved.instructions, str)
+    assert isinstance(plus_plus.instructions, str)
     assert baseline.instructions != improved.instructions
+    assert baseline.instructions != plus_plus.instructions
+    assert improved.instructions != plus_plus.instructions
+    # Improved has ESM-2 BOS/EOS strip and synthesis carve-out.
     assert "embeddings[1:-1]" in improved.instructions
-    assert "embeddings[1:-1]" not in baseline.instructions
     assert "Tool-deterministic synthesis carve-out" in improved.instructions
-    assert "Tool-deterministic synthesis carve-out" not in baseline.instructions
+    # Plus-plus has the static-files gate and second-strategy fallbacks.
+    assert "ANSWER FROM STATIC FILES" in plus_plus.instructions
+    assert "TRY A SECOND STRATEGY" in plus_plus.instructions
 
 
 def test_team_run_result_type_is_shared():
     """All teams must return the same TeamRunResult so the dispatcher works."""
-    # We can't easily call the run functions without an LLM, but we can
-    # check the type-annotation surface matches.
-    for run_fn in (run_solo, run_worker_critic, run_worker_critic_plus):
+    for run_fn in (run_solo, run_worker_critic, run_worker_critic_plus, run_worker_critic_plus_plus, run_human_in_the_loop):
         sig = inspect.signature(run_fn)
         ret = sig.return_annotation
         assert ret is TeamRunResult, f"{run_fn.__name__} returns {ret}, expected TeamRunResult"

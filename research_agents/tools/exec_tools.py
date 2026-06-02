@@ -63,6 +63,13 @@ def write_file_text(workspace_path: str | Path, relative_path: str, content: str
     """Write content to a file inside the workspace directory."""
     root = Path(workspace_path).resolve()
 
+    # Strip a leading "workspace/" the agent sometimes prepends by mistake,
+    # which would otherwise create a workspace/workspace/ double-nesting.
+    for prefix in ("workspace/", "workspace\\"):
+        if relative_path.startswith(prefix):
+            relative_path = relative_path[len(prefix):]
+            break
+
     candidate = Path(relative_path)
     if candidate.is_absolute():
         raise ValueError("relative_path must be relative to the workspace/ directory")
@@ -201,8 +208,7 @@ def execute_command_text(
     if not root.is_dir():
         raise ValueError(f"Workspace directory does not exist: {workspace_path}")
 
-    # Even if the agent passes a huge timeout, we clamp so a single command
-    # cannot exceed the wall-clock budget we've set for the whole run.
+    # Clamp so a single command cannot exceed the hard per-command ceiling.
     timeout = min(timeout, MAX_TIMEOUT)
 
     env = os.environ.copy()
@@ -434,6 +440,12 @@ def cache_workspace_artifact_text(
 def read_workspace_file_text(workspace_path: str | Path, relative_path: str) -> str:
     """Read a file from the workspace directory."""
     root = Path(workspace_path).resolve()
+
+    # Same leading-prefix strip as write_file_text.
+    for prefix in ("workspace/", "workspace\\"):
+        if relative_path.startswith(prefix):
+            relative_path = relative_path[len(prefix):]
+            break
 
     candidate = Path(relative_path)
     if candidate.is_absolute():

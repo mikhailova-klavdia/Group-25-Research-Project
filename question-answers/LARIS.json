@@ -1,0 +1,17 @@
+[
+  {
+    "id": "LARIS_001",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad' and the ligand-receptor database from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv', run the LARIS inference with parameters: 20 nearest neighbors, mu equals 0.40, sigma equals 100, 5 permutation repeats, expressed_pct equals 0.1, mu_celltype equals 100, and by_celltype set to True with groupby 'cell_type'. How many cell type-level interactions have a p_value less than 0.05?",
+    "ground_truth": "8772"
+  },
+  {
+    "id": "LARIS_002",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad' (human tonsil Slide-tags spatial transcriptomics data with 5695 cells x 25583 genes) and the ligand-receptor database from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv', prepare a ligand-receptor AnnData object using 20 nearest neighbors and 'X_spatial' as the spatial coordinates key. How many ligand-receptor interaction pairs are in the resulting LR AnnData object (number of variables)?",
+    "ground_truth": "1985"
+  },
+  {
+    "id": "LARIS_003",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad' and the ligand-receptor database from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv', run the LARIS inference with parameters: 20 nearest neighbors, mu equals 0.40, sigma equals 100, 5 permutation repeats, expressed_pct equals 0.1, mu_celltype equals 100, and by_celltype set to True with groupby 'cell_type'. What is the ligand name of the top-ranked spatially variable interaction (rank 0)?",
+    "ground_truth": "SEMA4A"
+  }
+]

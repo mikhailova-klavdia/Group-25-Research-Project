@@ -1,0 +1,17 @@
+[
+  {
+    "id": "SCISTREECNA_001",
+    "question": "Using the single-cell copy number data from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv' (100 SNP sites x 60 cells, 'ref|alt|cn' format), run SciStree2 inference (using scistreecna's external module). Then evaluate the inferred tree against the ground truth tree from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_tree.pkl'. What is the SciStree2 tree accuracy (reported as a decimal number)?",
+    "ground_truth": "0.3793103448275862"
+  },
+  {
+    "id": "SCISTREECNA_002",
+    "question": "Using the single-cell copy number data from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv' (100 SNP sites x 60 cells, 'ref|alt|cn' format), run ScisTreeCNA inference with the following parameters: allelic dropout rate equals 0.1, sequencing error equals 0.01, copy number noise equals 0.05, minimum copy number equals 1, maximum copy number equals 5, tree batch size equals 128, and node batch size equals 256. Then evaluate the inferred genotypes against the ground truth genotypes from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_tg.txt'. What is the genotype accuracy (reported as a decimal number)?",
+    "ground_truth": "0.9911666666666666"
+  },
+  {
+    "id": "SCISTREECNA_003",
+    "question": "Using the single-cell copy number data from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv' (100 SNP sites x 60 cells, 'ref|alt|cn' format), run ScisTreeCNA inference with the following parameters: allelic dropout rate equals 0.1, sequencing error equals 0.01, copy number noise equals 0.05, minimum copy number equals 1, maximum copy number equals 5, tree batch size equals 128, and node batch size equals 256. Then evaluate the inferred tree against the ground truth tree from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_tree.pkl'. What is the tree accuracy (reported as a decimal number)?",
+    "ground_truth": "0.4827586206896552"
+  }
+]

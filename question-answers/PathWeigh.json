@@ -1,0 +1,7 @@
+[
+  {
+    "id": "PATHWEIGH_001",
+    "question": "Using the pre-generated UDP data from 'PathWeigh/notebooks/rnaseq/data/output_udp.csv' (34694 genes x 20 samples), calculate pathway activity using PathWeigh with is_rnaseq set to True. What is the pathway activity score for the 'Acute myeloid leukemia(Kegg)' pathway in sample '17-019'? Provide the answer rounded to 6 decimal places.",
+    "ground_truth": "0.398714"
+  }
+]

@@ -1,0 +1,155 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alphagenome-mcp"
+version = "1.0.0"
+description = "Model Context Protocol (MCP) server for AlphaGenome - Google DeepMind's genomic prediction model"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "AlphaGenome MCP Contributors" }
+]
+keywords = [
+    "genomics",
+    "machine learning",
+    "mcp",
+    "alphagenome",
+    "bioinformatics",
+    "variant analysis"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+
+dependencies = [
+    # Core AlphaGenome dependencies
+    "alphagenome",
+    "absl-py",
+    "anndata",
+    "grpcio>=1.67.1",
+    "immutabledict",
+    "intervaltree",
+    "jaxtyping",
+    "matplotlib",
+    "ml_dtypes",
+    "numpy",
+    "pandas",
+    "protobuf>=5.28.3",
+    "pyarrow",
+    "scipy",
+    "seaborn",
+    "tqdm",
+    "typeguard",
+    "typing_extensions",
+    "zstandard",
+    
+    # MCP and server dependencies
+    "fastmcp>=0.1.0",
+    "uvicorn>=0.20.0",
+    "uv>=0.8.13",
+    
+    # Visualization dependencies
+    "plotnine>=0.12.0",
+    
+    # Additional dependencies for tools
+    "ipython",
+    "jupyter",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+]
+
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+]
+
+docs = [
+    "sphinx>=5.0",
+    "sphinx-autodoc-typehints",
+    "sphinx-book-theme",
+    "myst-nb",
+]
+
+[project.scripts]
+alphagenome-mcp = "src.alphagenome_mcp:main"
+
+[project.urls]
+Homepage = "https://github.com/your-org/alphagenome-mcp"
+Documentation = "https://alphagenome-mcp.readthedocs.io"
+Repository = "https://github.com/your-org/alphagenome-mcp"
+"Bug Tracker" = "https://github.com/your-org/alphagenome-mcp/issues"
+"AlphaGenome Docs" = "https://www.alphagenomedocs.com/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yaml", "*.yml", "*.csv", "*.tsv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["*_test.py", "test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--cov=src",
+    "--cov-report=term-missing",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "W", "I", "N", "B", "UP"]
+ignore = ["E501"]  # Line too long - handled by black
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]

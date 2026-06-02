@@ -9,9 +9,16 @@
 
 # Local paper workspaces
 papers/
+Papers/
+
+# Per-repo reference link (local use only)
+biorxiv_link.txt
 
 # LLM-as-judge evaluation output (generated; not tracked)
 ClaudeEval/
+
+# Raw eval chain outputs (iteration artefacts; not tracked)
+Chains/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

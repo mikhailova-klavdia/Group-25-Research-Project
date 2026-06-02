@@ -5,6 +5,7 @@ description = "Research agents powered by OpenAI Agents SDK for analyzing scient
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=0.40.0",
     "openai-agents>=0.17.4",
     "pydantic>=2.12.5",
     "pypdf>=4.0.0",

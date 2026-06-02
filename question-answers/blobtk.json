@@ -1,0 +1,37 @@
+[
+  {
+    "id": "BLOBTK_001",
+    "question": "Using the blobtk filter tool, filter a BAM file located at blobtk/notebooks/blobtk_filter/input/test.bam using the sequence ID list at blobtk/notebooks/blobtk_filter/input/test.list, and save the output read list to blobtk/notebooks/blobtk_filter/output/filtered_reads.txt. What is the first read ID listed in the output file?",
+    "ground_truth": "ERR070029.230709"
+  },
+  {
+    "id": "BLOBTK_002",
+    "question": "Using the blobtk taxonomy filter tool, process the NCBI taxdump located at blobtk/notebooks/blobtk_taxonomy/input/ncbi_taxdump with NCBI format, filter to root taxon ID 2 (Bacteria), and save output to blobtk/notebooks/blobtk_taxonomy/output/test_filtered_bacteria. How many name entries in the output names.dmp file have the name class 'in-part'?",
+    "ground_truth": "5"
+  },
+  {
+    "id": "BLOBTK_003",
+    "question": "Using blobtk validate, validate the GenomeHubs configuration file located at blobtk/notebooks/blobtk_validate/input/genomehubs/ATTR_genome_size.types.yaml with the NCBI taxonomy dump at blobtk/notebooks/blobtk_validate/input/ncbi_taxdump using ncbi format, and generate a JSON schema output file. In the generated schema, how many definitions are defined in the definitions section?",
+    "ground_truth": "20"
+  },
+  {
+    "id": "BLOBTK_004",
+    "question": "Using blobtk validate, validate the GenomeHubs configuration file located at blobtk/notebooks/blobtk_validate/input/genomehubs/ATTR_genome_size.types.yaml with the NCBI taxonomy dump at blobtk/notebooks/blobtk_validate/input/ncbi_taxdump using ncbi format, and generate a JSON schema output file at blobtk/notebooks/blobtk_validate/output/schema.json. What is the title field value in the root level of the generated JSON schema?",
+    "ground_truth": "GHubsConfig"
+  },
+  {
+    "id": "BLOBTK_005",
+    "question": "Using the blobtk taxonomy filter tool, process the NCBI taxdump located at blobtk/notebooks/blobtk_taxonomy/input/ncbi_taxdump with NCBI format, filter to root taxon ID 2 (Bacteria), and save output to blobtk/notebooks/blobtk_taxonomy/output/test_filtered_bacteria. What is the taxonomic rank of the filtered taxon as shown in the output nodes.dmp file?",
+    "ground_truth": "superkingdom"
+  },
+  {
+    "id": "BLOBTK_006",
+    "question": "Generate a legend visualization from the BlobDir at blobtk/notebooks/blobtk_plot/input/BlobDir with the y field set to length, saving the result to blobtk/notebooks/blobtk_plot/output/test_legend.svg. What is the hexadecimal color code used for the fill attribute of the category rectangle in the generated legend?",
+    "ground_truth": "#a6cee3"
+  },
+  {
+    "id": "BLOBTK_007",
+    "question": "Using the BlobToolKit snail plot generator, create a snail plot from the BlobDir at blobtk/notebooks/blobtk_plot/input/BlobDir and save it to blobtk/notebooks/blobtk_plot/output/test_snail.svg. What is the total scaffold count reported in the Scaffold statistics section of the generated snail plot?",
+    "ground_truth": "1"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "GENECAD_001",
+    "question": "Use the gff.py summarize command to analyze genecad/notebooks/gff_summarize/data/arabidopsis_chr4.gff3. In the strand distribution section, what percentage of records are on the positive strand (rounded to two decimal places)?",
+    "ground_truth": "50.75"
+  },
+  {
+    "id": "GENECAD_002",
+    "question": "Using the gff.py filter_to_valid_genes command, filter the Arabidopsis chromosome 4 GFF file at genecad/notebooks/gff_filter_to_valid_genes/data/arabidopsis_chr4.gff3 with the require-utrs option set to no. What is the gene ID (in the format AT4GXXXXX) of the first protein-coding gene that appears in the filtered output?",
+    "ground_truth": "AT4G00005"
+  },
+  {
+    "id": "GENECAD_003",
+    "question": "Use the gff.py summarize command to analyze the GFF file at genecad/notebooks/gff_summarize/data/arabidopsis_chr4.gff3. What is the most common feature type combination per transcript, and how many transcripts have this combination?",
+    "ground_truth": "CDS, exon, five_prime_UTR, three_prime_UTR with 6197 transcripts"
+  },
+  {
+    "id": "GENECAD_004",
+    "question": "Using the gff.py filter_to_chromosome command, filter the Arabidopsis GFF file at genecad/notebooks/gff_filter_to_chromosome/data/arabidopsis_full.gff3 to include only entries from chromosome 3. Save the output to genecad/notebooks/gff_filter_to_chromosome/output/arabidopsis_chr3_analysis.gff3. How many features of type gene are in the filtered output file?",
+    "ground_truth": "5460"
+  },
+  {
+    "id": "GENECAD_005",
+    "question": "Using the gff.py merge command, merge the Arabidopsis chromosome 1 GFF3 file at genecad/notebooks/gff_merge/data/arabidopsis_chr1.gff3 and the chromosome 2 GFF3 file at genecad/notebooks/gff_merge/data/arabidopsis_chr2.gff3 into a single output file at genecad/notebooks/gff_merge/output/merged.gff3. How many gene features (lines where the third column equals 'gene') are in the merged output file?",
+    "ground_truth": "11473"
+  },
+  {
+    "id": "GENECAD_006",
+    "question": "Using the gff.py filter_to_valid_genes command, filter the Arabidopsis chromosome 4 GFF file located at genecad/notebooks/gff_filter_to_valid_genes/data/arabidopsis_chr4.gff3 with the require-utrs option set to yes, saving the output to genecad/notebooks/gff_filter_to_valid_genes/output/valid_genes_with_utrs.gff3. How many gene features are present in the resulting filtered GFF file?",
+    "ground_truth": "3433"
+  }
+]

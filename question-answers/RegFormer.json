@@ -1,0 +1,27 @@
+[
+  {
+    "id": "REGFORMER_001",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy' and cell labels from 'RegFormer/notebooks/cell_emb/data/cell_labels.csv' (containing cell_type column). Calculate the silhouette score using cosine distance to evaluate embedding quality based on the cell_type labels. What is the silhouette score rounded to 4 decimal places?",
+    "ground_truth": "-0.1416"
+  },
+  {
+    "id": "REGFORMER_002",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2 test runs with columns for Loss, PCC, and Spearman correlation (no header row). What is the Spearman correlation coefficient for the second test run (Run 1)?",
+    "ground_truth": "0.8841"
+  },
+  {
+    "id": "REGFORMER_003",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels from 'RegFormer/notebooks/cell_emb/data/cell_labels.csv', and gene expression matrix from 'RegFormer/notebooks/cell_emb/data/gene_expression.csv'. Create an AnnData object with the gene expression as the main matrix and store the embeddings in obsm with key 'X_regformer'. What is the embedding dimension (number of features in the embedding)?",
+    "ground_truth": "512"
+  },
+  {
+    "id": "REGFORMER_004",
+    "question": "Load the cell labels from 'RegFormer/notebooks/cell_emb/data/cell_labels.csv'. What is the cell type annotation for the first cell (Cell_0)?",
+    "ground_truth": "NK cell"
+  },
+  {
+    "id": "REGFORMER_005",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2 test runs with columns for Loss, PCC (Pearson Correlation Coefficient), and Spearman correlation (no header row). What is the PCC value for the first test run (Run 0)?",
+    "ground_truth": "0.9076"
+  }
+]

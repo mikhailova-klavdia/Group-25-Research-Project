@@ -1,0 +1,37 @@
+[
+  {
+    "id": "FADVI_001",
+    "question": "Load the pre-trained FADVI model from 'fadvi/notebooks/basic_usage/fadvi_save/' and extract the batch latent representation. What is the dimensionality (number of features) of the batch latent representation?",
+    "ground_truth": "30"
+  },
+  {
+    "id": "FADVI_002",
+    "question": "Load the expression matrix from 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv' and metadata from 'fadvi/notebooks/advanced_usage/data/metadata.csv' to create an AnnData object. How many unique batches are present in the data?",
+    "ground_truth": "3"
+  },
+  {
+    "id": "FADVI_003",
+    "question": "Create an AnnData object using the expression matrix from 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv', metadata from 'fadvi/notebooks/advanced_usage/data/metadata.csv', and highly variable genes from 'fadvi/notebooks/advanced_usage/data/highly_variable_genes.csv'. Setup FADVI with batch_key='batch' and labels_key='cell_type'. Initialize a FADVI model with beta=1.0, lambda_b=25.0, lambda_l=75.0, alpha_bl=0.5, alpha_lb=0.5, alpha_rb=1.5, alpha_rl=1.5, and gamma=0.3. Train for 10 epochs with train_size=0.8 and validation_size=0.2. What is the dimensionality (number of columns) of the residual latent representation?",
+    "ground_truth": "10"
+  },
+  {
+    "id": "FADVI_004",
+    "question": "Load the scRNA-seq data from 'fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad'. How many unique cell types are present in the scRNA-seq dataset?",
+    "ground_truth": "4"
+  },
+  {
+    "id": "FADVI_005",
+    "question": "Load the saved AnnData object from 'fadvi/notebooks/basic_usage/fadvi_save/adata.h5ad' which contains FADVI predictions. Compute the Adjusted Rand Index (ARI) between the original cell type labels (column 'cell_type') and the predicted cell type labels (column 'label_pred'). What is the Label ARI value rounded to 3 decimal places?",
+    "ground_truth": "0.987"
+  },
+  {
+    "id": "FADVI_006",
+    "question": "Load the raw PBMC3K scRNA-seq data from 'fadvi/notebooks/basic_usage/data/data/pbmc3k_raw.h5ad' (2700 cells x 32738 genes), perform preprocessing (filter cells with min_genes=200, filter genes with min_cells=3, normalize to target_sum=10000, log transform), compute highly variable genes (n_top_genes=2000), compute neighbors, and run Louvain clustering with resolution=0.5. How many unique clusters are identified?",
+    "ground_truth": "6"
+  },
+  {
+    "id": "FADVI_007",
+    "question": "Load the scRNA-seq data from 'fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad' (500 cells x 2000 genes) and the spatial transcriptomics data from 'fadvi/notebooks/spatial_and_single_cell/data/st_data.h5ad' (300 spots x 2000 genes). Use TACCO to annotate the ST data using the scRNA-seq reference with the cell_type annotation key, concatenate the data with 'tech' as the batch label, then train a FADVI model with batch_key='tech', labels_key='cell_type', using the counts layer, for 30 epochs. What is the dimensionality (number of features) of the latent representation?",
+    "ground_truth": "30"
+  }
+]

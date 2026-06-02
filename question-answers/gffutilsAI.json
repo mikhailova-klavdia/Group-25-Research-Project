@@ -1,0 +1,17 @@
+[
+  {
+    "id": "GFFUTILSAI_001",
+    "question": "Using the gffai tool with the Anthropic provider and model claude-3-5-haiku-latest, query the GFF file at gffutilsAI/notebooks/gffai/data/sample.gff with temperature 0.1 and maximum tokens 4096. Ask the query: 'What feature types are available in my GFF file?' How many distinct feature types are reported?",
+    "ground_truth": "6"
+  },
+  {
+    "id": "GFFUTILSAI_002",
+    "question": "Using the gffai tool with the Anthropic provider and model claude-3-5-haiku-latest, query the GFF file at gffutilsAI/notebooks/gffai/data/sample.gff with temperature 0.1 and maximum tokens 4096. Ask the query: 'How many genes are present in this GFF file?' What is the total number of genes?",
+    "ground_truth": "1151"
+  },
+  {
+    "id": "GFFUTILSAI_003",
+    "question": "Using the gffai tool with the Anthropic provider and model claude-3-5-haiku-latest, query the GFF file at gffutilsAI/notebooks/gffai/data/sample.gff with temperature 0.1 and maximum tokens 4096. Ask the query: 'How many genes are on chromosome 1 (Chr1)?' What is the count of genes on Chr1?",
+    "ground_truth": "318"
+  }
+]
