@@ -130,6 +130,9 @@ def test_testing_team_runs_validation_before_worker_critic():
 
     assert result.answer.final_answer == "42"
     assert len(result.captures) == 1
+    assert result.testing_report is not None
+    assert result.testing_report["overall_status"] == "ready"
+    assert result.testing_report["validated_workflows"] == ["example-workflow"]
     worker_prompt = run_with_critic.call_args.kwargs["question"]
     assert "WORKFLOW TESTING REPORT" in worker_prompt
     assert "validated: example-workflow" in worker_prompt

@@ -59,4 +59,5 @@ def run_testing_worker_critic(
         captures=[testing_capture, *exec_result.captures],
         reviews=exec_result.reviews,
         install_events=exec_result.install_events,
+        testing_report=report.model_dump(),
     )
