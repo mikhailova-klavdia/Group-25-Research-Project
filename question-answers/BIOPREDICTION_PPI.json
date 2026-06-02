@@ -1,0 +1,4 @@
+[
+  {"id": "BIOPREDICTION_PPI_001", "question": "Using the extract_entropy_features tool, extract Tsallis entropy-based features from the protein sequences at BioPrediction-PPI/notebooks/extract_entropy_features/data/sample_proteins.fasta. Set the sequence label to 'protein', use a k-mer size of 5, and specify Tsallis as the entropy type. What is the k1 (1-mer Tsallis entropy) value for the sequence Q9ULG1 in the output file?", "ground_truth": "0.9361035480865181"},
+  {"id": "BIOPREDICTION_PPI_002", "question": "Using the extract_entropy_features tool, extract Shannon entropy features from the protein sequences at BioPrediction-PPI/notebooks/extract_entropy_features/data/sample_proteins.fasta. Use 'protein' as the label, set k-mer size to 5, and specify Shannon as the entropy type. In the output CSV file, what is the k5 (5-mer Shannon entropy) value for the sequence P37268?", "ground_truth": "8.689997971419444"}
+]

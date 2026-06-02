@@ -156,7 +156,16 @@ def _iter_repo_files(root: Path):
             path = current_path / filename
             if filename in {".DS_Store"}:
                 continue
-            if _should_skip_file(path):
+            try:
+                skip = _should_skip_file(path)
+            except (ValueError, OSError):
+                # An unreadable entry (broken symlink, permission error, a file
+                # that vanished mid-walk, a special/device file) must NOT abort
+                # the whole listing — skip just that file.  Previously the
+                # ValueError raised by _is_text_file propagated up and made
+                # `list_repo_files` fail entirely (observed on the grf repo).
+                continue
+            if skip:
                 continue
             yield path
 

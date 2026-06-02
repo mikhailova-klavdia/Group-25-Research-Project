@@ -1,0 +1,3 @@
+[
+  {"id": "MODEL_BASED_STANDARDIZATION_001", "question": "Load multi-omics data from primary metabolites ('data/Primary_synth.tsv'), lipids ('data/Lipids_synth.tsv'), biogenic amines ('data/BA_synth.tsv'), and proteins ('data/proteins_synth.tsv'). Merge all dataframes by 'subjectID', then apply WGCNA's goodSamplesGenes function with default parameters (50% missingness filter). Count the remaining analytes in each category by intersecting original column names with filtered columns. Report the counts for proteins, lipids, primary metabolites, and biogenic amines respectively, as a space-separated string.", "ground_truth": "283 712 149 321 1465"}
+]

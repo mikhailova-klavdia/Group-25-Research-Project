@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -171,3 +172,24 @@ class PaperToolTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "no extractable text"):
                 read_paper_text(str(pdf_path))
+
+
+class RepoToolRobustnessTests(unittest.TestCase):
+    def test_list_repo_files_skips_unreadable_entry(self):
+        """One unreadable file (e.g. a broken symlink) must not abort the whole listing.
+
+        Regression test for the grf failure where ``_is_text_file`` raised on an
+        OSError and that propagated out of ``list_repo_files``.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "good.txt").write_text("hello world", encoding="utf-8")
+            try:
+                os.symlink(root / "nonexistent-target", root / "broken")
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks not supported on this platform")
+
+            out = list_repo_files_text(str(root))
+
+            self.assertIn("good.txt", out)
+            self.assertNotIn("broken", out)

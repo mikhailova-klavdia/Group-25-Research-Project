@@ -85,6 +85,19 @@ class ResearchContext:
     # Set by _run_triage_stage so subsequent questions skip re-reading the paper.
     session_overview: str | None = field(default=None)
 
+    # Optional human-in-the-loop chat channel.  The interactive CLI
+    # (``hitl_main``) sets this so the ``ask_human`` tool can reach the
+    # operator; it stays ``None`` on headless/batch runs, where ask_human
+    # degrades to "proceed autonomously".  Additive and defaulted, so every
+    # existing construction of ResearchContext is unaffected.
+    human: "HumanChannel | None" = None
+
+    # Optional progress reporter.  The interactive CLI sets this so the team can
+    # stream friendly stage/step updates while it works; ``None`` on
+    # headless/batch runs means total silence (no behaviour change there).
+    # Additive and defaulted, like ``human``.
+    reporter: "Reporter | None" = None
+
 
 def _venv_bin_name() -> str:
     """Return the venv's scripts-directory name for the current platform.
