@@ -162,6 +162,7 @@ def _build_record(
     critic_reviews: list | None = None,
     install_events: list | None = None,
     testing_report: dict | None = None,
+    gap_report: dict | None = None,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
 
@@ -231,6 +232,8 @@ def _build_record(
     }
     if testing_report is not None:
         record["testing_report"] = testing_report
+    if gap_report is not None:
+        record["gap_report"] = gap_report
     return record
 
 
@@ -272,6 +275,7 @@ def run_react_query(
         critic_reviews = team_result.reviews
         install_events = team_result.install_events
         testing_report = team_result.testing_report
+        gap_report = team_result.gap_report
     except MaxTurnsExceeded:
         print(
             "\nError: Agent did not finish within 150 turns. "
@@ -324,6 +328,7 @@ def run_react_query(
         critic_reviews=critic_reviews,
         install_events=install_events,
         testing_report=testing_report,
+        gap_report=gap_report,
     )
 
     # --- Print chain to stdout ---

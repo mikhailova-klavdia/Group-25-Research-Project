@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from research_agents.agents.critic_agent import CriticReview
 from research_agents.agents.react_agent import ReActAnswer, ReActStep
-from research_agents.react_main import _failure_analysis
+from research_agents.react_main import _build_record, _failure_analysis
 from research_agents.orchestration import (
     InstallEvent,
     _build_critic_input,
@@ -114,6 +114,31 @@ def test_failure_analysis_infers_blocked_status_for_old_style_failure_answer():
     assert analysis["answer_status"] == "blocked"
     assert analysis["blocker_type"] == "unknown"
     assert "missing input file" in analysis["blocker_explanation"]
+
+
+def test_build_record_preserves_gap_and_testing_reports():
+    result = _result("EXECUTION_REQUIRED â€” checkpoint missing")
+    capture = SimpleNamespace(outputs=["Exit code: 1\nFileNotFoundError: weights/model.ckpt"])
+
+    record = _build_record(
+        entry_id="Q001",
+        biorxiv_url="",
+        question="Run the script.",
+        ground_truth="",
+        output=result.final_output,
+        model="gpt-5-mini-2025-08-07",
+        pre_estimate=123,
+        result=result,
+        capture=capture,
+        team_name="testing-worker-critic",
+        critic_reviews=[],
+        install_events=[],
+        testing_report={"overall_status": "ready"},
+        gap_report={"missing_artifacts": ["Missing checkpoint"]},
+    )
+
+    assert record["testing_report"]["overall_status"] == "ready"
+    assert record["gap_report"]["missing_artifacts"] == ["Missing checkpoint"]
 
 
 def test_run_with_critic_installs_missing_module_then_retries(tmp_path):

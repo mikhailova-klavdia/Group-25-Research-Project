@@ -109,6 +109,10 @@ class TeamRunResult:
     # it to expose the TestingReport that would otherwise only exist in
     # memory and in the worker prompt preamble.
     testing_report: dict[str, Any] | None = None
+    # Optional post-execution discrepancy analysis payload. Kept separate
+    # from the worker answer because a blocked benchmark answer and a
+    # reproducibility-gap diagnosis are related but not interchangeable.
+    gap_report: dict[str, Any] | None = None
 
     @property
     def final_capture(self) -> ToolOutputCapture:

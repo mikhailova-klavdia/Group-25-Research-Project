@@ -9,6 +9,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from research_agents.agents.gap_detection_agent import GapDetectionReport, GapRecord
 from research_agents.agents.critic_agent import CriticReview
 from research_agents.agents.react_agent import ReActAnswer, ReActStep
 from research_agents.agents.testing_agent import (
@@ -62,6 +63,26 @@ def _testing_report(status: str) -> WorkflowTestingReport:
     )
 
 
+def _gap_report() -> GapDetectionReport:
+    return GapDetectionReport(
+        overall_gap_assessment="One high-severity missing artifact blocks full reproduction.",
+        identified_gaps=[
+            GapRecord(
+                title="Missing checkpoint",
+                gap_type="missing_artifact",
+                severity="high",
+                related_repo_files=["weights/model.ckpt"],
+                execution_evidence=["FileNotFoundError: weights/model.ckpt"],
+                explanation="The validated workflow expects a checkpoint that is absent.",
+                likely_impact="The main inference path cannot be reproduced.",
+                possible_remediation="Provide the checkpoint or a documented download link.",
+            )
+        ],
+        evidence_sources=["testing_report.workflows", "execution_answer.blocker_evidence"],
+        recommended_followups=["Check whether the paper artifacts cache already has the weight."],
+    )
+
+
 def test_canonicalize_testing_report_marks_ready_when_any_workflow_validates():
     report = canonicalize_testing_report(_testing_report("validated"))
 
@@ -93,6 +114,7 @@ def test_testing_team_runs_validation_before_worker_critic():
     root = Path("tests/.tmp-testing-team")
     context = _context(root)
     testing_result = SimpleNamespace(final_output=_testing_report("validated"))
+    gap_result = SimpleNamespace(final_output=_gap_report())
     final_answer = ReActAnswer(
         chain=[
             ReActStep(
@@ -108,7 +130,7 @@ def test_testing_team_runs_validation_before_worker_critic():
     exec_result = TeamRunResult(
         answer=final_answer,
         worker_result=SimpleNamespace(final_output=final_answer),
-        captures=[],
+        captures=[SimpleNamespace(outputs=["Exit code: 0\nworkflow ok"])],
         reviews=[CriticReview(verdict="pass", reasoning="Grounded in execution.")],
         install_events=[],
     )
@@ -117,7 +139,7 @@ def test_testing_team_runs_validation_before_worker_critic():
         patch("research_agents.teams.testing_worker_critic.Runner.run_sync") as run_sync,
         patch("research_agents.teams.testing_worker_critic.run_with_critic") as run_with_critic,
     ):
-        run_sync.return_value = testing_result
+        run_sync.side_effect = [testing_result, gap_result]
         run_with_critic.return_value = exec_result
 
         result = run_testing_worker_critic(
@@ -129,10 +151,12 @@ def test_testing_team_runs_validation_before_worker_critic():
         )
 
     assert result.answer.final_answer == "42"
-    assert len(result.captures) == 1
+    assert len(result.captures) == 2
     assert result.testing_report is not None
+    assert result.gap_report is not None
     assert result.testing_report["overall_status"] == "ready"
     assert result.testing_report["validated_workflows"] == ["example-workflow"]
+    assert result.gap_report["missing_artifacts"] == ["Missing checkpoint"]
     worker_prompt = run_with_critic.call_args.kwargs["question"]
     assert "WORKFLOW TESTING REPORT" in worker_prompt
     assert "validated: example-workflow" in worker_prompt
