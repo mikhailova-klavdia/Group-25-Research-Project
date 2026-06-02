@@ -10,6 +10,7 @@
 # Local paper workspaces
 papers/
 Papers/
+Paper2AgentBench/
 
 # Per-repo reference link (local use only)
 biorxiv_link.txt
