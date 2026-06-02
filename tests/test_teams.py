@@ -19,8 +19,10 @@ from research_agents.orchestration import TeamRunResult
 from research_agents.teams import DEFAULT_TEAM, TEAMS, TeamSpec
 from research_agents.teams.human_in_the_loop import run_human_in_the_loop
 from research_agents.teams.solo import run_solo
+from research_agents.teams.testing_worker_critic import run_testing_worker_critic
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
+from research_agents.teams.worker_critic_plus_plus_hitl import run_worker_critic_plus_plus_hitl
 from research_agents.teams.worker_critic_plus_plus import run_worker_critic_plus_plus
 
 
@@ -30,6 +32,7 @@ def test_registry_contains_all_shipped_teams():
         "solo",
         "worker-critic",
         "worker-critic-plus",
+        "testing-worker-critic",
         "worker-critic-plus-plus",
         "human-in-the-loop",
         "worker-critic-plus-plus-hitl",
@@ -58,10 +61,12 @@ def test_only_plus_teams_apply_setup():
     assert TEAMS["solo"].apply_setup is False
     assert TEAMS["worker-critic"].apply_setup is False
     assert TEAMS["worker-critic-plus"].apply_setup is True
+    assert TEAMS["testing-worker-critic"].apply_setup is True
     assert TEAMS["worker-critic-plus-plus"].apply_setup is True
     # The human-in-the-loop team deliberately does NOT use the config file;
     # it sets up the venv interactively instead.
     assert TEAMS["human-in-the-loop"].apply_setup is False
+    assert TEAMS["worker-critic-plus-plus-hitl"].apply_setup is False
 
 
 @pytest.mark.parametrize(
@@ -70,8 +75,10 @@ def test_only_plus_teams_apply_setup():
         ("solo", run_solo),
         ("worker-critic", run_worker_critic),
         ("worker-critic-plus", run_worker_critic_plus),
+        ("testing-worker-critic", run_testing_worker_critic),
         ("worker-critic-plus-plus", run_worker_critic_plus_plus),
         ("human-in-the-loop", run_human_in_the_loop),
+        ("worker-critic-plus-plus-hitl", run_worker_critic_plus_plus_hitl),
     ],
 )
 def test_team_run_fn_matches_module(name, run_fn):
@@ -81,7 +88,15 @@ def test_team_run_fn_matches_module(name, run_fn):
 
 @pytest.mark.parametrize(
     "run_fn",
-    [run_solo, run_worker_critic, run_worker_critic_plus, run_worker_critic_plus_plus, run_human_in_the_loop],
+    [
+        run_solo,
+        run_worker_critic,
+        run_worker_critic_plus,
+        run_testing_worker_critic,
+        run_worker_critic_plus_plus,
+        run_human_in_the_loop,
+        run_worker_critic_plus_plus_hitl,
+    ],
 )
 def test_team_run_signatures_are_uniform(run_fn):
     """Dispatcher relies on every team having the same call signature.
@@ -106,6 +121,12 @@ def test_worker_critic_plus_uses_improved_factory():
     """The worker-critic-plus team must build a worker from create_react_agent_improved."""
     src = inspect.getsource(run_worker_critic_plus)
     assert "create_react_agent_improved" in src
+
+
+def test_testing_worker_critic_uses_testing_aware_factory():
+    """The testing team must hand off to the testing-aware execution worker."""
+    src = inspect.getsource(run_testing_worker_critic)
+    assert "create_execution_agent_with_testing" in src
 
 
 def test_worker_critic_plus_plus_uses_plus_plus_factory():
@@ -135,7 +156,17 @@ def test_baseline_and_improved_factories_produce_distinct_prompts():
 
 def test_team_run_result_type_is_shared():
     """All teams must return the same TeamRunResult so the dispatcher works."""
-    for run_fn in (run_solo, run_worker_critic, run_worker_critic_plus, run_worker_critic_plus_plus, run_human_in_the_loop):
+    # We can't easily call the run functions without an LLM, but we can
+    # check the type-annotation surface matches.
+    for run_fn in (
+        run_solo,
+        run_worker_critic,
+        run_worker_critic_plus,
+        run_testing_worker_critic,
+        run_worker_critic_plus_plus,
+        run_human_in_the_loop,
+        run_worker_critic_plus_plus_hitl,
+    ):
         sig = inspect.signature(run_fn)
         ret = sig.return_annotation
         assert ret is TeamRunResult, f"{run_fn.__name__} returns {ret}, expected TeamRunResult"

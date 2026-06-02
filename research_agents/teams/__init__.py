@@ -19,7 +19,7 @@
 #    up front, ``False`` otherwise).
 # 3. Use it from the CLI with ``--team <your-name>``.
 #
-# Six teams ship today, in increasing complexity:
+# Seven teams ship today, in increasing complexity:
 #   * ``solo`` — single ReAct worker, no critic, no install retry.
 #   * ``worker-critic`` — the colleague's two-agent system (worker + LLM
 #     critic + deterministic missing-module install retry).
@@ -39,6 +39,7 @@ from research_agents.orchestration import TeamRunResult
 from research_agents.project import ResearchContext
 from research_agents.teams.human_in_the_loop import run_human_in_the_loop
 from research_agents.teams.solo import run_solo
+from research_agents.teams.testing_worker_critic import run_testing_worker_critic
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
 from research_agents.teams.worker_critic_plus_plus import run_worker_critic_plus_plus
@@ -98,6 +99,16 @@ TEAMS: dict[str, TeamSpec] = {
             "up-front venv setup scripts (model-weight downloads, framework warmups)."
         ),
         run=run_worker_critic_plus,
+        apply_setup=True,
+    ),
+    "testing-worker-critic": TeamSpec(
+        name="testing-worker-critic",
+        description=(
+            "Three stages: a workflow-testing agent performs smoke validation on "
+            "candidate repo workflows, hands a typed TestingReport to a ReAct "
+            "execution worker, then the usual LLM critic audits the answer."
+        ),
+        run=run_testing_worker_critic,
         apply_setup=True,
     ),
     "worker-critic-plus-plus": TeamSpec(
