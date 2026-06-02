@@ -161,7 +161,6 @@ def _build_record(
     team_name: str,
     critic_reviews: list | None = None,
     install_events: list | None = None,
-    extraction_report: dict | None = None,
     testing_report: dict | None = None,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
@@ -230,8 +229,6 @@ def _build_record(
             ) if result else 0.0,
         },
     }
-    if extraction_report is not None:
-        record["extraction_report"] = extraction_report
     if testing_report is not None:
         record["testing_report"] = testing_report
     return record
@@ -274,7 +271,6 @@ def run_react_query(
         capture = team_result.final_capture
         critic_reviews = team_result.reviews
         install_events = team_result.install_events
-        extraction_report = team_result.extraction_report
         testing_report = team_result.testing_report
     except MaxTurnsExceeded:
         print(
@@ -327,7 +323,6 @@ def run_react_query(
         team_name=team.name,
         critic_reviews=critic_reviews,
         install_events=install_events,
-        extraction_report=extraction_report,
         testing_report=testing_report,
     )
 
