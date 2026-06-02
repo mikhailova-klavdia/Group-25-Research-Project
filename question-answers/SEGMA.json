@@ -1,0 +1,7 @@
+[
+  {
+    "id": "SEGMA_001",
+    "question": "Using the SEGMA process_sequences tool, process the FASTA file located at SEGMA/notebooks/get_seqs/input/test.fasta. What is the total number of amino acids across all sequences in the input file?",
+    "ground_truth": "187"
+  }
+]

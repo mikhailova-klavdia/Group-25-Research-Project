@@ -20,6 +20,7 @@ from agents import Agent, RunHooks, Runner
 from research_agents.agents.critic_agent import CriticReview, create_critic_agent
 from research_agents.agents.react_agent import ReActAnswer, create_react_agent
 from research_agents.config import DEFAULT_MODEL
+from research_agents.hitl import apply_integrity_guard
 from research_agents.project import ResearchContext, _find_python_in_venv
 from research_agents.tools.exec_tools import MAX_TIMEOUT
 
@@ -35,6 +36,25 @@ WorkerFactory = Callable[[str], Agent[ResearchContext]]
 _MISSING_MODULE_RE = re.compile(
     r"(?:ModuleNotFoundError|ImportError):\s+No module named\s+['\"]?([^'\"\s]+)"
 )
+
+# execute_command always prefixes its result with "Exit code: N"; read tools
+# (read_paper, read_repo_file, search_repo, …) never do.  Checking for this
+# prefix reliably separates execution outputs from read outputs.
+_EXEC_OUTPUT_PREFIX = "exit code:"
+
+
+def _execution_was_attempted(outputs: list[str]) -> bool:
+    """Return True if any captured output came from an execute_command call.
+
+    Used to guard against applying the integrity check to purely read-only
+    chains where no execution was ever attempted — those chains can produce
+    correct answers from file reads and code inspection without running any
+    commands, and blocking them wastes correct answers.
+    """
+    return any(
+        (out or "").lstrip().lower().startswith(_EXEC_OUTPUT_PREFIX)
+        for out in outputs
+    )
 
 _PACKAGE_NAME_BY_IMPORT = {
     "Bio": "biopython",
@@ -221,6 +241,7 @@ def run_with_critic(
     critic_model: str = DEFAULT_MODEL,
     max_retries: int = 1,
     worker_factory: WorkerFactory = create_react_agent,
+    needs_execution: bool = False,
 ) -> TeamRunResult:
     """Run worker, review with critic, and optionally retry once.
 
@@ -311,8 +332,20 @@ def run_with_critic(
     if last_answer is None or last_worker_result is None:
         raise RuntimeError(f"No worker result produced for {entry_id}")
 
+    # Only activate the guard when execution was actually attempted. If the
+    # worker answered from reads alone (file listings, code inspection) the
+    # guard would incorrectly downgrade correct read-derived answers because
+    # no execute_command ever ran.  needs_execution=True from the caller says
+    # "this *kind* of question needs execution"; the auto-detect adds "AND
+    # the agent actually tried to run something this time."
+    effective_needs_execution = needs_execution and _execution_was_attempted(
+        captures[-1].outputs
+    )
+    guarded = apply_integrity_guard(
+        last_answer, captures[-1].outputs, needs_execution=effective_needs_execution
+    )
     return TeamRunResult(
-        answer=last_answer,
+        answer=guarded,
         worker_result=last_worker_result,
         captures=captures,
         reviews=reviews,

@@ -28,6 +28,7 @@ import json
 import sys
 from pathlib import Path
 
+import openai
 from agents.exceptions import MaxTurnsExceeded, ModelRefusalError
 
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
@@ -95,7 +96,13 @@ def _is_correct(final_answer: str, ground_truth: str) -> bool:
 
     try:
         fa_num, gt_num = float(fa), float(gt)
-        if abs(fa_num - gt_num) <= 1e-5 * max(abs(gt_num), 1.0):
+        # Pure relative tolerance: scale to the larger magnitude so tiny
+        # scientific numbers (e.g. 5e-8) are not swallowed by a fixed floor.
+        # 0.1% (1e-3) handles 2–3 sig fig rounding without false-matching
+        # values that differ by orders of magnitude.
+        # 1e-15 epsilon only guards the true-zero vs true-zero edge case.
+        scale = max(abs(fa_num), abs(gt_num), 1e-15)
+        if abs(fa_num - gt_num) <= 1e-3 * scale:
             return True
     except ValueError:
         pass
@@ -208,17 +215,17 @@ def _build_record(
         ],
         "token_usage": {
             "pre_run_estimate": pre_estimate,
-            "input_tokens": result.context_wrapper.usage.input_tokens,
-            "output_tokens": result.context_wrapper.usage.output_tokens,
+            "input_tokens": result.context_wrapper.usage.input_tokens if result else 0,
+            "output_tokens": result.context_wrapper.usage.output_tokens if result else 0,
             "total_tokens": (
                 result.context_wrapper.usage.input_tokens
                 + result.context_wrapper.usage.output_tokens
-            ),
+            ) if result else 0,
             "estimated_cost_usd": calculate_cost(
                 result.context_wrapper.usage.input_tokens,
                 result.context_wrapper.usage.output_tokens,
                 model,
-            ),
+            ) if result else 0.0,
         },
     }
 
@@ -273,6 +280,24 @@ def run_react_query(
             file=sys.stderr,
         )
         sys.exit(1)
+    except openai.RateLimitError as exc:
+        print(
+            f"\n[RATE LIMIT] OpenAI rate limit reached: {exc}",
+            file=sys.stderr,
+        )
+        print(
+            "The API has either hit a requests-per-minute / tokens-per-minute cap "
+            "or exhausted the account quota. Wait a moment and re-run, or switch "
+            "models with --model.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    except openai.APIStatusError as exc:
+        print(
+            f"\n[API ERROR] OpenAI returned HTTP {exc.status_code}: {exc.message}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
     # --- Token usage ---
     usage = result.context_wrapper.usage
@@ -335,22 +360,23 @@ def run_react_query(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nSaved chain to: {output_path}")
-    append_cost_log(
-        project_dir=context.project_dir,
-        run_id=context.run_id,
-        question=question,
-        model=model,
-        pre_estimate=pre_estimate,
-        input_tokens=result.context_wrapper.usage.input_tokens,
-        output_tokens=result.context_wrapper.usage.output_tokens,
-    )
-    print_token_report(
-        pre_estimate,
-        result.context_wrapper.usage.input_tokens,
-        result.context_wrapper.usage.output_tokens,
-        model,
-        project_dir=context.project_dir,
-    )
+    if result is not None:
+        append_cost_log(
+            project_dir=context.project_dir,
+            run_id=context.run_id,
+            question=question,
+            model=model,
+            pre_estimate=pre_estimate,
+            input_tokens=result.context_wrapper.usage.input_tokens,
+            output_tokens=result.context_wrapper.usage.output_tokens,
+        )
+        print_token_report(
+            pre_estimate,
+            result.context_wrapper.usage.input_tokens,
+            result.context_wrapper.usage.output_tokens,
+            model,
+            project_dir=context.project_dir,
+        )
     return record
 
 

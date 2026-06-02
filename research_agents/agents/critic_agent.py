@@ -88,10 +88,24 @@ Strict execution rule:
   reading a generated artifact, the verdict MUST be "incorrect" (or
   "redo_more_steps" if a retry remains useful). This applies even when the
   answer happens to match the ground truth.
+- Logic-only answers are NOT acceptable for execution questions: if the
+  worker derived the answer through reasoning or formula application rather
+  than actually running code and reading the output, the verdict MUST be
+  "incorrect". An answer like "R = 1.5 because 50% inflation means ..." with
+  no successful execute_command in the chain is fabrication, not execution.
+  A "pass" verdict requires real tool output in the chain that directly
+  supports the final_answer value.
 - For embedding questions, distinguish raw model-token arrays from
   per-residue arrays. If the worker answers with a raw shape including
   BOS/EOS tokens when the question asks for residue rows/sequence length,
   use "incorrect".
+- ESM-2 embedding sanity check: if the question involves ESM-2 per-residue
+  embeddings and the worker reports a negative mean value, or reports a row
+  count that is 2 more than the sequence length (i.e., includes BOS and EOS
+  tokens), the verdict MUST be "incorrect". A genuine per-residue mean from
+  ESM-2 is always positive (embeddings are L2-normalised representations, not
+  raw logits). A row count matching sequence_length + 2 means the worker did
+  not slice embeddings[1:-1] as required.
 """
 
 

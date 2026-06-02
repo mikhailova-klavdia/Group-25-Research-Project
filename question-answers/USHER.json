@@ -1,0 +1,17 @@
+[
+  {
+    "id": "USHER_001",
+    "question": "Using the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells \u00d7 342 genes) and scRNA-seq data from 'USHER/repo/USHER/datasets/scRNAseq_scGPT.h5ad' (26323 cells \u00d7 25425 genes), prepare scGPT embedding AnnData objects where the main matrix X contains the scGPT embeddings. Use 'predicted_celltype' as the cell type column for Xenium and 'annotation_level_0' for scRNA-seq. What is the number of dimensions (features) in the scGPT embedding matrix X for the Xenium data?",
+    "ground_truth": "512"
+  },
+  {
+    "id": "USHER_002",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells \u00d7 342 genes), the scRNA-seq data from 'USHER/repo/USHER/datasets/scRNAseq_scGPT.h5ad' (26323 cells \u00d7 25425 genes), and the pre-trained USHER alignment model from 'USHER/repo/USHER/datasets/scGPT_example/alignment_model.pt' (with hidden dimension 512). Prepare scGPT embedding AnnData objects, apply USHER alignment to transform Xenium embeddings to the scRNA-seq space, and concatenate the aligned datasets. What is the total number of cells in the final combined aligned dataset?",
+    "ground_truth": "64603"
+  },
+  {
+    "id": "USHER_003",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad', create an AnnData object with the scGPT embeddings from obsm['X_scGPT'] as the main matrix, and use 'predicted_celltype' as the cell type column. How many unique cell types are present in the data?",
+    "ground_truth": "11"
+  }
+]

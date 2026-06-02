@@ -93,17 +93,42 @@ def _stage(context: ResearchContext, message: str) -> None:
 def _run_triage_stage(
     context: ResearchContext, question: str, model: str
 ) -> tuple[TriageReport, ToolOutputCapture]:
-    """Stage 0 — the Repo Scout classifies the question and maps the repo."""
-    _stage(context, "Reading the paper and scanning the repo to understand your question…")
+    """Stage 0 — the Repo Scout classifies the question and maps the repo.
+
+    If ``context.session_overview`` is already set (a previous question in the
+    same hitl_main session already explored the repo), it is injected into the
+    triage input so the scout skips re-reading the paper and only finds paths
+    relevant to THIS question.  After the first successful triage the overview is
+    written back to ``context.session_overview`` so hitl_main can propagate it
+    to subsequent fresh workspaces.
+    """
+    cached = context.session_overview
+    if cached:
+        _stage(context, "Deciding how to approach your question (repo already explored)…")
+        triage_input = (
+            f"REPO OVERVIEW (already gathered — use this, skip read_paper()):\n"
+            f"{cached}\n\n"
+            f"Question to triage:\n{question}"
+        )
+    else:
+        _stage(context, "Reading the paper and scanning the repo to understand your question…")
+        triage_input = f"Question to triage:\n{question}"
+
     capture = _capture(context)
     result = Runner.run_sync(
         create_triage_agent(model),
-        f"Question to triage:\n{question}",
+        triage_input,
         context=context,
         max_turns=150,
         hooks=capture,
     )
-    return result.final_output, capture
+    triage: TriageReport = result.final_output
+
+    # Write the overview back so hitl_main can cache it across questions.
+    if context.session_overview is None and triage.repo_overview:
+        context.session_overview = triage.repo_overview
+
+    return triage, capture
 
 
 def _run_readonly_stage(

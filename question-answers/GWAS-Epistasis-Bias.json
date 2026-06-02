@@ -1,0 +1,7 @@
+[
+  {
+    "id": "GWAS_EPISTASIS_BIAS_006",
+    "question": "Execute the get_rho_max_distribution_benchmark.py script located at GWAS-Epistasis-Bias/notebooks/get_rho_max_distribution. The script computes correlations between interaction features and individual SNPs using QR decomposition. What is the maximum rho value (max_rho) found across all iterations as reported in the output/results_summary.txt file?",
+    "ground_truth": "0.12866141057609576"
+  }
+]

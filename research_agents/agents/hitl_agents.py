@@ -7,8 +7,8 @@ calls ``ask_human`` when it hits something only a person can resolve (a
 token, a gated download, a needed workaround). It emits a typed
 ``EnvReport`` that hands the prepared environment off to Stage 2.
 
-Stage 2 reuses the existing improved ReAct worker prompt
-(``REACT_INSTRUCTIONS_IMPROVED``) plus an "ask the human" carve-out and the
+Stage 2 reuses the plus-plus ReAct worker prompt
+(``REACT_INSTRUCTIONS_PLUS_PLUS``) plus an "ask the human" carve-out and the
 ``ask_human`` tool, so the executor can request help (e.g. the TabPFN
 license-gate → open-V2 workaround) instead of only reporting a blocker.
 
@@ -24,7 +24,7 @@ from research_agents.config import DEFAULT_MODEL
 from research_agents.hitl import ask_human
 from research_agents.project import ResearchContext
 from research_agents.agents.react_agent import (
-    REACT_INSTRUCTIONS_IMPROVED,
+    REACT_INSTRUCTIONS_PLUS_PLUS,
     ReActAnswer,
 )
 from research_agents.tools.paper_tools import read_paper
@@ -282,7 +282,7 @@ verified, ready (or honestly-blocked) environment and report.
 """
 
 
-_ASK_HUMAN_CARVEOUT = """\
+_ASK_HUMAN_CARVEOUT = """
 
   ASKING THE HUMAN (human-in-the-loop)
   ────────────────────────────────────
@@ -311,11 +311,10 @@ _ASK_HUMAN_CARVEOUT = """\
 """
 
 
-# Execution-worker prompt = the existing improved ReAct prompt plus the
-# ask-the-human carve-out appended.  We append (rather than edit the
-# baseline) so react_agent.py stays untouched and the HITL behaviour is an
-# obvious additive block.
-_DATA_FABRICATION_BAN = """\
+# Execution-worker prompt = the plus-plus ReAct prompt plus the ask-the-human
+# carve-out appended.  We append (rather than edit the baseline) so
+# react_agent.py stays untouched and the HITL behaviour is an obvious additive block.
+_DATA_FABRICATION_BAN = """
 
   DATA-FABRICATION BAN (overrides the synthesis carve-out above)
   ─────────────────────────────────────────────────────────────
@@ -332,7 +331,7 @@ _DATA_FABRICATION_BAN = """\
 
 
 EXECUTION_HITL_INSTRUCTIONS = (
-    REACT_INSTRUCTIONS_IMPROVED + _ASK_HUMAN_CARVEOUT + _DATA_FABRICATION_BAN
+    REACT_INSTRUCTIONS_PLUS_PLUS + _ASK_HUMAN_CARVEOUT + _DATA_FABRICATION_BAN
 )
 
 
@@ -350,9 +349,9 @@ def create_setup_agent(model: str = DEFAULT_MODEL) -> Agent[ResearchContext]:
 def create_execution_agent_hitl(model: str = DEFAULT_MODEL) -> Agent[ResearchContext]:
     """Build the Stage-2 ReAct execution worker with the ask-human carve-out.
 
-    Same tools and ``ReActAnswer`` output as the baseline improved worker,
-    plus ``ask_human``.  Suitable as a ``worker_factory`` for
-    ``orchestration.run_with_critic`` (it accepts a single ``model`` arg).
+    Uses ``REACT_INSTRUCTIONS_PLUS_PLUS`` as its base (the same prompt as the
+    ``worker-critic-plus-plus`` team) plus ``ask_human``.  Suitable as a
+    ``worker_factory`` for ``orchestration.run_with_critic``.
     """
     return Agent(
         name="ReAct Execution Worker (HITL)",
@@ -368,11 +367,21 @@ You are the REPO SCOUT. Decide, up front, whether answering the user's question
 requires running code, and gather a quick map of the repository for whoever answers
 next. You do NOT answer the question, and you NEVER install or run anything.
 
+CACHED OVERVIEW (interactive sessions)
+───────────────────────────────────────
+If the input begins with "REPO OVERVIEW (already gathered):", the paper and repo have
+already been explored earlier in this session. Use that overview directly as
+repo_overview WITHOUT calling read_paper() again. You still need to search the repo
+for files relevant to THIS specific question (list_repo_files, find_repo_files,
+search_repo), but skip the initial paper read — it has already been done.
+
 STEPS
 ─────
-1. Call read_paper() briefly, and explore the repo (list_repo_files / find_repo_files /
-   search_repo / read_repo_file) just enough to (a) describe what the repo is and
-   contains, and (b) locate the files/dirs relevant to the question.
+1. If no cached overview is present: call read_paper() briefly, then explore the repo
+   (list_repo_files / find_repo_files / search_repo / read_repo_file) just enough to
+   (a) describe what the repo is and contains, and (b) locate the relevant files.
+   If a cached overview IS present: skip read_paper(); use the overview as-is and
+   search only for paths relevant to THIS question.
 2. Decide needs_execution:
    • FALSE (read-only) — conceptual/text questions answerable from the paper or repo text
      alone: "summarise", "what is this repo/paper about", "explain the method", "what is
@@ -382,8 +391,9 @@ STEPS
      shape", "process this file".
    When genuinely unsure, prefer TRUE (better to set up needlessly than to answer a
    compute question from text); call ask_human only if a quick steer would settle it.
-3. Emit a TriageReport: needs_execution, a one-line rationale, a short repo_overview, and
-   the relevant_paths you found.
+3. Emit a TriageReport: needs_execution, a one-line rationale, a short repo_overview
+   (copy the cached overview verbatim if one was provided), and the relevant_paths
+   you found for THIS question.
 
 Do not install dependencies, write files, or execute commands — that is a later stage's job.
 """

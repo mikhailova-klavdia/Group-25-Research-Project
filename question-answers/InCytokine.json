@@ -1,0 +1,7 @@
+[
+  {
+    "id": "INCYTOKINE_001",
+    "question": "Run the InCytokine cytokine analysis CLI tool on the input images located at InCytokine/repo/InCytokine/input_examples/res84qM, using the template file at InCytokine/notebooks/cytokine_analysis/config/template.json, the parameters file at InCytokine/notebooks/cytokine_analysis/config/params.json, and the blob results folder at InCytokine/notebooks/cytokine_analysis/blob_results. In the raw intensity CSV output file for res84qM_4, what is the raw intensity value for row 3, column A?",
+    "ground_truth": "3.3793103448275863"
+  }
+]

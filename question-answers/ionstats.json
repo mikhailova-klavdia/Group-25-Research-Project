@@ -1,0 +1,17 @@
+[
+  {
+    "id": "IONSTATS_001",
+    "question": "In the control sample sequencing summary file at ionstats/notebooks/ionstats/data/sequencing_summary_control.txt, what is the mean quality score (mean_qscore_template) across all reads, rounded to 2 decimal places?",
+    "ground_truth": "11.98"
+  },
+  {
+    "id": "IONSTATS_002",
+    "question": "In the control sample sequencing summary file at ionstats/notebooks/ionstats/data/sequencing_summary_control.txt, what is the maximum sequence length (sequence_length_template) in base pairs?",
+    "ground_truth": "14981"
+  },
+  {
+    "id": "IONSTATS_003",
+    "question": "Using the combined sequencing summary file at ionstats/notebooks/ionstats/input/sequencing_summary.txt, which contains both control and treatment (aa) samples identified by the barcode_arrangement column, how many total reads are in this combined dataset?",
+    "ground_truth": "2000"
+  }
+]

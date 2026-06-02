@@ -19,14 +19,18 @@
 #    up front, ``False`` otherwise).
 # 3. Use it from the CLI with ``--team <your-name>``.
 #
-# Four teams ship today, in increasing complexity:
+# Seven teams ship today, in increasing complexity:
 #   * ``solo`` — single ReAct worker, no critic, no install retry.
 #   * ``worker-critic`` — the colleague's two-agent system (worker + LLM
 #     critic + deterministic missing-module install retry).
 #   * ``worker-critic-plus`` — same shape as worker-critic but with the
 #     improved-variant prompt and up-front setup-script downloads.
-#   * ``human-in-the-loop`` — two-stage setup-crew → execution-crew that can
-#     ask a human for help (no config file); driven by ``hitl_main``.
+#   * ``worker-critic-plus-plus`` — same shape but with the plus-plus prompt.
+#   * ``human-in-the-loop`` — three-stage triage → setup → execution crew that
+#     asks the human operator for help; interactive via ``hitl_main``.
+#   * ``worker-critic-plus-plus-hitl`` — plus-plus team with a Claude operator
+#     channel that answers ask_human autonomously in batch; interactive via
+#     ``hitl_main --team worker-critic-plus-plus-hitl``.
 
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -38,6 +42,8 @@ from research_agents.teams.solo import run_solo
 from research_agents.teams.testing_worker_critic import run_testing_worker_critic
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
+from research_agents.teams.worker_critic_plus_plus import run_worker_critic_plus_plus
+from research_agents.teams.worker_critic_plus_plus_hitl import run_worker_critic_plus_plus_hitl
 
 
 # A team's run function takes a context + a question and returns a
@@ -105,6 +111,15 @@ TEAMS: dict[str, TeamSpec] = {
         run=run_testing_worker_critic,
         apply_setup=True,
     ),
+    "worker-critic-plus-plus": TeamSpec(
+        name="worker-critic-plus-plus",
+        description=(
+            "Same shape as worker-critic-plus with a dedicated prompt variant "
+            "(REACT_INSTRUCTIONS_PLUS_PLUS) that can be extended independently."
+        ),
+        run=run_worker_critic_plus_plus,
+        apply_setup=True,
+    ),
     "human-in-the-loop": TeamSpec(
         name="human-in-the-loop",
         description=(
@@ -116,6 +131,18 @@ TEAMS: dict[str, TeamSpec] = {
             "runs degrade ask_human to autonomous."
         ),
         run=run_human_in_the_loop,
+        apply_setup=False,
+    ),
+    "worker-critic-plus-plus-hitl": TeamSpec(
+        name="worker-critic-plus-plus-hitl",
+        description=(
+            "Plus-plus team with a ClaudeHuman operator channel: triage → setup → "
+            "execution, where every ask_human call is answered by Claude instead of "
+            "blocking on stdin. Enables fully autonomous batch runs that still make "
+            "practical human-level decisions (open model variants, version workarounds, "
+            "missing-data choices). Requires ANTHROPIC_API_KEY."
+        ),
+        run=run_worker_critic_plus_plus_hitl,
         apply_setup=False,
     ),
 }

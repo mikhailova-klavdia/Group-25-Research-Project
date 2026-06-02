@@ -1,0 +1,7 @@
+[
+  {
+    "id": "OVO_001",
+    "question": "When checking the status of job 'job_20260112_143052' using the ovo scheduler status command, what exit code was returned?",
+    "ground_truth": "2"
+  }
+]

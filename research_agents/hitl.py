@@ -195,7 +195,7 @@ def apply_integrity_guard(
     *,
     needs_execution: bool,
 ) -> "ReActAnswer":
-    """Downgrade an ungrounded 'answered' execution result to 'blocked' (HITL backstop).
+    """Downgrade an ungrounded 'answered' execution result to 'blocked' (integrity backstop).
 
     Acts only when the question required execution, the worker reported ``answered``, and
     ``execution_grounded`` is ``False``. Genuine runs and honestly-blocked answers pass
