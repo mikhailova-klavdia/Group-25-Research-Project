@@ -35,6 +35,7 @@ from research_agents.orchestration import TeamRunResult
 from research_agents.project import ResearchContext
 from research_agents.teams.human_in_the_loop import run_human_in_the_loop
 from research_agents.teams.solo import run_solo
+from research_agents.teams.testing_worker_critic import run_testing_worker_critic
 from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
 
@@ -92,6 +93,16 @@ TEAMS: dict[str, TeamSpec] = {
             "up-front venv setup scripts (model-weight downloads, framework warmups)."
         ),
         run=run_worker_critic_plus,
+        apply_setup=True,
+    ),
+    "testing-worker-critic": TeamSpec(
+        name="testing-worker-critic",
+        description=(
+            "Three stages: a workflow-testing agent performs smoke validation on "
+            "candidate repo workflows, hands a typed TestingReport to a ReAct "
+            "execution worker, then the usual LLM critic audits the answer."
+        ),
+        run=run_testing_worker_critic,
         apply_setup=True,
     ),
     "human-in-the-loop": TeamSpec(
