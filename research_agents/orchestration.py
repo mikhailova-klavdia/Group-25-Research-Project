@@ -104,6 +104,9 @@ class TeamRunResult:
     captures: list[ToolOutputCapture] = field(default_factory=list)
     reviews: list[CriticReview] = field(default_factory=list)
     install_events: list[InstallEvent] = field(default_factory=list)
+    # Optional structured extraction payload for teams that separate paper
+    # and repo understanding into a dedicated first stage.
+    extraction_report: dict[str, Any] | None = None
     # Optional per-team structured payload persisted into the final run
     # JSON.  Most teams leave this as None; the workflow-testing team uses
     # it to expose the TestingReport that would otherwise only exist in
