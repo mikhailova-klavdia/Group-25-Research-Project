@@ -1,7 +1,0 @@
-bitarray>=2.9.0
-packaging >= 23.2
-polars-lts-cpu == 1.8.2
-pytz >= 2023.3
-six >= 1.16.0
-tzdata >= 2023.3
-typing
