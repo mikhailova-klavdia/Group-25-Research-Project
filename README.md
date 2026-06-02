@@ -15,6 +15,9 @@ Research agents powered by the OpenAI Agents SDK for analyzing local paper + rep
 git clone <repo-url>
 cd Group-25-Research-Project
 
+# Clone Paper2AgentBench into the repo root
+git clone https://github.com/jmiao24/Paper2AgentBench
+
 # Create your .env file with your API key
 cp .env.example .env
 # Edit .env and add your actual OPENAI_API_KEY
@@ -22,6 +25,8 @@ cp .env.example .env
 # Install dependencies
 uv sync
 ```
+
+`Paper2AgentBench/` is a local benchmark data dependency. Keep it cloned at the repository root so paths like `Paper2AgentBench/eval/100_compbio_repos/300_questions.csv` resolve correctly.
 
 ## Project Layout
 
@@ -127,7 +132,11 @@ Claude will analyse all repos, rename the folders, and produce `papertags.md`. R
 
 ## Evaluation Corpus
 
-The agent is tested against a local `papers/<slug>/` workspace per paper. `papers/` is gitignored — contributors clone the repos and download the PDFs locally. Benchmark questions and (where available) ground truths come from [Paper2AgentBench](https://github.com/jmiao24/Paper2AgentBench):
+The agent is tested against a local `papers/<slug>/` workspace per paper. `papers/` is gitignored — contributors clone the repos and download the PDFs locally. Benchmark questions and (where available) ground truths come from [Paper2AgentBench](https://github.com/jmiao24/Paper2AgentBench), which should be cloned locally into `./Paper2AgentBench/`:
+
+```bash
+git clone https://github.com/jmiao24/Paper2AgentBench
+```
 
 | Bench set | Questions | Paper / repo mapping | Ground truth |
 |-----------|-----------|----------------------|--------------|
