@@ -9,6 +9,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from research_agents.agents.gap_detection_agent import GapDetectionReport, GapRecord
 from research_agents.agents.critic_agent import CriticReview
 from research_agents.agents.extraction_agent import (
     ExtractionReport,
@@ -95,6 +96,26 @@ def _testing_report() -> WorkflowTestingReport:
     )
 
 
+def _gap_report() -> GapDetectionReport:
+    return GapDetectionReport(
+        overall_gap_assessment="One missing artifact still blocks full reproduction.",
+        identified_gaps=[
+            GapRecord(
+                title="Missing affinity weights",
+                gap_type="missing_artifact",
+                severity="high",
+                related_repo_files=["weights/affinity.pt"],
+                execution_evidence=["FileNotFoundError: weights/affinity.pt"],
+                explanation="The validated workflow still requires a checkpoint that is absent.",
+                likely_impact="The main affinity workflow cannot complete.",
+                possible_remediation="Provide the weight file or a documented download link.",
+            )
+        ],
+        evidence_sources=["testing_report.workflows", "execution_answer.blocker_evidence"],
+        recommended_followups=["Check whether the shared artifacts cache already has the weights."],
+    )
+
+
 def test_canonicalize_extraction_report_derives_aggregate_fields():
     report = canonicalize_extraction_report(_extraction_report())
 
@@ -124,6 +145,7 @@ def test_testing_team_runs_extraction_before_testing_and_worker():
     context = _context(root)
     extraction_result = SimpleNamespace(final_output=_extraction_report())
     testing_result = SimpleNamespace(final_output=_testing_report())
+    gap_result = SimpleNamespace(final_output=_gap_report())
     final_answer = ReActAnswer(
         chain=[
             ReActStep(
@@ -139,7 +161,7 @@ def test_testing_team_runs_extraction_before_testing_and_worker():
     exec_result = TeamRunResult(
         answer=final_answer,
         worker_result=SimpleNamespace(final_output=final_answer),
-        captures=[],
+        captures=[SimpleNamespace(outputs=["Exit code: 0\naffinity workflow ok"])],
         reviews=[CriticReview(verdict="pass", reasoning="Grounded in execution.")],
         install_events=[],
     )
@@ -148,7 +170,7 @@ def test_testing_team_runs_extraction_before_testing_and_worker():
         patch("research_agents.teams.testing_worker_critic.Runner.run_sync") as run_sync,
         patch("research_agents.teams.testing_worker_critic.run_with_critic") as run_with_critic,
     ):
-        run_sync.side_effect = [extraction_result, testing_result]
+        run_sync.side_effect = [extraction_result, testing_result, gap_result]
         run_with_critic.return_value = exec_result
 
         result = run_testing_worker_critic(
@@ -160,10 +182,11 @@ def test_testing_team_runs_extraction_before_testing_and_worker():
         )
 
     assert result.answer.final_answer == "42"
-    assert len(result.captures) == 2
+    assert len(result.captures) == 3
     assert result.extraction_report is not None
     assert result.extraction_report["identified_experiments"] == ["affinity-prediction"]
     assert result.testing_report is not None
+    assert result.gap_report is not None
     testing_prompt = run_sync.call_args_list[1].args[1]
     worker_prompt = run_with_critic.call_args.kwargs["question"]
     assert "EXTRACTION REPORT" in testing_prompt
