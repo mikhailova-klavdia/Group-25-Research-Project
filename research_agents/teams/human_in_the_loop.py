@@ -29,9 +29,11 @@ from research_agents.agents.hitl_agents import (
 )
 from research_agents.hitl import apply_integrity_guard
 from research_agents.orchestration import (
+    AgentUsage,
     TeamRunResult,
     ToolOutputCapture,
     run_with_critic,
+    usage_from_result,
 )
 from research_agents.project import ResearchContext
 
@@ -92,7 +94,7 @@ def _stage(context: ResearchContext, message: str) -> None:
 
 def _run_triage_stage(
     context: ResearchContext, question: str, model: str
-) -> tuple[TriageReport, ToolOutputCapture]:
+) -> tuple[TriageReport, ToolOutputCapture, AgentUsage]:
     """Stage 0 — the Repo Scout classifies the question and maps the repo.
 
     If ``context.session_overview`` is already set (a previous question in the
@@ -128,12 +130,17 @@ def _run_triage_stage(
     if context.session_overview is None and triage.repo_overview:
         context.session_overview = triage.repo_overview
 
-    return triage, capture
+    return triage, capture, usage_from_result(
+        result,
+        stage="triage",
+        agent_name="Repo Scout",
+        model=model,
+    )
 
 
 def _run_readonly_stage(
     context: ResearchContext, question: str, triage: TriageReport, model: str
-) -> tuple[Any, ToolOutputCapture]:
+) -> tuple[Any, ToolOutputCapture, AgentUsage]:
     """Stage R — answer a read-only question from the paper/repo text (no setup, no critic)."""
     _stage(context, "This doesn't need any code — answering from the paper and repo…")
     capture = _capture(context)
@@ -145,12 +152,17 @@ def _run_readonly_stage(
         max_turns=150,
         hooks=capture,
     )
-    return result, capture
+    return result, capture, usage_from_result(
+        result,
+        stage="read_only_answer",
+        agent_name="Read-only Answerer",
+        model=model,
+    )
 
 
 def _run_setup_stage(
     context: ResearchContext, question: str, triage: TriageReport, model: str
-) -> tuple[EnvReport, list[ToolOutputCapture]]:
+) -> tuple[EnvReport, list[ToolOutputCapture], list[AgentUsage]]:
     """Stage 1 — the setup engineer prepares the venv (one retry if it reports not ready)."""
     _stage(context, "This needs code — setting up the environment (this can take a few minutes)…")
     setup_input = (
@@ -164,6 +176,15 @@ def _run_setup_stage(
     result = Runner.run_sync(
         create_setup_agent(model), setup_input, context=context, max_turns=150, hooks=first_capture
     )
+    usages = [
+        usage_from_result(
+            result,
+            stage="setup",
+            agent_name="Environment Setup Engineer",
+            model=model,
+            attempt=1,
+        )
+    ]
     env: EnvReport = result.final_output
     captures = [first_capture]
 
@@ -178,10 +199,19 @@ def _run_setup_stage(
         retry_result = Runner.run_sync(
             create_setup_agent(model), nudge, context=context, max_turns=150, hooks=retry_capture
         )
+        usages.append(
+            usage_from_result(
+                retry_result,
+                stage="setup",
+                agent_name="Environment Setup Engineer",
+                model=model,
+                attempt=2,
+            )
+        )
         env = retry_result.final_output
         captures.append(retry_capture)
 
-    return env, captures
+    return env, captures, usages
 
 
 def run_human_in_the_loop(
@@ -196,11 +226,13 @@ def run_human_in_the_loop(
     Signature matches every other team's ``run`` so the CLI dispatchers
     (``react_main`` batch mode and the interactive ``hitl_main``) invoke it uniformly.
     """
-    triage, triage_capture = _run_triage_stage(context, question, model)
+    triage, triage_capture, triage_usage = _run_triage_stage(context, question, model)
 
     # ---- Read-only path: skip setup + critic entirely ----
     if not triage.needs_execution:
-        readonly_result, readonly_capture = _run_readonly_stage(context, question, triage, model)
+        readonly_result, readonly_capture, readonly_usage = _run_readonly_stage(
+            context, question, triage, model
+        )
         _stage(context, "Done.")
         return TeamRunResult(
             answer=readonly_result.final_output,
@@ -208,10 +240,11 @@ def run_human_in_the_loop(
             captures=[triage_capture, readonly_capture],
             reviews=[],
             install_events=[],
+            agent_usages=[triage_usage, readonly_usage],
         )
 
     # ---- Execution path: setup → reused worker+critic loop → integrity guard ----
-    env, setup_captures = _run_setup_stage(context, question, triage, model)
+    env, setup_captures, setup_usages = _run_setup_stage(context, question, triage, model)
 
     _stage(context, "Running it…")
     exec_input = (
@@ -243,4 +276,5 @@ def run_human_in_the_loop(
         captures=[triage_capture, *setup_captures, *exec_result.captures],
         reviews=exec_result.reviews,
         install_events=exec_result.install_events,
+        agent_usages=[triage_usage, *setup_usages, *exec_result.agent_usages],
     )

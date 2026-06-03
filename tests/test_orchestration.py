@@ -6,6 +6,7 @@ from research_agents.agents.critic_agent import CriticReview
 from research_agents.agents.react_agent import ReActAnswer, ReActStep
 from research_agents.react_main import _build_record, _failure_analysis
 from research_agents.orchestration import (
+    AgentUsage,
     InstallEvent,
     _build_critic_input,
     _detect_missing_modules,
@@ -135,10 +136,22 @@ def test_build_record_preserves_gap_and_testing_reports():
         install_events=[],
         testing_report={"overall_status": "ready"},
         gap_report={"missing_artifacts": ["Missing checkpoint"]},
+        agent_usages=[
+            AgentUsage(
+                stage="execution_worker",
+                agent_name="ReAct worker",
+                model="gpt-5-mini-2025-08-07",
+                input_tokens=10,
+                output_tokens=5,
+                attempt=1,
+            )
+        ],
     )
 
     assert record["testing_report"]["overall_status"] == "ready"
     assert record["gap_report"]["missing_artifacts"] == ["Missing checkpoint"]
+    assert record["token_usage"]["aggregate"]["total_tokens"] == 15
+    assert record["token_usage"]["by_agent"][0]["stage"] == "execution_worker"
 
 
 def test_run_with_critic_installs_missing_module_then_retries(tmp_path):
@@ -187,6 +200,11 @@ def test_run_with_critic_installs_missing_module_then_retries(tmp_path):
     assert install.called
     assert team_result.answer.final_answer == "EXECUTION_REQUIRED — weights missing"
     assert team_result.reviews[0].verdict == "pass"
+    assert [entry.stage for entry in team_result.agent_usages] == [
+        "execution_worker",
+        "execution_worker",
+        "critic_review",
+    ]
 
 
 def test_run_with_critic_uses_injected_worker_factory(tmp_path):
