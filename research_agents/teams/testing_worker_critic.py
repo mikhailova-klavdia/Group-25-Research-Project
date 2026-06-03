@@ -30,6 +30,17 @@ from research_agents.orchestration import TeamRunResult, ToolOutputCapture, run_
 from research_agents.project import ResearchContext
 
 
+def _announce_stage(stage_name: str) -> None:
+    """Print a short stage marker so long team runs do not look frozen.
+
+    The testing-worker-critic team chains multiple structured-agent calls
+    before the final answer appears. Without explicit stage markers, a
+    user watching stdout cannot tell whether the run is still progressing
+    or which stage is currently spending tokens/time.
+    """
+    print(f"[team/testing-worker-critic] {stage_name}...")
+
+
 def run_testing_worker_critic(
     context: ResearchContext,
     question: str,
@@ -47,6 +58,7 @@ def run_testing_worker_critic(
     summarizes paper/repo/execution discrepancies from the structured
     evidence rather than re-reading the repo.
     """
+    _announce_stage("Extraction")
     extraction_capture = ToolOutputCapture()
     extraction_result = Runner.run_sync(
         create_extraction_agent(model),
@@ -60,6 +72,7 @@ def run_testing_worker_critic(
     )
 
     extraction_preamble = format_extraction_report_for_downstream(extraction_report)
+    _announce_stage("Workflow testing")
     testing_capture = ToolOutputCapture()
     testing_result = Runner.run_sync(
         create_testing_agent(model),
@@ -75,6 +88,7 @@ def run_testing_worker_critic(
         f"{format_testing_report_for_worker(report)}\n\n"
         f"QUESTION:\n{question}"
     )
+    _announce_stage("Execution worker + critic")
     exec_result = run_with_critic(
         context=context,
         question=worker_input,
@@ -103,6 +117,7 @@ def run_testing_worker_critic(
             for event in exec_result.install_events
         ],
     )
+    _announce_stage("Gap detection")
     gap_result = Runner.run_sync(
         create_gap_detection_agent(model),
         gap_input,

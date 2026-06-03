@@ -173,3 +173,51 @@ def test_testing_team_runs_validation_before_worker_critic():
     assert "EXTRACTION REPORT" in testing_prompt
     assert "WORKFLOW TESTING REPORT" in worker_prompt
     assert "validated: example-workflow" in worker_prompt
+
+
+def test_testing_team_announces_stage_progress(capsys):
+    root = Path("tests/.tmp-testing-team-progress")
+    context = _context(root)
+    extraction_result = SimpleNamespace(final_output=_extraction_report())
+    testing_result = SimpleNamespace(final_output=_testing_report("validated"))
+    gap_result = SimpleNamespace(final_output=_gap_report())
+    final_answer = ReActAnswer(
+        chain=[
+            ReActStep(
+                step=1,
+                thought="Use the validated workflow first.",
+                action='execute_command("python scripts/run.py")',
+                observation="Exit code: 0",
+                reflection="The workflow ran successfully.",
+            )
+        ],
+        final_answer="42",
+    )
+    exec_result = TeamRunResult(
+        answer=final_answer,
+        worker_result=SimpleNamespace(final_output=final_answer),
+        captures=[SimpleNamespace(outputs=["Exit code: 0\nworkflow ok"])],
+        reviews=[CriticReview(verdict="pass", reasoning="Grounded in execution.")],
+        install_events=[],
+    )
+
+    with (
+        patch("research_agents.teams.testing_worker_critic.Runner.run_sync") as run_sync,
+        patch("research_agents.teams.testing_worker_critic.run_with_critic") as run_with_critic,
+    ):
+        run_sync.side_effect = [extraction_result, testing_result, gap_result]
+        run_with_critic.return_value = exec_result
+
+        run_testing_worker_critic(
+            context=context,
+            question="Run the example workflow.",
+            ground_truth="42",
+            entry_id="Q001",
+            model="gpt-5-mini-2025-08-07",
+        )
+
+    captured = capsys.readouterr()
+    assert "[team/testing-worker-critic] Extraction..." in captured.out
+    assert "[team/testing-worker-critic] Workflow testing..." in captured.out
+    assert "[team/testing-worker-critic] Execution worker + critic..." in captured.out
+    assert "[team/testing-worker-critic] Gap detection..." in captured.out

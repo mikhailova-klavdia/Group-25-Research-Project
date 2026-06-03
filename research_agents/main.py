@@ -93,6 +93,9 @@ def run_research_query(
             file=sys.stderr,
         )
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("\nInterrupted by user. Partial output was not saved.", file=sys.stderr)
+        sys.exit(130)
 
     output = result.final_output
     append_cost_log(

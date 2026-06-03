@@ -312,6 +312,12 @@ def run_react_query(
             file=sys.stderr,
         )
         sys.exit(2)
+    except KeyboardInterrupt:
+        print(
+            "\nInterrupted by user. Partial output was not saved.",
+            file=sys.stderr,
+        )
+        sys.exit(130)
 
     # --- Token usage ---
     usage = result.context_wrapper.usage
@@ -549,15 +555,19 @@ Examples:
             print(f"Error resolving project: {exc}", file=sys.stderr)
             sys.exit(1)
 
-        run_react_query(
-            context=context,
-            question=question,
-            model=args.model,
-            entry_id=entry_id,
-            biorxiv_url=args.biorxiv_url,
-            ground_truth=ground_truth,
-            team=team,
-        )
+        try:
+            run_react_query(
+                context=context,
+                question=question,
+                model=args.model,
+                entry_id=entry_id,
+                biorxiv_url=args.biorxiv_url,
+                ground_truth=ground_truth,
+                team=team,
+            )
+        except KeyboardInterrupt:
+            print("\nInterrupted by user.", file=sys.stderr)
+            sys.exit(130)
         saved.append(context.run_dir / f"{entry_id}.json")
 
     print(f"\n{'=' * 60}")
