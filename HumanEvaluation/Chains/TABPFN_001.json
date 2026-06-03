@@ -1,0 +1,80 @@
+{
+  "id": "TABPFN_001",
+  "repo_link": "https://github.com/PriorLabs/TabPFN",
+  "question": "Download the **scikit-learn/breast-cancer-wisconsin dataset**, train a TabPFN model on it, and tell me the performance compared to other classifiers",
+  "ground_truth": "~0.97 accuracy / ~0.99 ROC AUC; beats RF, LogReg, SVC",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "Read the paper to understand TabPFN and confirm what the question asks (train on breast-cancer and compare).",
+      "action": "read_paper()",
+      "observation": "Loaded Nature TabPFN paper (overview, evaluation protocol, claimed strengths on small tabular datasets).",
+      "reflection": "Paper confirms TabPFN is intended for small tabular tasks; proceed to inspect the repository to find example scripts and model-loading behavior."
+    },
+    {
+      "step": 2,
+      "thought": "List repository files to locate examples and model-related code before executing anything.",
+      "action": "list_repo_files()",
+      "observation": "Found examples (including examples/tabpfn_for_binary_classification.py), src/tabpfn/*, scripts/download_all_models.py, etc.",
+      "reflection": "Examples present; will inspect example and model-loading code to see how models are loaded/downloaded."
+    },
+    {
+      "step": 3,
+      "thought": "Look for packaged pretrained weights (.pth) in the repo to see if model files are already available locally.",
+      "action": "find_repo_files({\"pattern\":\".pth\",\"include_binary\":true})",
+      "observation": "No .pth files found.",
+      "reflection": "No .pth; check for other weight file extensions (.pt) since these might be present."
+    },
+    {
+      "step": 4,
+      "thought": "Search for .pt files as the repo might include some supporting binary artifacts.",
+      "action": "find_repo_files({\"pattern\":\".pt\",\"include_binary\":true})",
+      "observation": "Found src/tabpfn/architectures/shared/tabpfn_col_embedding.pt (376.6 KB).",
+      "reflection": "There is a small .pt embedding artifact but no full model checkpoints; model-loading likely downloads main checkpoints. Read the example script next."
+    },
+    {
+      "step": 5,
+      "thought": "Open the binary-classification example to see how to run the breast cancer example.",
+      "action": "read_repo_file({\"relative_path\":\"examples/tabpfn_for_binary_classification.py\"})",
+      "observation": "Example uses sklearn.load_breast_cancer, splits data, instantiates TabPFNClassifier(), fits, then prints ROC AUC and accuracy.",
+      "reflection": "Example will attempt to load a TabPFN model on first use. Inspect TabPFNClassifier and model-loading behavior to see download implications."
+    },
+    {
+      "step": 6,
+      "thought": "Read the TabPFNClassifier implementation to confirm default model version and loading behavior.",
+      "action": "read_repo_file({\"relative_path\":\"src/tabpfn/classifier.py\"})",
+      "observation": "TabPFNClassifier.create_default_for_version and constructor present; default model_path='auto'; model version logic present.",
+      "reflection": "Model loading delegates to model_loading; check that file to see download sources/limitations."
+    },
+    {
+      "step": 7,
+      "thought": "Inspect model_loading.py to understand where models are downloaded from and whether gated HF repos are required.",
+      "action": "read_repo_file({\"relative_path\":\"src/tabpfn/model_loading.py\"})",
+      "observation": "Model sources defined: v2, v2.5, v2.6. v2.5/v2.6 are HF gated repos requiring browser license acceptance; v2 supports direct download (fallback S3). Default model_version in settings is v2.6.",
+      "reflection": "Default is v2.6 (gated). To avoid gating issues, prefer using v2 default model for automated download. Plan to run a script that requests ModelVersion.V2 to allow direct download."
+    },
+    {
+      "step": 8,
+      "thought": "Confirm default model_version setting so I know what TabPFNClassifier() would attempt by default.",
+      "action": "read_repo_file({\"relative_path\":\"src/tabpfn/settings.py\"})",
+      "observation": "settings.tabpfn.model_version default is ModelVersion.V2_6.",
+      "reflection": "Because V2_6 is gated, I'll explicitly request the V2 model when running to allow direct download or fallback; prepare a small script to run the breast-cancer experiment and compare baselines."
+    },
+    {
+      "step": 9,
+      "thought": "Write a script in workspace that loads sklearn breast cancer, fits TabPFN using ModelVersion.V2 (direct-download-capable), and compares standard sklearn classifiers (LR, RF, GB).",
+      "action": "write_file({\"relative_path\":\"workspace/run_breast_cancer.py\",\"content\":\"import time\\nfrom sklearn.datasets import load_breast_cancer\\nfrom sklearn.model_selection import train_test_split\\nfrom sklearn.metrics import accuracy_score, roc_auc_score\\n\\nfrom tabpfn import TabPFNClassifier\\nfrom tabpfn.constants import ModelVersion\\n\\nfrom sklearn.linear_model import LogisticRegression\\nfrom sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier\\nimport numpy as np\\n\\nnp.random.seed(0)\\n\\nX, y = load_breast_cancer(return_X_y=True)\\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)\\n\\nresults = {}\\n\\n# TabPFN v2 (use model version V2 to allow direct downloads)\\nclf_t = TabPFNClassifier.create_default_for_version(ModelVersion.V2)\\nstart = time.time()\\nclf_t.fit(X_train, y_train)\\nend = time.time()\\nproba = clf_t.predict_proba(X_test)[:, 1]\\npred = clf_t.predict(X_test)\\nresults['TabPFN'] = {'accuracy': accuracy_score(y_test, pred), 'roc_auc': roc_auc_score(y_test, proba), 'time': end-start}\\nprint(f\"TabPFN accuracy={results['TabPFN']['accuracy']:.6f} roc_auc={results['TabPFN']['roc_auc']:.6f} time={results['TabPFN']['time']:.2f}s\")\\n\\n# Logistic Regression\\nclf_lr = LogisticRegression(max_iter=1000)\\nstart = time.time()\\nclf_lr.fit(X_train, y_train)\\nend = time.time()\\nproba = clf_lr.predict_proba(X_test)[:, 1]\\npred = clf_lr.predict(X_test)\\nresults['LogisticRegression'] = {'accuracy': accuracy_score(y_test, pred), 'roc_auc': roc_auc_score(y_test, proba), 'time': end-start}\\nprint(f\"LogisticRegression accuracy={results['LogisticRegression']['accuracy']:.6f} roc_auc={results['LogisticRegression']['roc_auc']:.6f} time={results['LogisticRegression']['time']:.2f}s\")\\n\\n# Random Forest\\nclf_rf = RandomForestClassifier(n_estimators=100, random_state=0)\\nstart = time.time()\\nclf_rf.fit(X_train, y_train)\\nend = time.time()\\nproba = clf_rf.predict_proba(X_test)[:, 1]\\npred = clf_rf.predict(X_test)\\nresults['RandomForest'] = {'accuracy': accuracy_score(y_test, pred), 'roc_auc': roc_auc_score(y_test, proba), 'time': end-start}\\nprint(f\"RandomForest accuracy={results['RandomForest']['accuracy']:.6f} roc_auc={results['RandomForest']['roc_auc']:.6f} time={results['RandomForest']['time']:.2f}s\")\\n\\n# Gradient Boosting\\nclf_gb = GradientBoostingClassifier(random_state=0)\\nstart = time.time()\\nclf_gb.fit(X_train, y_train)\\nend = time.time()\\nproba = clf_gb.predict_proba(X_test)[:, 1]\\npred = clf_gb.predict(X_test)\\nresults['GradBoost'] = {'accuracy': accuracy_score(y_test, pred), 'roc_auc': roc_auc_score(y_test, proba), 'time': end-start}\\nprint(f\"GradBoost accuracy={results['GradBoost']['accuracy']:.6f} roc_auc={results['GradBoost']['roc_auc']:.6f} time={results['GradBoost']['time']:.2f}s\")\\n\"})",
+      "observation": "Wrote workspace/run_breast_cancer.py (script to run TabPFN v2 and baselines).",
+      "reflection": "Run the script to execute training and report metrics; allow sufficient timeout for model download and inference."
+    },
+    {
+      "step": 10,
+      "thought": "Execute the script to train TabPFN (v2) on the breast-cancer dataset and compare with LogisticRegression, RandomForest, and GradientBoosting.",
+      "action": "execute_command({\"command\":\"python3 workspace/run_breast_cancer.py\",\"timeout\":1200})",
+      "observation": "Script completed successfully. STDOUT:\nTabPFN accuracy=0.978723 roc_auc=0.996793 time=4.45s\nLogisticRegression accuracy=0.962766 roc_auc=0.997163 time=0.05s\nRandomForest accuracy=0.952128 roc_auc=0.994264 time=0.07s\nGradBoost accuracy=0.957447 roc_auc=0.992106 time=0.18s\n(STDERR contained a HF Hub warning and LR convergence warning.)",
+      "reflection": "We have concrete measured metrics. TabPFN achieved the highest accuracy and competitive ROC AUC on this dataset; prepare final concise answer reporting these numbers and the comparison."
+    }
+  ],
+  "final_answer": "TabPFN (v2) — accuracy=0.978723, ROC AUC=0.996793; LogisticRegression — accuracy=0.962766, ROC AUC=0.997163; RandomForest — accuracy=0.952128, ROC AUC=0.994264; GradientBoosting — accuracy=0.957447, ROC AUC=0.992106. TabPFN achieved the highest accuracy and competitive ROC AUC (very slightly below logistic regression) on the scikit-learn breast-cancer dataset.",
+  "correct": true
+}
