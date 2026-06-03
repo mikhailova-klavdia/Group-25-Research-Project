@@ -161,6 +161,7 @@ def _build_record(
     team_name: str,
     critic_reviews: list | None = None,
     install_events: list | None = None,
+    extraction_report: dict | None = None,
     testing_report: dict | None = None,
     gap_report: dict | None = None,
 ) -> dict:
@@ -192,6 +193,7 @@ def _build_record(
     record = {
         "id": entry_id,
         "team": team_name,
+        "model": model,
         "repo_link": biorxiv_url,
         "question": question,
         "ground_truth": ground_truth,
@@ -230,6 +232,8 @@ def _build_record(
             ) if result else 0.0,
         },
     }
+    if extraction_report is not None:
+        record["extraction_report"] = extraction_report
     if testing_report is not None:
         record["testing_report"] = testing_report
     if gap_report is not None:
@@ -274,6 +278,7 @@ def run_react_query(
         capture = team_result.final_capture
         critic_reviews = team_result.reviews
         install_events = team_result.install_events
+        extraction_report = team_result.extraction_report
         testing_report = team_result.testing_report
         gap_report = team_result.gap_report
     except MaxTurnsExceeded:
@@ -327,6 +332,7 @@ def run_react_query(
         team_name=team.name,
         critic_reviews=critic_reviews,
         install_events=install_events,
+        extraction_report=extraction_report,
         testing_report=testing_report,
         gap_report=gap_report,
     )
@@ -434,9 +440,11 @@ Examples:
     )
     parser.add_argument(
         "--model",
-        default=DEFAULT_MODEL,
-        choices=[DEFAULT_MODEL, ALTERNATE_MODEL],
-        help=f"Model to use (default: {DEFAULT_MODEL})",
+        default=None,
+        help=(
+            f"Model to use. OpenAI default: {DEFAULT_MODEL}. "
+            "For other providers the provider's default is used when omitted."
+        ),
     )
     parser.add_argument(
         "--biorxiv-url",
@@ -484,6 +492,9 @@ Examples:
     if not OPENAI_API_KEY:
         print("Error: OPENAI_API_KEY not set. Create a .env file or export it.", file=sys.stderr)
         sys.exit(1)
+
+    if args.model is None:
+        args.model = DEFAULT_MODEL
 
     if not args.questions_file and not args.question:
         parser.error("Provide either --question (single) or --questions-file (batch).")

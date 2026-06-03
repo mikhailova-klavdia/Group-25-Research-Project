@@ -7,6 +7,12 @@
 
 from agents import Runner
 
+from research_agents.agents.extraction_agent import (
+    ExtractionReport,
+    canonicalize_extraction_report,
+    create_extraction_agent,
+    format_extraction_report_for_downstream,
+)
 from research_agents.agents.gap_detection_agent import (
     GapDetectionReport,
     build_gap_detection_input,
@@ -31,27 +37,44 @@ def run_testing_worker_critic(
     entry_id: str,
     model: str,
 ) -> TeamRunResult:
-    """Validate workflows, execute, then run dedicated gap detection.
+    """Extract workflows, validate them, execute, then run gap detection.
 
-    The first stage is intentionally lightweight: it should de-risk the
-    likely workflow(s) for the question, not fully reproduce the paper.
-    Its typed report is prepended to the worker prompt so the ReAct worker
-    can spend its turn budget executing promising paths instead of
-    rediscovering obvious blockers from scratch. After execution, a
-    separate gap-detection stage analyzes discrepancies using the
-    testing report plus execution evidence rather than re-reading the repo.
+    Extraction produces a stable paper/repo inventory first. The testing
+    stage validates those extracted workflows instead of rediscovering
+    them from scratch, and the worker receives both reports as structured
+    prompt context before execution-time reasoning begins. After the
+    worker+critic loop finishes, a dedicated gap-detection stage
+    summarizes paper/repo/execution discrepancies from the structured
+    evidence rather than re-reading the repo.
     """
+    extraction_capture = ToolOutputCapture()
+    extraction_result = Runner.run_sync(
+        create_extraction_agent(model),
+        question,
+        context=context,
+        max_turns=150,
+        hooks=extraction_capture,
+    )
+    extraction_report: ExtractionReport = canonicalize_extraction_report(
+        extraction_result.final_output
+    )
+
+    extraction_preamble = format_extraction_report_for_downstream(extraction_report)
     testing_capture = ToolOutputCapture()
     testing_result = Runner.run_sync(
         create_testing_agent(model),
-        question,
+        f"{extraction_preamble}\n\nQUESTION:\n{question}",
         context=context,
         max_turns=150,
         hooks=testing_capture,
     )
     report: TestingReport = canonicalize_testing_report(testing_result.final_output)
 
-    worker_input = f"{format_testing_report_for_worker(report)}\n\nQUESTION:\n{question}"
+    worker_input = (
+        f"{extraction_preamble}\n\n"
+        f"{format_testing_report_for_worker(report)}\n\n"
+        f"QUESTION:\n{question}"
+    )
     exec_result = run_with_critic(
         context=context,
         question=worker_input,
@@ -91,9 +114,10 @@ def run_testing_worker_critic(
     return TeamRunResult(
         answer=exec_result.answer,
         worker_result=exec_result.worker_result,
-        captures=[testing_capture, *exec_result.captures],
+        captures=[extraction_capture, testing_capture, *exec_result.captures],
         reviews=exec_result.reviews,
         install_events=exec_result.install_events,
+        extraction_report=extraction_report.model_dump(),
         testing_report=report.model_dump(),
         gap_report=gap_report.model_dump(),
     )

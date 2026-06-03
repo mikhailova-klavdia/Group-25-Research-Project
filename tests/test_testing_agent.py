@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 from research_agents.agents.gap_detection_agent import GapDetectionReport, GapRecord
 from research_agents.agents.critic_agent import CriticReview
+from research_agents.agents.extraction_agent import ExtractionReport
 from research_agents.agents.react_agent import ReActAnswer, ReActStep
 from research_agents.agents.testing_agent import (
     TestingReport as WorkflowTestingReport,
@@ -83,6 +84,14 @@ def _gap_report() -> GapDetectionReport:
     )
 
 
+def _extraction_report() -> ExtractionReport:
+    return ExtractionReport(
+        paper_summary="The paper describes an example workflow.",
+        research_objective="Run the example workflow from the repo.",
+        notes="Synthetic extraction fixture for testing.",
+    )
+
+
 def test_canonicalize_testing_report_marks_ready_when_any_workflow_validates():
     report = canonicalize_testing_report(_testing_report("validated"))
 
@@ -113,6 +122,7 @@ def test_format_testing_report_for_worker_includes_actionable_evidence():
 def test_testing_team_runs_validation_before_worker_critic():
     root = Path("tests/.tmp-testing-team")
     context = _context(root)
+    extraction_result = SimpleNamespace(final_output=_extraction_report())
     testing_result = SimpleNamespace(final_output=_testing_report("validated"))
     gap_result = SimpleNamespace(final_output=_gap_report())
     final_answer = ReActAnswer(
@@ -139,7 +149,7 @@ def test_testing_team_runs_validation_before_worker_critic():
         patch("research_agents.teams.testing_worker_critic.Runner.run_sync") as run_sync,
         patch("research_agents.teams.testing_worker_critic.run_with_critic") as run_with_critic,
     ):
-        run_sync.side_effect = [testing_result, gap_result]
+        run_sync.side_effect = [extraction_result, testing_result, gap_result]
         run_with_critic.return_value = exec_result
 
         result = run_testing_worker_critic(
@@ -151,12 +161,15 @@ def test_testing_team_runs_validation_before_worker_critic():
         )
 
     assert result.answer.final_answer == "42"
-    assert len(result.captures) == 2
+    assert result.extraction_report is not None
+    assert len(result.captures) == 3
     assert result.testing_report is not None
     assert result.gap_report is not None
     assert result.testing_report["overall_status"] == "ready"
     assert result.testing_report["validated_workflows"] == ["example-workflow"]
     assert result.gap_report["missing_artifacts"] == ["Missing checkpoint"]
+    testing_prompt = run_sync.call_args_list[1].args[1]
     worker_prompt = run_with_critic.call_args.kwargs["question"]
+    assert "EXTRACTION REPORT" in testing_prompt
     assert "WORKFLOW TESTING REPORT" in worker_prompt
     assert "validated: example-workflow" in worker_prompt
