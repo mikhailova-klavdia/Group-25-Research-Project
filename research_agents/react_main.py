@@ -33,7 +33,7 @@ from agents.exceptions import MaxTurnsExceeded, ModelRefusalError
 
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
 from research_agents.agents.react_agent import REACT_INSTRUCTIONS, ReActAnswer
-from research_agents.orchestration import ToolOutputCapture
+from research_agents.orchestration import AgentUsage, ToolOutputCapture
 from research_agents.project import ResearchContext, resolve_project
 from research_agents.teams import DEFAULT_TEAM, TEAMS, TeamSpec
 from research_agents.token_utils import (
@@ -164,6 +164,7 @@ def _build_record(
     extraction_report: dict | None = None,
     testing_report: dict | None = None,
     gap_report: dict | None = None,
+    agent_usages: list[AgentUsage] | None = None,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
 
@@ -186,6 +187,15 @@ def _build_record(
                 "reflection": s.reflection,
             }
         )
+
+    usage_entries = agent_usages or []
+    aggregate_input_tokens = sum(entry.input_tokens for entry in usage_entries)
+    aggregate_output_tokens = sum(entry.output_tokens for entry in usage_entries)
+    aggregate_total_tokens = aggregate_input_tokens + aggregate_output_tokens
+    aggregate_cost = sum(
+        calculate_cost(entry.input_tokens, entry.output_tokens, entry.model)
+        for entry in usage_entries
+    )
 
     # ``team`` lives at the top of the record so a comparison script can
     # bucket chains by team without parsing internals.  Schema version is
@@ -219,6 +229,8 @@ def _build_record(
         ],
         "token_usage": {
             "pre_run_estimate": pre_estimate,
+            # Legacy worker-result accounting kept for compatibility with
+            # existing analysis scripts that read the top-level fields.
             "input_tokens": result.context_wrapper.usage.input_tokens if result else 0,
             "output_tokens": result.context_wrapper.usage.output_tokens if result else 0,
             "total_tokens": (
@@ -230,6 +242,29 @@ def _build_record(
                 result.context_wrapper.usage.output_tokens,
                 model,
             ) if result else 0.0,
+            "aggregate": {
+                "input_tokens": aggregate_input_tokens,
+                "output_tokens": aggregate_output_tokens,
+                "total_tokens": aggregate_total_tokens,
+                "estimated_cost_usd": aggregate_cost,
+            },
+            "by_agent": [
+                {
+                    "stage": entry.stage,
+                    "agent_name": entry.agent_name,
+                    "model": entry.model,
+                    "attempt": entry.attempt,
+                    "input_tokens": entry.input_tokens,
+                    "output_tokens": entry.output_tokens,
+                    "total_tokens": entry.total_tokens,
+                    "estimated_cost_usd": calculate_cost(
+                        entry.input_tokens,
+                        entry.output_tokens,
+                        entry.model,
+                    ),
+                }
+                for entry in usage_entries
+            ],
         },
     }
     if extraction_report is not None:
@@ -281,6 +316,7 @@ def run_react_query(
         extraction_report = team_result.extraction_report
         testing_report = team_result.testing_report
         gap_report = team_result.gap_report
+        agent_usages = team_result.agent_usages
     except MaxTurnsExceeded:
         print(
             "\nError: Agent did not finish within 150 turns. "
@@ -321,10 +357,23 @@ def run_react_query(
 
     # --- Token usage ---
     usage = result.context_wrapper.usage
+    aggregate_input = sum(entry.input_tokens for entry in agent_usages)
+    aggregate_output = sum(entry.output_tokens for entry in agent_usages)
     print("\nToken usage:")
-    print(f"  Input tokens:  {usage.input_tokens}")
-    print(f"  Output tokens: {usage.output_tokens}")
-    print(f"  Total tokens:  {usage.input_tokens + usage.output_tokens}")
+    print(f"  Worker input tokens:   {usage.input_tokens}")
+    print(f"  Worker output tokens:  {usage.output_tokens}")
+    print(f"  Worker total tokens:   {usage.input_tokens + usage.output_tokens}")
+    print(f"  Team input tokens:     {aggregate_input}")
+    print(f"  Team output tokens:    {aggregate_output}")
+    print(f"  Team total tokens:     {aggregate_input + aggregate_output}")
+    if agent_usages:
+        print("  Per-agent breakdown:")
+        for entry in agent_usages:
+            attempt_suffix = f" (attempt {entry.attempt})" if entry.attempt is not None else ""
+            print(
+                f"    - {entry.stage}: {entry.agent_name}{attempt_suffix} "
+                f"[in={entry.input_tokens}, out={entry.output_tokens}, total={entry.total_tokens}]"
+            )
     record = _build_record(
         entry_id,
         biorxiv_url,
@@ -341,6 +390,7 @@ def run_react_query(
         extraction_report=extraction_report,
         testing_report=testing_report,
         gap_report=gap_report,
+        agent_usages=agent_usages,
     )
 
     # --- Print chain to stdout ---

@@ -96,6 +96,56 @@ class InstallEvent:
 
 
 @dataclass
+class AgentUsage:
+    """Token and cost accounting for one agent invocation.
+
+    Stored per invocation rather than per unique role because some teams
+    intentionally retry the worker or run the critic multiple times.  The
+    saved JSON needs each call preserved so total spend can be audited
+    against the actual orchestration path, not an averaged summary.
+    """
+
+    stage: str
+    agent_name: str
+    model: str
+    input_tokens: int
+    output_tokens: int
+    attempt: int | None = None
+
+    @property
+    def total_tokens(self) -> int:
+        """Return total tokens consumed by this invocation."""
+        return self.input_tokens + self.output_tokens
+
+
+def usage_from_result(
+    result: Any,
+    *,
+    stage: str,
+    agent_name: str,
+    model: str,
+    attempt: int | None = None,
+) -> AgentUsage:
+    """Extract one ``AgentUsage`` record from a Runner result object.
+
+    Kept tolerant of missing usage fields so unit tests can supply small
+    ``SimpleNamespace`` fixtures without reproducing the SDK's full result
+    shape.  Production runs always provide the real usage numbers.
+    """
+    usage = getattr(getattr(result, "context_wrapper", None), "usage", None)
+    input_tokens = int(getattr(usage, "input_tokens", 0) or 0)
+    output_tokens = int(getattr(usage, "output_tokens", 0) or 0)
+    return AgentUsage(
+        stage=stage,
+        agent_name=agent_name,
+        model=model,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        attempt=attempt,
+    )
+
+
+@dataclass
 class TeamRunResult:
     """Result bundle returned by worker plus critic orchestration."""
 
@@ -116,6 +166,10 @@ class TeamRunResult:
     # from the worker answer because a blocked benchmark answer and a
     # reproducibility-gap diagnosis are related but not interchangeable.
     gap_report: dict[str, Any] | None = None
+    # Per-agent usage for every stage the team ran.  Stored at the team
+    # boundary so ``react_main`` can write one consistent JSON schema for
+    # single-agent, worker+critic, and multi-stage teams alike.
+    agent_usages: list[AgentUsage] = field(default_factory=list)
 
     @property
     def final_capture(self) -> ToolOutputCapture:
@@ -266,6 +320,7 @@ def run_with_critic(
     reviews: list[CriticReview] = []
     captures: list[ToolOutputCapture] = []
     install_events: list[InstallEvent] = []
+    agent_usages: list[AgentUsage] = []
     feedback_for_retry = ""
 
     last_answer: ReActAnswer | None = None
@@ -284,6 +339,15 @@ def run_with_critic(
             context=context,
             max_turns=150,
             hooks=capture,
+        )
+        agent_usages.append(
+            usage_from_result(
+                worker_result,
+                stage="execution_worker",
+                agent_name=getattr(worker, "name", "Execution worker"),
+                model=worker_model,
+                attempt=attempt_index + 1,
+            )
         )
         captures.append(capture)
         answer = worker_result.final_output
@@ -309,12 +373,22 @@ def run_with_critic(
             tool_outputs=capture.outputs,
             install_events=install_events,
         )
-        review = Runner.run_sync(
+        critic_result = Runner.run_sync(
             critic,
             critic_input,
             context=context,
             max_turns=10,
-        ).final_output
+        )
+        agent_usages.append(
+            usage_from_result(
+                critic_result,
+                stage="critic_review",
+                agent_name=getattr(critic, "name", "Critic"),
+                model=critic_model,
+                attempt=len(reviews) + 1,
+            )
+        )
+        review = critic_result.final_output
         reviews.append(review)
 
         if review.verdict in {"pass", "incorrect"} or attempt_index >= max_retries:
@@ -362,4 +436,5 @@ def run_with_critic(
         captures=captures,
         reviews=reviews,
         install_events=install_events,
+        agent_usages=agent_usages,
     )
