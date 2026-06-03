@@ -104,10 +104,11 @@ TEAMS: dict[str, TeamSpec] = {
     "testing-worker-critic": TeamSpec(
         name="testing-worker-critic",
         description=(
-            "Four stages: an extraction agent inventories paper/repo workflows, "
+            "Five stages: an extraction agent inventories paper/repo workflows, "
             "a workflow-testing agent smoke-validates them, a ReAct execution "
-            "worker answers using both reports, then the usual LLM critic audits "
-            "the answer."
+            "worker answers using both reports, the usual LLM critic audits "
+            "the answer, and a dedicated gap-detection agent summarizes "
+            "paper/repo/execution discrepancies."
         ),
         run=run_testing_worker_critic,
         apply_setup=True,

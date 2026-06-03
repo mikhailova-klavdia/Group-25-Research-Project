@@ -163,6 +163,7 @@ def _build_record(
     install_events: list | None = None,
     extraction_report: dict | None = None,
     testing_report: dict | None = None,
+    gap_report: dict | None = None,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
 
@@ -235,6 +236,8 @@ def _build_record(
         record["extraction_report"] = extraction_report
     if testing_report is not None:
         record["testing_report"] = testing_report
+    if gap_report is not None:
+        record["gap_report"] = gap_report
     return record
 
 
@@ -277,6 +280,7 @@ def run_react_query(
         install_events = team_result.install_events
         extraction_report = team_result.extraction_report
         testing_report = team_result.testing_report
+        gap_report = team_result.gap_report
     except MaxTurnsExceeded:
         print(
             "\nError: Agent did not finish within 150 turns. "
@@ -308,6 +312,12 @@ def run_react_query(
             file=sys.stderr,
         )
         sys.exit(2)
+    except KeyboardInterrupt:
+        print(
+            "\nInterrupted by user. Partial output was not saved.",
+            file=sys.stderr,
+        )
+        sys.exit(130)
 
     # --- Token usage ---
     usage = result.context_wrapper.usage
@@ -330,6 +340,7 @@ def run_react_query(
         install_events=install_events,
         extraction_report=extraction_report,
         testing_report=testing_report,
+        gap_report=gap_report,
     )
 
     # --- Print chain to stdout ---
@@ -544,15 +555,19 @@ Examples:
             print(f"Error resolving project: {exc}", file=sys.stderr)
             sys.exit(1)
 
-        run_react_query(
-            context=context,
-            question=question,
-            model=args.model,
-            entry_id=entry_id,
-            biorxiv_url=args.biorxiv_url,
-            ground_truth=ground_truth,
-            team=team,
-        )
+        try:
+            run_react_query(
+                context=context,
+                question=question,
+                model=args.model,
+                entry_id=entry_id,
+                biorxiv_url=args.biorxiv_url,
+                ground_truth=ground_truth,
+                team=team,
+            )
+        except KeyboardInterrupt:
+            print("\nInterrupted by user.", file=sys.stderr)
+            sys.exit(130)
         saved.append(context.run_dir / f"{entry_id}.json")
 
     print(f"\n{'=' * 60}")
