@@ -192,6 +192,7 @@ def _build_record(
     record = {
         "id": entry_id,
         "team": team_name,
+        "model": model,
         "repo_link": biorxiv_url,
         "question": question,
         "ground_truth": ground_truth,
@@ -434,9 +435,11 @@ Examples:
     )
     parser.add_argument(
         "--model",
-        default=DEFAULT_MODEL,
-        choices=[DEFAULT_MODEL, ALTERNATE_MODEL],
-        help=f"Model to use (default: {DEFAULT_MODEL})",
+        default=None,
+        help=(
+            f"Model to use. OpenAI default: {DEFAULT_MODEL}. "
+            "For other providers the provider's default is used when omitted."
+        ),
     )
     parser.add_argument(
         "--biorxiv-url",
@@ -484,6 +487,9 @@ Examples:
     if not OPENAI_API_KEY:
         print("Error: OPENAI_API_KEY not set. Create a .env file or export it.", file=sys.stderr)
         sys.exit(1)
+
+    if args.model is None:
+        args.model = DEFAULT_MODEL
 
     if not args.questions_file and not args.question:
         parser.error("Provide either --question (single) or --questions-file (batch).")

@@ -84,23 +84,49 @@ def extract_slug(folder_name: str) -> str:
     return parts[2] if len(parts) >= 3 else folder_name
 
 
+# Folder slug → QA JSON filename when they don't match directly.
+_SLUG_JSON_OVERRIDE: dict[str, str] = {
+    "metapointfinder": "METAPOINT.json",
+}
+
+
 def load_questions(biorxiv_url: str, slug: str) -> list[dict]:
     """
-    Scan 300_questions.csv and return all rows whose normalised biorxiv_link
-    matches the given URL.  IDs are generated as <SLUG>_001, <SLUG>_002 …
+    Return questions for this repo.  CSV lookup is tried first (if the file
+    exists); falls back to question-answers/<slug>.json so the runner keeps
+    working after the upstream 300_questions.csv is no longer in the repo.
     """
     norm_target = normalise_url(biorxiv_url)
     id_prefix = slug.upper().replace("-", "_")
-    matches = []
-    with open(QUESTIONS_CSV, newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            if normalise_url(row["biorxiv_link"]) == norm_target:
-                matches.append({
-                    "id": f"{id_prefix}_{len(matches) + 1:03d}",
-                    "question": row["question"],
-                    "ground_truth": row["ground_truth"],
-                })
-    return matches
+
+    if QUESTIONS_CSV.exists():
+        matches = []
+        with open(QUESTIONS_CSV, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if normalise_url(row["biorxiv_link"]) == norm_target:
+                    matches.append({
+                        "id": f"{id_prefix}_{len(matches) + 1:03d}",
+                        "question": row["question"],
+                        "ground_truth": row["ground_truth"],
+                    })
+        if matches:
+            return matches
+
+    # Fall back to question-answers/<slug>.json (handles non-bio repos and
+    # the case where 300_questions.csv has been removed from the repo).
+    json_name = _SLUG_JSON_OVERRIDE.get(slug, f"{slug}.json")
+    for candidate in (QA_DIR / json_name, QA_DIR / f"{slug.upper()}.json"):
+        if candidate.exists():
+            data = json.loads(candidate.read_text(encoding="utf-8"))
+            return [
+                {
+                    "id": d.get("id", f"{id_prefix}_{i:03d}"),
+                    "question": d["question"],
+                    "ground_truth": d.get("ground_truth", ""),
+                }
+                for i, d in enumerate(data, 1)
+            ]
+    return []
 
 
 def _junction(src: Path, dst: Path) -> None:
