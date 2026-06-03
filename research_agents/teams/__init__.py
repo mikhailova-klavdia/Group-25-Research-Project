@@ -44,6 +44,7 @@ from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
 from research_agents.teams.worker_critic_plus_plus import run_worker_critic_plus_plus
 from research_agents.teams.worker_critic_plus_plus_hitl import run_worker_critic_plus_plus_hitl
+from research_agents.teams.worker_verifier_critic import run_worker_verifier_critic
 
 
 # A team's run function takes a context + a question and returns a
@@ -100,6 +101,20 @@ TEAMS: dict[str, TeamSpec] = {
         ),
         run=run_worker_critic_plus,
         apply_setup=True,
+    ),
+    "worker-verifier-critic": TeamSpec(
+        name="worker-verifier-critic",
+        description=(
+            "Three agents: improved ReAct worker + code verifier + LLM critic. "
+            "The verifier checks a finite bug checklist (ESM-2 BOS/EOS indexing, "
+            "numpy 2.x removed aliases, Python 2 pickle encoding, FASTA counting, "
+            "off-by-one after filtering, curl redirect failures) derived from "
+            "annotation of 65 benchmark chains. When it finds a fixable bug it "
+            "rewrites the script, re-executes in the existing workspace, and the "
+            "corrected answer replaces the worker's answer before the critic sees it."
+        ),
+        run=run_worker_verifier_critic,
+        apply_setup=False,
     ),
     "testing-worker-critic": TeamSpec(
         name="testing-worker-critic",
