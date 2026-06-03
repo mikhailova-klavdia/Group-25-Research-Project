@@ -9,7 +9,7 @@
 from agents import Runner
 
 from research_agents.agents.react_agent import create_react_agent
-from research_agents.orchestration import TeamRunResult, ToolOutputCapture
+from research_agents.orchestration import TeamRunResult, ToolOutputCapture, usage_from_result
 from research_agents.project import ResearchContext
 
 
@@ -48,4 +48,13 @@ def run_solo(
         captures=[capture],
         reviews=[],
         install_events=[],
+        agent_usages=[
+            usage_from_result(
+                result,
+                stage="execution_worker",
+                agent_name=getattr(worker, "name", "ReAct worker"),
+                model=model,
+                attempt=1,
+            )
+        ],
     )

@@ -26,7 +26,12 @@ from research_agents.agents.testing_agent import (
     create_testing_agent,
     format_testing_report_for_worker,
 )
-from research_agents.orchestration import TeamRunResult, ToolOutputCapture, run_with_critic
+from research_agents.orchestration import (
+    TeamRunResult,
+    ToolOutputCapture,
+    run_with_critic,
+    usage_from_result,
+)
 from research_agents.project import ResearchContext
 
 
@@ -67,6 +72,12 @@ def run_testing_worker_critic(
         max_turns=150,
         hooks=extraction_capture,
     )
+    extraction_usage = usage_from_result(
+        extraction_result,
+        stage="extraction",
+        agent_name="Extraction Agent",
+        model=model,
+    )
     extraction_report: ExtractionReport = canonicalize_extraction_report(
         extraction_result.final_output
     )
@@ -80,6 +91,12 @@ def run_testing_worker_critic(
         context=context,
         max_turns=150,
         hooks=testing_capture,
+    )
+    testing_usage = usage_from_result(
+        testing_result,
+        stage="workflow_testing",
+        agent_name="Workflow Testing Agent",
+        model=model,
     )
     report: TestingReport = canonicalize_testing_report(testing_result.final_output)
 
@@ -124,6 +141,12 @@ def run_testing_worker_critic(
         context=context,
         max_turns=20,
     )
+    gap_usage = usage_from_result(
+        gap_result,
+        stage="gap_detection",
+        agent_name="Gap Detection Agent",
+        model=model,
+    )
     gap_report: GapDetectionReport = canonicalize_gap_detection_report(gap_result.final_output)
 
     return TeamRunResult(
@@ -135,4 +158,10 @@ def run_testing_worker_critic(
         extraction_report=extraction_report.model_dump(),
         testing_report=report.model_dump(),
         gap_report=gap_report.model_dump(),
+        agent_usages=[
+            extraction_usage,
+            testing_usage,
+            *exec_result.agent_usages,
+            gap_usage,
+        ],
     )
