@@ -1,0 +1,370 @@
+[
+  {
+    "id": "CYTEONTO_001",
+    "repo": "CyteOnto",
+    "project": "papers/CyteOnto",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' column containing cell type names). How many unique cell type labels are in this file?",
+    "ground_truth": "4",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.06.686964v1"
+  },
+  {
+    "id": "CYTEONTO_002",
+    "repo": "CyteOnto",
+    "project": "papers/CyteOnto",
+    "question": "Load the algorithm 1 predicted labels from 'CyteOnto/notebooks/adv_tutorial/data/algorithm1_labels.csv' (CSV file with 'label' column). What is the first label in the list?",
+    "ground_truth": "stem cell",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.06.686964v1"
+  },
+  {
+    "id": "CYTEONTO_003",
+    "repo": "CyteOnto",
+    "project": "papers/CyteOnto",
+    "question": "Load the algorithm 2 predicted labels from 'CyteOnto/notebooks/adv_tutorial/data/algorithm2_labels.csv' (CSV file with 'label' column). What is the last label in the list?",
+    "ground_truth": "ovum",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.06.686964v1"
+  },
+  {
+    "id": "GWAS_EPISTASIS_BIAS_001",
+    "repo": "GWAS-Epistasis-Bias",
+    "project": "papers/GWAS-Epistasis-Bias",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by interactions (lambda), using a sample size of 100000, with rho ranging from -0.3 to 0.3, lambda ranging from 0 to 0.171, a grid resolution of 100, and a GWAS significance threshold of 5.45. Save the output to the directory 'GWAS-Epistasis-Bias/notebooks/math_model_plots/output'. What is the null type I error rate (alpha_w) value reported in the output?",
+    "ground_truth": "5.036982e-08",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.21.689603v1"
+  },
+  {
+    "id": "GWAS_EPISTASIS_BIAS_002",
+    "repo": "GWAS-Epistasis-Bias",
+    "project": "papers/GWAS-Epistasis-Bias",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps (from 0.001 to 0.171), 500 target SNPs, 100 interaction pairs, 1000 additive SNPs, chromosome A size of 4034, significance threshold of 5.45, and random seed of 42. How many results are statistically significant at the genome-wide significance threshold of p-value less than 5e-8?",
+    "ground_truth": "0",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.21.689603v1"
+  },
+  {
+    "id": "GWAS_EPISTASIS_BIAS_003",
+    "repo": "GWAS-Epistasis-Bias",
+    "project": "papers/GWAS-Epistasis-Bias",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps spanning from 0.001 to 0.171, 500 target SNPs, 100 interaction pairs, 1000 additive SNPs, chromosome A size of 4034, significance threshold of 5.45, and random seed of 42. What is the mean of the absolute t-statistic values across all tests, rounded to two decimal places?",
+    "ground_truth": "0.79",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.21.689603v1"
+  },
+  {
+    "id": "USHER_002",
+    "repo": "USHER",
+    "project": "papers/USHER",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data from 'USHER/repo/USHER/datasets/scRNAseq_scGPT.h5ad' (26323 cells Ã— 25425 genes), and the pre-trained USHER alignment model from 'USHER/repo/USHER/datasets/scGPT_example/alignment_model.pt' (with hidden dimension 512). Prepare scGPT embedding AnnData objects, apply USHER alignment to transform Xenium embeddings to the scRNA-seq space, and concatenate the aligned datasets. What is the total number of cells in the final combined aligned dataset?",
+    "ground_truth": "64603",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.20.689462v1"
+  },
+  {
+    "id": "SENTIEON_CLI_001",
+    "repo": "sentieon-cli",
+    "project": "papers/sentieon-cli",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/notebooks/run_dnascope/input/reference.fa, R1 fastq file at sentieon-cli/notebooks/run_dnascope/input/sample_R1.fastq.gz, R2 fastq file at sentieon-cli/notebooks/run_dnascope/input/sample_R2.fastq.gz, model bundle at sentieon-cli/notebooks/run_dnascope/input/model.bundle, dbSNP file at sentieon-cli/notebooks/run_dnascope/input/dbsnp.vcf.gz, BED file at sentieon-cli/notebooks/run_dnascope/input/target.bed, readgroup string '@RG\\tID:HG002-1\\tSM:HG002\\tLB:HG002-LB-1\\tPL:ILLUMINA', 2 threads, and output VCF at sentieon-cli/notebooks/run_dnascope/output/sample.vcf.gz. What pcr_indel_model setting does the DNAscope algorithm use in the dry run commands?",
+    "ground_truth": "CONSERVATIVE",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.14.688541v1"
+  },
+  {
+    "id": "GWPROT_001",
+    "repo": "GWProt",
+    "project": "papers/GWProt",
+    "question": "Using the GWProt library, load all PDB files from 'GWProt/repo/GWProt/docs/Examples/Example_Data/KRAS Proteins/' directory to create GW_protein objects. How many protein structures are loaded?",
+    "ground_truth": "54",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.03.686256v1"
+  },
+  {
+    "id": "GWPROT_002",
+    "repo": "GWProt",
+    "project": "papers/GWProt",
+    "question": "Using the ligand metadata file at 'GWProt/repo/GWProt/docs/Examples/Example_Data/KRAS Ligands.csv', count how many unique ligand types are present in the KRAS protein dataset. What is the count of unique ligand types?",
+    "ground_truth": "4",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.03.686256v1"
+  },
+  {
+    "id": "LARIS_001",
+    "repo": "LARIS",
+    "project": "papers/LARIS",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad' and the ligand-receptor database from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv', run the LARIS inference with parameters: 20 nearest neighbors, mu equals 0.40, sigma equals 100, 5 permutation repeats, expressed_pct equals 0.1, mu_celltype equals 100, and by_celltype set to True with groupby 'cell_type'. How many cell type-level interactions have a p_value less than 0.05?",
+    "ground_truth": "8772",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.26.690796v1"
+  },
+  {
+    "id": "LARIS_002",
+    "repo": "LARIS",
+    "project": "papers/LARIS",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad' (human tonsil Slide-tags spatial transcriptomics data with 5695 cells x 25583 genes) and the ligand-receptor database from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv', prepare a ligand-receptor AnnData object using 20 nearest neighbors and 'X_spatial' as the spatial coordinates key. How many ligand-receptor interaction pairs are in the resulting LR AnnData object (number of variables)?",
+    "ground_truth": "1985",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.26.690796v1"
+  },
+  {
+    "id": "LARIS_003",
+    "repo": "LARIS",
+    "project": "papers/LARIS",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad' and the ligand-receptor database from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv', run the LARIS inference with parameters: 20 nearest neighbors, mu equals 0.40, sigma equals 100, 5 permutation repeats, expressed_pct equals 0.1, mu_celltype equals 100, and by_celltype set to True with groupby 'cell_type'. What is the ligand name of the top-ranked spatially variable interaction (rank 0)?",
+    "ground_truth": "SEMA4A",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.26.690796v1"
+  },
+  {
+    "id": "SC_FRAMEWORK_001",
+    "repo": "SC-Framework",
+    "project": "papers/SC-Framework",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observations (cells) are in the dataset?",
+    "ground_truth": "5000",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.11.687874v1"
+  },
+  {
+    "id": "SEGMA_001",
+    "repo": "SEGMA",
+    "project": "papers/segma",
+    "question": "Using the SEGMA process_sequences tool, process the FASTA file located at SEGMA/notebooks/get_seqs/input/test.fasta. What is the total number of amino acids across all sequences in the input file?",
+    "ground_truth": "187",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.13.688364v1"
+  },
+  {
+    "id": "SCISTREECNA_001",
+    "repo": "ScisTreeCNA",
+    "project": "papers/ScisTreeCNA",
+    "question": "Using the single-cell copy number data from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv' (100 SNP sites x 60 cells, 'ref|alt|cn' format), run SciStree2 inference (using scistreecna's external module). Then evaluate the inferred tree against the ground truth tree from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_tree.pkl'. What is the SciStree2 tree accuracy (reported as a decimal number)?",
+    "ground_truth": "0.3793103448275862",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.21.689819v1"
+  },
+  {
+    "id": "SCISTREECNA_003",
+    "repo": "ScisTreeCNA",
+    "project": "papers/ScisTreeCNA",
+    "question": "Using the single-cell copy number data from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv' (100 SNP sites x 60 cells, 'ref|alt|cn' format), run ScisTreeCNA inference with the following parameters: allelic dropout rate equals 0.1, sequencing error equals 0.01, copy number noise equals 0.05, minimum copy number equals 1, maximum copy number equals 5, tree batch size equals 128, and node batch size equals 256. Then evaluate the inferred tree against the ground truth tree from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_tree.pkl'. What is the tree accuracy (reported as a decimal number)?",
+    "ground_truth": "0.4827586206896552",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.21.689819v1"
+  },
+  {
+    "id": "DISTORTIONS_001",
+    "repo": "distortions",
+    "project": "papers/distortions",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell types are annotated in the 'cell.type' column?",
+    "ground_truth": "36",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.08.21.671523v1"
+  },
+  {
+    "id": "DISTORTIONS_005",
+    "repo": "distortions",
+    "project": "papers/distortions",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 cells x 1838 genes, pre-processed), run UMAP embedding using 10 nearest neighbors with 50 PCA components and spectral initialization, then perform Leiden clustering with resolution 0.5, 2 iterations, igraph flavor, and undirected mode. How many unique clusters are identified?",
+    "ground_truth": "6",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.08.21.671523v1"
+  },
+  {
+    "id": "DISTORTIONS_006",
+    "repo": "distortions",
+    "project": "papers/distortions",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 features) and metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. Sample 100 cells from each of 8 specific cell types: Ciliated_amphid_neuron, Pharyngeal_neuron, GLR, Glia, Body_wall_muscle, Pharyngeal_muscle, Hypodermis, and Intestine using stratified sampling with seed 42. How many total cells are in the sampled subset?",
+    "ground_truth": "800",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.08.21.671523v1"
+  },
+  {
+    "id": "ARCADIA_PUBLIC_002",
+    "repo": "ARCADIA_public",
+    "project": "papers/ARCADIA_public",
+    "question": "Using the run_pipeline tool, run the complete ARCADIA pipeline for the cite_seq dataset. According to the configuration file at ARCADIA_public/repo/ARCADIA_public/configs/config.json, what is the maximum number of training epochs configured?",
+    "ground_truth": "300",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.20.689521v1"
+  },
+  {
+    "id": "ARCADIA_PUBLIC_003",
+    "repo": "ARCADIA_public",
+    "project": "papers/ARCADIA_public",
+    "question": "Using the ARCADIA hyperparameter search tool, run a hyperparameter search with the dataset name 'cite_seq', maximum epochs set to 400, batch size set to 1024, latent dimension set to 60, number of layers set to 3, 1024 hidden units for RNA encoder, 512 hidden units for protein encoder, learning rate of 0.001, and gradient clipping value of 1.0. How many total parameter combinations are in the default search grid when exploring n_layers options of [3, 1, 6] and latent_dim options of [60, 30]?",
+    "ground_truth": "6",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.20.689521v1"
+  },
+  {
+    "id": "REGFORMER_002",
+    "repo": "RegFormer",
+    "project": "papers/RegFormer",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2 test runs with columns for Loss, PCC, and Spearman correlation (no header row). What is the Spearman correlation coefficient for the second test run (Run 1)?",
+    "ground_truth": "0.8841",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.01.24.634217v1"
+  },
+  {
+    "id": "REGFORMER_003",
+    "repo": "RegFormer",
+    "project": "papers/RegFormer",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels from 'RegFormer/notebooks/cell_emb/data/cell_labels.csv', and gene expression matrix from 'RegFormer/notebooks/cell_emb/data/gene_expression.csv'. Create an AnnData object with the gene expression as the main matrix and store the embeddings in obsm with key 'X_regformer'. What is the embedding dimension (number of features in the embedding)?",
+    "ground_truth": "512",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.01.24.634217v1"
+  },
+  {
+    "id": "FADVI_001",
+    "repo": "fadvi",
+    "project": "papers/fadvi",
+    "question": "Load the pre-trained FADVI model from 'fadvi/notebooks/basic_usage/fadvi_save/' and extract the batch latent representation. What is the dimensionality (number of features) of the batch latent representation?",
+    "ground_truth": "30",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.03.683998v1"
+  },
+  {
+    "id": "FADVI_003",
+    "repo": "fadvi",
+    "project": "papers/fadvi",
+    "question": "Create an AnnData object using the expression matrix from 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv', metadata from 'fadvi/notebooks/advanced_usage/data/metadata.csv', and highly variable genes from 'fadvi/notebooks/advanced_usage/data/highly_variable_genes.csv'. Setup FADVI with batch_key='batch' and labels_key='cell_type'. Initialize a FADVI model with beta=1.0, lambda_b=25.0, lambda_l=75.0, alpha_bl=0.5, alpha_lb=0.5, alpha_rb=1.5, alpha_rl=1.5, and gamma=0.3. Train for 10 epochs with train_size=0.8 and validation_size=0.2. What is the dimensionality (number of columns) of the residual latent representation?",
+    "ground_truth": "10",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.03.683998v1"
+  },
+  {
+    "id": "FADVI_007",
+    "repo": "fadvi",
+    "project": "papers/fadvi",
+    "question": "Load the scRNA-seq data from 'fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad' (500 cells x 2000 genes) and the spatial transcriptomics data from 'fadvi/notebooks/spatial_and_single_cell/data/st_data.h5ad' (300 spots x 2000 genes). Use TACCO to annotate the ST data using the scRNA-seq reference with the cell_type annotation key, concatenate the data with 'tech' as the batch label, then train a FADVI model with batch_key='tech', labels_key='cell_type', using the counts layer, for 30 epochs. What is the dimensionality (number of features) of the latent representation?",
+    "ground_truth": "30",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.03.683998v1"
+  },
+  {
+    "id": "PPLM_001",
+    "repo": "PPLM",
+    "project": "papers/PPLM",
+    "question": "Using the PPLM binding affinity prediction tool, predict the binding affinity between the receptor protein sequence in the FASTA file at PPLM/notebooks/run_pplm-affinity/data/receptor.fasta and the ligand protein sequence in the FASTA file at PPLM/notebooks/run_pplm-affinity/data/ligand.fasta. What is the predicted binding affinity value in kcal/mol?",
+    "ground_truth": "-8.226562",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_002",
+    "repo": "PPLM",
+    "project": "papers/PPLM",
+    "question": "Using the PPLM binding affinity prediction tool with the receptor FASTA file at PPLM/notebooks/run_pplm-affinity/data/receptor.fasta and ligand FASTA file at PPLM/notebooks/run_pplm-affinity/data/ligand.fasta, is the predicted binding interaction favorable or unfavorable (based on whether the affinity value is negative or positive)?",
+    "ground_truth": "Favorable",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_003",
+    "repo": "PPLM",
+    "project": "papers/PPLM",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the shape of the embed_A embeddings in the output pickle file (format as tuple)?",
+    "ground_truth": "(122, 1280)",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_004",
+    "repo": "PPLM",
+    "project": "papers/PPLM",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the mean value of the embed_A embeddings in the output pickle file (rounded to 6 decimal places)?",
+    "ground_truth": "-0.000396",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_005",
+    "repo": "PPLM",
+    "project": "papers/PPLM",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the shape of the inter_attn (inter-protein attention) array in the output pickle file (format as tuple)?",
+    "ground_truth": "(660, 122, 70)",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_006",
+    "repo": "PPLM",
+    "project": "papers/PPLM",
+    "question": "Using the PPLM protein-protein interaction prediction tool, predict the interaction probability between the first protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq1.fasta and the second protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq2.fasta, using GPU device 0. What is the predicted interaction score reported in the output?",
+    "ground_truth": "0.94310874",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "METAPOINT_001",
+    "repo": "metapointfinder",
+    "project": "papers/metapointfinder",
+    "question": "Using the protein mutant generator tool, generate wildtype and mutant protein sequences from the AMR protein mutation data. Use the TSV file at metapointfinder/notebooks/mutation_r_wt_generator/input/AMRProt-mutation_underscore_combined.tsv and the FASTA file at metapointfinder/notebooks/mutation_r_wt_generator/input/AMRProt_mutation.fa. Generate 3 mutant-wildtype pairs per input row, use random seed 42, and save output to metapointfinder/notebooks/mutation_r_wt_generator/output/protein_mutants_test.faa. How many total sequences are generated in the output FASTA file?",
+    "ground_truth": "1182",
+    "biorxiv": "https://www.biorxiv.org/content/10.64898/2025.12.04.691125v1"
+  },
+  {
+    "id": "METAPOINT_002",
+    "repo": "metapointfinder",
+    "project": "papers/metapointfinder",
+    "question": "Generate protein mutants using the TSV file at metapointfinder/notebooks/mutation_r_wt_generator/input/AMRProt-mutation_underscore_combined.tsv and FASTA file at metapointfinder/notebooks/mutation_r_wt_generator/input/AMRProt_mutation.fa, with 3 pairs per row, seed 42, output to metapointfinder/notebooks/mutation_r_wt_generator/output/protein_mutants_test.faa. How many unique AMR classes appear in the output sequences?",
+    "ground_truth": "37",
+    "biorxiv": "https://www.biorxiv.org/content/10.64898/2025.12.04.691125v1"
+  },
+  {
+    "id": "METAPOINT_003",
+    "repo": "metapointfinder",
+    "project": "papers/metapointfinder",
+    "question": "Using the generate_dna_mutants tool, process the sample input TSV file at metapointfinder/notebooks/make_dna_mutants/output/sample_input.tsv, generating 2 mutant plus wildtype pairs per row, with random seed set to 42. Save the output FASTA to metapointfinder/notebooks/make_dna_mutants/output/benchmark_dna_mutants.fna. How many total sequences are generated in the output FASTA file?",
+    "ground_truth": "20",
+    "biorxiv": "https://www.biorxiv.org/content/10.64898/2025.12.04.691125v1"
+  },
+  {
+    "id": "METAPOINT_004",
+    "repo": "metapointfinder",
+    "project": "papers/metapointfinder",
+    "question": "Using the pad_sequences tool, pad or truncate the FASTA sequences in the input file at metapointfinder/notebooks/pad_to_10kb/data/input_sequences.fasta to a target length of 5000 base pairs with center trimming mode, saving the output to metapointfinder/notebooks/pad_to_10kb/output/test_padded_5kb.fasta. After running the tool, what is the length in base pairs of the sequence with ID seq_long_15000bp in the output file?",
+    "ground_truth": "5000",
+    "biorxiv": "https://www.biorxiv.org/content/10.64898/2025.12.04.691125v1"
+  },
+  {
+    "id": "METAPOINT_005",
+    "repo": "metapointfinder",
+    "project": "papers/metapointfinder",
+    "question": "Using the pad_sequences tool, pad or truncate the FASTA sequences in the input file at metapointfinder/notebooks/pad_to_10kb/data/input_sequences.fasta to a target length of 10000 base pairs, saving the output to metapointfinder/notebooks/pad_to_10kb/output/test_padded_10kb.fasta with center trimming mode. After running the tool, what is the length in base pairs of the sequence with ID seq_short_500bp in the output file?",
+    "ground_truth": "10000",
+    "biorxiv": "https://www.biorxiv.org/content/10.64898/2025.12.04.691125v1"
+  },
+  {
+    "id": "CROSSPPI_001",
+    "repo": "CrossPPI",
+    "project": "papers/CrossPPI",
+    "question": "Use the CrossPPI binding affinity predictor to analyze a RAS-RAF protein interaction. The ligand sequence is MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLAARTVESRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQHKLRKLNPPDESGPGCMSCKCVLS (189 residues). The receptor sequence is MPSKKQRGSKSKKAAGAAGTSSAGKKPNQKGKGGKNGRGQSSTGNFPGKRAKFVNNQRESFSGPIKRNYIAQVQERGLQQLFELLESDLFSRSTPLADKIRQLVNFWKTSLKEKQQKIENNIKFLGSRKTTGNRLQARLQVF (142 residues). Use the pre-trained models from the save directory. What is the ensemble predicted pKD value (rounded to 2 decimal places)?",
+    "ground_truth": "5.65",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  },
+  {
+    "id": "CROSSPPI_003",
+    "repo": "CrossPPI",
+    "project": "papers/CrossPPI",
+    "question": "Use the CrossPPI binding affinity predictor to predict the pKD value for a protein-protein interaction. The ligand protein sequence is MGDKPIWEQIGSSFIQHYYQLFDNDRTQLGAIYIDASCLTWEGQQFQGKAAIVEKLSSLPFQKIQHSITAQDHQPTPDSCIISMVVGQLKADEDPIMGFHQMFLLKNINDAWVCTNDMFRLALHNFG (127 residues, CDC42-like protein). The receptor protein sequence is MAAQGEPQVQFKLVLVGDGGTGKTTFVKRHLTGEFEKKYVATLGVEVHPLVFHTNRGPIKFNVWDTAGQEKFGGLRDGYYIQAQCAIIMFDVTSRVTYKNVPNWHRDLVRVCENIPIVLCGNKVDIKDRKVKAKSIVFHRKKNLQYYDISAKSNYNFEKPFLWLARKLIGDPNLEFVAMPALAPPEVVMDPALAAQYEHDLEVAQTTALPDEDDDL (216 residues, RAC1-like protein). Use the pre-trained models from the save directory. What is the ensemble predicted pKD value (rounded to 2 decimal places)?",
+    "ground_truth": "8.20",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  },
+  {
+    "id": "CROSSPPI_004",
+    "repo": "CrossPPI",
+    "project": "papers/CrossPPI",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the KRAS protein sequence MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLAARTVESRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQHKLRKLNPPDESGPGCMSCKCVLS with complex ID TEST003, using maximum sequence length of 1000 residues. What is the mean value of the first residue embedding vector (rounded to 4 decimal places)?",
+    "ground_truth": "9.6298",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  },
+  {
+    "id": "CROSSPPI_006",
+    "repo": "CrossPPI",
+    "project": "papers/CrossPPI",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the RAC1 receptor protein sequence MAAQGEPQVQFKLVLVGDGGTGKTTFVKRHLTGEFEKKYVATLGVEVHPLVFHTNRGPIKFNVWDTAGQEKFGGLRDGYYIQAQCAIIMFDVTSRVTYKNVPNWHRDLVRVCENIPIVLCGNKVDIKDRKVKAKSIVFHRKKNLQYYDISAKSNYNFEKPFLWLARKLIGDPNLEFVAMPALAPPEVVMDPALAAQYEHDLEVAQTTALPDEDDDL with complex ID EMB002, using maximum sequence length of 1000 residues, and save the output to CrossPPI/notebooks/embedding_generator/output/EMB002_test.npy. What is the number of rows in the generated embedding array (which corresponds to the sequence length)?",
+    "ground_truth": "216",
+    "biorxiv": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  },
+  {
+    "id": "SAM2_001",
+    "repo": "sam2",
+    "project": "papers/sam2",
+    "question": "Use sam2.1_hiera_tiny checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/notebooks/images/groceries.jpg'",
+    "ground_truth": "~52 masks",
+    "biorxiv": "https://github.com/facebookresearch/sam2"
+  },
+  {
+    "id": "SAM2_002",
+    "repo": "sam2",
+    "project": "papers/sam2",
+    "question": "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/notebooks/images/cars.jpg'",
+    "ground_truth": "~54 masks",
+    "biorxiv": "https://github.com/facebookresearch/sam2"
+  },
+  {
+    "id": "TABPFN_001",
+    "repo": "tabpfn",
+    "project": "papers/tabpfn",
+    "question": "Download the **scikit-learn/breast-cancer-wisconsin dataset**, train a TabPFN model on it, and tell me the performance compared to other classifiers",
+    "ground_truth": "~0.97 accuracy / ~0.99 ROC AUC; beats RF, LogReg, SVC",
+    "biorxiv": "https://github.com/PriorLabs/TabPFN"
+  },
+  {
+    "id": "TABPFN_002",
+    "repo": "tabpfn",
+    "project": "papers/tabpfn",
+    "question": "Download the **California Housing dataset** from sklearn, train a TabPFN model on it, and tell me the performance compared to other regressors",
+    "ground_truth": "~0.84 R^2 / ~0.45 RMSE; beats LinReg and RandomForest",
+    "biorxiv": "https://github.com/PriorLabs/TabPFN"
+  }
+]

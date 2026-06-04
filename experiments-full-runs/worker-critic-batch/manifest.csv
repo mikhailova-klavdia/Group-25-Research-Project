@@ -1,0 +1,47 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,elapsed_s
+2026-06-04T20:30:12+00:00,CYTEONTO_001,papers/CyteOnto,ok,False,Required file 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' not found,116478,0.0366,50.2
+2026-06-04T20:31:26+00:00,CYTEONTO_002,papers/CyteOnto,ok,True,stem cell,111258,0.034,46.7
+2026-06-04T20:31:57+00:00,CYTEONTO_003,papers/CyteOnto,ok,True,ovum,110100,0.0328,31.5
+2026-06-04T20:33:43+00:00,GWAS_EPISTASIS_BIAS_001,papers/GWAS-Epistasis-Bias,ok,True,5.0369820092655004e-08,436924,0.1238,105.4
+2026-06-04T20:34:50+00:00,GWAS_EPISTASIS_BIAS_002,papers/GWAS-Epistasis-Bias,ok,True,0,67712,0.0256,67.4
+2026-06-04T20:38:47+00:00,GWAS_EPISTASIS_BIAS_003,papers/GWAS-Epistasis-Bias,ok,False,0.80,514253,0.1502,237.3
+2026-06-04T20:40:42+00:00,USHER_002,papers/USHER,ok,False,"EXECUTION_REQUIRED — required dataset/model files (xenium_scGPT.h5ad, scRNAseq_s",299057,0.0851,115.1
+2026-06-04T20:41:49+00:00,SENTIEON_CLI_001,papers/sentieon-cli,ok,True,CONSERVATIVE,257196,0.072,66.4
+2026-06-04T20:43:03+00:00,GWPROT_001,papers/GWProt,ok,True,54,325486,0.093,73.7
+2026-06-04T20:43:37+00:00,GWPROT_002,papers/GWProt,ok,True,4,100670,0.0301,34.7
+2026-06-04T20:44:54+00:00,LARIS_001,papers/LARIS,ok,False,EXECUTION_REQUIRED — required AnnData file 'LARIS/notebooks/04_laris_tutorial/da,448675,0.1213,77.2
+2026-06-04T20:46:24+00:00,LARIS_002,papers/LARIS,ok,False,Required file 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/ad,512021,0.1378,89.8
+2026-06-04T20:47:24+00:00,LARIS_003,papers/LARIS,ok,False,Required file 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/ad,507645,0.1345,59.3
+2026-06-04T20:48:53+00:00,SC_FRAMEWORK_001,papers/SC-Framework,ok,True,5000,246592,0.0694,89.7
+2026-06-04T20:49:29+00:00,SEGMA_001,papers/segma,ok,True,187 amino acids,102255,0.0309,36.0
+2026-06-04T20:50:29+00:00,SCISTREECNA_001,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — Required input files referenced in the question are not pre,296544,0.082,60.0
+2026-06-04T20:51:18+00:00,SCISTREECNA_003,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — Required data files 'ScisTreeCNA/notebooks/scistreecna_basi,263757,0.0724,48.8
+2026-06-04T20:52:01+00:00,DISTORTIONS_001,papers/distortions,ok,False,Required file 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv' not ,222642,0.0612,43.3
+2026-06-04T20:53:11+00:00,DISTORTIONS_005,papers/distortions,ok,False,Required file 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' not f,278888,0.0795,69.3
+2026-06-04T20:54:49+00:00,DISTORTIONS_006,papers/distortions,ok,False,Required files 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' and 'di,517776,0.1416,98.3
+2026-06-04T20:55:22+00:00,ARCADIA_PUBLIC_002,papers/ARCADIA_public,ok,True,300,135680,0.0379,33.3
+2026-06-04T20:56:10+00:00,ARCADIA_PUBLIC_003,papers/ARCADIA_public,ok,True,162,109941,0.0332,48.1
+2026-06-04T20:57:07+00:00,REGFORMER_002,papers/RegFormer,ok,True,0.8841,275103,0.0757,56.2
+2026-06-04T20:58:34+00:00,REGFORMER_003,papers/RegFormer,ok,False,EXECUTION_REQUIRED — Required file 'RegFormer/notebooks/cell_emb/data/embeddings,455915,0.1248,87.2
+2026-06-04T20:58:51+00:00,FADVI_001,papers/fadvi,ok,False,EXECUTION_REQUIRED — need to load the pretrained model file from repo and inspec,18133,0.0071,17.6
+2026-06-04T20:59:47+00:00,FADVI_003,papers/fadvi,ok,True,10,181216,0.053,55.1
+2026-06-04T21:00:44+00:00,FADVI_007,papers/fadvi,ok,False,EXECUTION_REQUIRED — Required data files 'fadvi/notebooks/spatial_and_single_cel,128659,0.0394,57.6
+2026-06-04T21:03:42+00:00,PPLM_001,papers/PPLM,ok,True,-8.2265625 kcal/mol,739995,0.1971,178.0
+2026-06-04T21:06:20+00:00,PPLM_002,papers/PPLM,ok,True,favorable (predicted affinity = -8.2265625),508527,0.1369,158.1
+2026-06-04T21:08:38+00:00,PPLM_003,papers/PPLM,ok,True,"(122, 1280)",622432,0.1678,137.9
+2026-06-04T21:10:32+00:00,PPLM_004,papers/PPLM,ok,True,-0.000396,523486,0.142,114.2
+2026-06-04T21:13:04+00:00,PPLM_005,papers/PPLM,ok,True,"(660, 122, 70)",925729,0.2446,151.8
+2026-06-04T21:15:15+00:00,PPLM_006,papers/PPLM,ok,True,0.9431081,717044,0.1938,131.0
+2026-06-04T21:16:16+00:00,METAPOINT_001,papers/metapointfinder,ok,True,1182,459410,0.1227,61.0
+2026-06-04T21:17:31+00:00,METAPOINT_002,papers/metapointfinder,ok,True,37,461780,0.1246,75.1
+2026-06-04T21:19:23+00:00,METAPOINT_003,papers/metapointfinder,ok,False,Required file 'metapointfinder/notebooks/make_dna_mutants/output/sample_input.ts,383517,0.1112,111.2
+2026-06-04T21:20:15+00:00,METAPOINT_004,papers/metapointfinder,ok,False,Required file 'metapointfinder/notebooks/pad_to_10kb/data/input_sequences.fasta',213223,0.0602,52.9
+2026-06-04T21:30:15+00:00,METAPOINT_005,papers/metapointfinder,timeout,,,,,600.0
+2026-06-04T21:35:41+00:00,CROSSPPI_001,papers/CrossPPI,ok,False,5.64,924386,0.261,325.2
+2026-06-04T21:36:31+00:00,CROSSPPI_003,papers/CrossPPI,ok,False,EXECUTION_REQUIRED — running the repository's inference script t.py is necessary,206002,0.0572,50.5
+2026-06-04T21:38:05+00:00,CROSSPPI_004,papers/CrossPPI,ok,False,-0.0011,157929,0.0502,93.5
+2026-06-04T21:39:32+00:00,CROSSPPI_006,papers/CrossPPI,ok,False,218,196219,0.0586,87.7
+2026-06-04T21:55:39+00:00,SAM2_001,papers/sam2,ok,False,Generated 52 masks for notebooks/images/groceries.jpg using sam2.1_hiera_tiny; o,2575914,0.6757,966.6
+2026-06-04T21:55:59+00:00,SAM2_002,papers/sam2,ok,False,EXECUTION_REQUIRED — need to run the model with the specified checkpoint to gene,105839,0.0292,20.2
+2026-06-04T21:58:40+00:00,TABPFN_001,papers/tabpfn,ok,False,EXECUTION_REQUIRED — TabPFN requires a one-time interactive license acceptance o,683798,0.1854,161.2
+2026-06-04T22:04:44+00:00,TABPFN_002,papers/tabpfn,ok,False,"TabPFN (v2, CPU, 2 estimators, ignore_pretraining_limits) — MSE 0.16224, MAE 0.2",1045277,0.2784,363.4

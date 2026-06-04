@@ -1,0 +1,90 @@
+[
+  {
+    "timestamp": "2026-06-04T15:04:05.111703+00:00",
+    "run_id": "20260604T150142-578baf11",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' co",
+    "pre_estimate_tokens": 1544,
+    "input_tokens": 34104,
+    "output_tokens": 2405,
+    "total_tokens": 36509,
+    "cost_usd": 0.013336
+  },
+  {
+    "timestamp": "2026-06-04T15:55:16.925047+00:00",
+    "run_id": "20260604T155247-2883aa98",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' co",
+    "pre_estimate_tokens": 1544,
+    "input_tokens": 40400,
+    "output_tokens": 2716,
+    "total_tokens": 43116,
+    "cost_usd": 0.015532
+  },
+  {
+    "timestamp": "2026-06-04T15:58:56.471238+00:00",
+    "run_id": "20260604T155653-fa68d8cd",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the algorithm 1 predicted labels from 'CyteOnto/notebooks/adv_tutorial/data/algorithm1_labels.csv' (CSV file with '",
+    "pre_estimate_tokens": 1540,
+    "input_tokens": 31296,
+    "output_tokens": 1179,
+    "total_tokens": 32475,
+    "cost_usd": 0.010182
+  },
+  {
+    "timestamp": "2026-06-04T20:22:23.034809+00:00",
+    "run_id": "20260604T202136-73072447",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' co",
+    "pre_estimate_tokens": 1544,
+    "input_tokens": 98898,
+    "output_tokens": 3164,
+    "total_tokens": 102062,
+    "cost_usd": 0.031053
+  },
+  {
+    "timestamp": "2026-06-04T20:24:25.848094+00:00",
+    "run_id": "20260604T202338-be36bed4",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' co",
+    "pre_estimate_tokens": 1544,
+    "input_tokens": 117176,
+    "output_tokens": 2958,
+    "total_tokens": 120134,
+    "cost_usd": 0.03521
+  },
+  {
+    "timestamp": "2026-06-04T20:30:12.649206+00:00",
+    "run_id": "20260604T202923-5d748156",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' co",
+    "pre_estimate_tokens": 1544,
+    "input_tokens": 106868,
+    "output_tokens": 3697,
+    "total_tokens": 110565,
+    "cost_usd": 0.034111
+  },
+  {
+    "timestamp": "2026-06-04T20:31:26.062915+00:00",
+    "run_id": "20260604T203040-490b9098",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the algorithm 1 predicted labels from 'CyteOnto/notebooks/adv_tutorial/data/algorithm1_labels.csv' (CSV file with '",
+    "pre_estimate_tokens": 1540,
+    "input_tokens": 102456,
+    "output_tokens": 2927,
+    "total_tokens": 105383,
+    "cost_usd": 0.031468
+  },
+  {
+    "timestamp": "2026-06-04T20:31:57.573079+00:00",
+    "run_id": "20260604T203127-2fe24bb9",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the algorithm 2 predicted labels from 'CyteOnto/notebooks/adv_tutorial/data/algorithm2_labels.csv' (CSV file with '",
+    "pre_estimate_tokens": 1540,
+    "input_tokens": 101560,
+    "output_tokens": 2349,
+    "total_tokens": 103909,
+    "cost_usd": 0.030088
+  }
+]
