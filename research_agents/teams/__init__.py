@@ -45,6 +45,7 @@ from research_agents.teams.worker_critic_plus import run_worker_critic_plus
 from research_agents.teams.worker_critic_plus_plus import run_worker_critic_plus_plus
 from research_agents.teams.worker_critic_plus_plus_hitl import run_worker_critic_plus_plus_hitl
 from research_agents.teams.worker_verifier_critic import run_worker_verifier_critic
+from research_agents.teams.worker_env_critic import run_worker_env_critic
 
 
 # A team's run function takes a context + a question and returns a
@@ -161,6 +162,18 @@ TEAMS: dict[str, TeamSpec] = {
         ),
         run=run_worker_critic_plus_plus_hitl,
         apply_setup=False,
+    ),
+    "worker-env-critic": TeamSpec(
+    name="worker-env-critic",
+    description=(
+        "Three agents: dedicated Environment Agent (discovers dep files, "
+        "installs packages, verifies imports, returns EnvironmentReport) → "
+        "plus-plus ReAct worker (receives the report as a preamble) → "
+        "LLM critic. Environment preparation is a first-class pipeline "
+        "stage with a structured audit trail."
+    ),
+    run=run_worker_env_critic,
+    apply_setup=False,
     ),
 }
 
