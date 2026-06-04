@@ -292,21 +292,22 @@ _ESM_STRIP_BULLET = """\
      against the FASTA's residue count before reporting."""
 
 _SYNTHESIS_CARVEOUT = """\
-  - For ESM/ESM-2 embeddings, raw token embeddings often include BOS/EOS
-    special tokens. When the question asks for per-residue rows or sequence
-    length, strip special tokens or use the original residue count.
+  - For models that prepend/append special tokens (BOS, EOS, CLS, SEP),
+    strip those positions before reporting per-residue or per-token counts
+    or statistics.
   - Tool-deterministic synthesis carve-out: if a question describes a tool
     whose output is fully determined by ANY valid input that exercises the
-    requested behavior (e.g. a padding tool whose output length depends only
-    on the target length, or a generator that produces a fixed number of
-    sequences regardless of seed content), and the literal input file
-    referenced in the question text is missing from the repo after the
-    exhaustive search protocol, you MAY synthesize a minimal valid input
-    that exercises the requested behavior. Stage the synthesized file at
-    the workspace path the question requests, run the tool, and report the
-    output it produced. Record the synthesis in your reflection. This
-    carve-out does NOT apply to ML inference, statistics, benchmarks, or
-    any output whose value depends on the specific content of the input."""
+    requested behavior (e.g. a tool whose output is fully determined by a
+    parameter in the question — such as a target size, a count, or a
+    threshold — rather than by the specific content of the input data),
+    and the literal input file referenced in the question text is missing
+    from the repo after the exhaustive search protocol, you MAY synthesize
+    a minimal valid input that exercises the requested behavior. Stage the
+    synthesized file at the workspace path the question requests, run the
+    tool, and report the output it produced. Record the synthesis in your
+    reflection. This carve-out does NOT apply to ML inference, statistics,
+    benchmarks, or any output whose value depends on the specific content
+    of the input."""
 
 
 def _build_improved_instructions() -> str:
@@ -478,8 +479,8 @@ WORKFLOW
      among many, cross-checked against the full tree.
 
      SEARCH PROTOCOL (exhaust ALL before reporting not found):
-     a. Search by filename stem from the question path (e.g. "receptor"
-        from "PPLM/data/receptor.fasta").
+     a. Search by filename stem from the question path (e.g. "config"
+        from "myrepo/configs/config.yaml").
      b. Search by extension/type: find_repo_files(".fasta").
      c. Search by concept keyword: search_repo("receptor"),
         search_repo("input").
@@ -559,13 +560,12 @@ WORKFLOW
    • If a Python import fails with `ModuleNotFoundError`, run
      `pip install <package>` with `timeout=3600` before rewriting
      the script or giving up.
-   • For ESM-2 / fair-esm embeddings: the per-token tensor returned by the
-     model has shape `(L+2, D)` where `L` is the input sequence length;
-     positions `0` and `L+1` are the BOS and EOS special tokens. When the
-     question asks for a per-residue row, the residue count, or anything
-     that should match the FASTA length, slice with `embeddings[1:-1]`
-     before computing the answer. Sanity-check the stripped row count
-     against the FASTA's residue count before reporting.
+   • For any model that uses tokenizer special tokens (BOS, EOS, CLS, SEP,
+     padding): the output tensor has shape (sequence_length + n_special, D),
+     not (sequence_length, D). When the question asks for per-residue or
+     per-token rows matching the original input length, slice off the
+     special-token positions before computing the answer, and sanity-check
+     the row count against the original input length.
    • read_workspace_file() to inspect output files
    • Retry failures up to 5 times per experiment; record each attempt.
 
@@ -618,34 +618,27 @@ WORKFLOW
       Do NOT report EXECUTION_REQUIRED due to a missing data file until all
       four of these searches have returned nothing.
 
-   g. DOWNLOAD PUBLIC REFERENCE DATA: if the missing file is a well-known
-      public biological dataset — reference genome, model-organism gene
-      annotation, benchmark dataset — attempt to download it before
-      reporting missing_input. These files are freely available and require
-      no authentication. Common sources:
-        • Arabidopsis (TAIR): https://www.arabidopsis.org/download/
-        • Ensembl: https://ftp.ensembl.org/pub/
-        • UCSC: https://hgdownload.soe.ucsc.edu/
-        • NCBI FTP: https://ftp.ncbi.nlm.nih.gov/
-        • UniProt: https://ftp.uniprot.org/pub/
-      Use wget or curl with execute_command(). If the download succeeds,
-      proceed to answer the question with the downloaded file. Only skip
-      this step if the file clearly requires an account, license, or
-      institutional access.
+   g. DOWNLOAD PUBLICLY AVAILABLE REFERENCE DATA: if the missing file is a
+      well-known public dataset or reference file that requires no
+      authentication or license, attempt to download it before reporting
+      missing_input. Use wget or curl with execute_command(). If the
+      download succeeds, proceed to answer the question with the downloaded
+      file. Only skip this step if the file clearly requires an account,
+      license, or institutional access.
 
    h. REIMPLEMENT SIMPLE PARSERS: if the required tool is a plain-text
       parser or counter, do NOT wait for the specific CLI or library — just
-      implement the analysis directly. Plain-text formats need no special
-      dependencies:
-        • GFF3/GTF: tab-separated; strand is column index 6 ('+'/'-');
-          skip lines starting with '#'. Readable with pandas or plain
-          open(). Example: (df[6] == '+').sum() / len(df) * 100
-        • BED/TSV/CSV: standard pandas read_csv with sep='\t'.
-        • FASTA: lines starting with '>' are headers; others are sequence.
-        • VCF: '#'-prefixed header lines, then tab-separated records.
-      A 5-line script answers most counting/filtering questions on these
-      formats. Only report missing_dependency after you have genuinely
-      tried a direct reimplementation.
+      implement the analysis directly. Common plain-text formats need no
+      special dependencies:
+        • Delimited files (CSV, TSV, space-separated): pandas read_csv or
+          plain Python split().
+        • Line-counted or pattern-matched text files: standard open() +
+          iteration.
+        • JSON / YAML / TOML: standard library json, PyYAML, or tomllib.
+        • Any format where the relevant operation is counting, filtering,
+          or summing rows: a 5-line script is almost always sufficient.
+      Only report missing_dependency after you have genuinely tried a
+      direct reimplementation.
 
    Record the second-strategy attempt as normal T/A/O/R steps. Only move
    to step 6 ANSWER after both strategies have been genuinely tried (or
@@ -676,21 +669,22 @@ WORKFLOW
   - If a question says run, process, merge, predict, or generate, README
     examples are not sufficient evidence. You must execute or read a
     generated artifact in the current chain, otherwise say EXECUTION_REQUIRED.
-  - For ESM/ESM-2 embeddings, raw token embeddings often include BOS/EOS
-    special tokens. When the question asks for per-residue rows or sequence
-    length, strip special tokens or use the original residue count.
+  - For models that prepend/append special tokens (BOS, EOS, CLS, SEP),
+    strip those positions before reporting per-residue or per-token counts
+    or statistics.
   - Tool-deterministic synthesis carve-out: if a question describes a tool
     whose output is fully determined by ANY valid input that exercises the
-    requested behavior (e.g. a padding tool whose output length depends only
-    on the target length, or a generator that produces a fixed number of
-    sequences regardless of seed content), and the literal input file
-    referenced in the question text is missing from the repo after the
-    exhaustive search protocol, you MAY synthesize a minimal valid input
-    that exercises the requested behavior. Stage the synthesized file at
-    the workspace path the question requests, run the tool, and report the
-    output it produced. Record the synthesis in your reflection. This
-    carve-out does NOT apply to ML inference, statistics, benchmarks, or
-    any output whose value depends on the specific content of the input.
+    requested behavior (e.g. a tool whose output is fully determined by a
+    parameter in the question — such as a target size, a count, or a
+    threshold — rather than by the specific content of the input data),
+    and the literal input file referenced in the question text is missing
+    from the repo after the exhaustive search protocol, you MAY synthesize
+    a minimal valid input that exercises the requested behavior. Stage the
+    synthesized file at the workspace path the question requests, run the
+    tool, and report the output it produced. Record the synthesis in your
+    reflection. This carve-out does NOT apply to ML inference, statistics,
+    benchmarks, or any output whose value depends on the specific content
+    of the input.
   - Do not fabricate tool outputs or results.
 
   MANDATORY FINAL ANSWER FORMAT ON FAILURE:

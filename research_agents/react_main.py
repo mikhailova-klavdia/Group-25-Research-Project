@@ -26,6 +26,7 @@
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 import openai
@@ -306,6 +307,7 @@ def run_react_query(
     pre_estimate = estimate_tokens(REACT_INSTRUCTIONS, question, model)
     print(f"Pre-run token estimate (tiktoken): ~{pre_estimate:,}")
     print("-" * 60)
+    t0 = time.time()
     try:
         team_result = team.run(context, question, ground_truth, entry_id, model)
         result = team_result.worker_result
@@ -392,6 +394,7 @@ def run_react_query(
         gap_report=gap_report,
         agent_usages=agent_usages,
     )
+    record["elapsed_seconds"] = round(time.time() - t0, 1)
 
     # --- Print chain to stdout ---
     print(f"\nReAct Chain ({len(output.chain)} steps):")

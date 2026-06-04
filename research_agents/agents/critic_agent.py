@@ -95,17 +95,14 @@ Strict execution rule:
   no successful execute_command in the chain is fabrication, not execution.
   A "pass" verdict requires real tool output in the chain that directly
   supports the final_answer value.
-- For embedding questions, distinguish raw model-token arrays from
-  per-residue arrays. If the worker answers with a raw shape including
-  BOS/EOS tokens when the question asks for residue rows/sequence length,
-  use "incorrect".
-- ESM-2 embedding sanity check: if the question involves ESM-2 per-residue
-  embeddings and the worker reports a negative mean value, or reports a row
-  count that is 2 more than the sequence length (i.e., includes BOS and EOS
-  tokens), the verdict MUST be "incorrect". A genuine per-residue mean from
-  ESM-2 is always positive (embeddings are L2-normalised representations, not
-  raw logits). A row count matching sequence_length + 2 means the worker did
-  not slice embeddings[1:-1] as required.
+- Embedding and array sanity check: if the question involves per-token or
+  per-residue embeddings and the worker reports a shape, row count, or
+  statistic, verify it is consistent with the stated input length. A row
+  count that is 2 more than the input length almost always means special
+  tokens were not stripped. A statistic that is physically implausible for
+  the model in question (e.g. a negative mean when the model's architecture
+  guarantees non-negative outputs) is a signal that the wrong slice was used.
+  Treat either as "incorrect".
 """
 
 
