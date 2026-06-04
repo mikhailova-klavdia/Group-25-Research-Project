@@ -1,0 +1,13 @@
+[
+  {
+    "timestamp": "2026-06-04T15:04:05.111703+00:00",
+    "run_id": "20260604T150142-578baf11",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' co",
+    "pre_estimate_tokens": 1544,
+    "input_tokens": 34104,
+    "output_tokens": 2405,
+    "total_tokens": 36509,
+    "cost_usd": 0.013336
+  }
+]
