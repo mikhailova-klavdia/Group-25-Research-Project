@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2026-05-30T21:08:07.801157+00:00",
+    "run_id": "20260530T210532-8a15c7d4",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Summarize this paper",
+    "pre_estimate_tokens": 1501,
+    "input_tokens": 95484,
+    "output_tokens": 2046,
+    "total_tokens": 97530,
+    "cost_usd": 0.027963
+  },
+  {
+    "timestamp": "2026-06-04T19:18:35.965599+00:00",
+    "run_id": "20260604T191348-066bbf3d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Download the **California Housing dataset** from sklearn, train a TabPFN model on it, and tell me the performance compar",
+    "pre_estimate_tokens": 1525,
+    "input_tokens": 52193,
+    "output_tokens": 2980,
+    "total_tokens": 55173,
+    "cost_usd": 0.019008
+  }
+]

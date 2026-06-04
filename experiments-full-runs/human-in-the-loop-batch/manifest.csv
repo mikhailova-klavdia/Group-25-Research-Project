@@ -1,0 +1,48 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,elapsed_s
+2026-06-04T15:55:18+00:00,CYTEONTO_001,papers/CyteOnto,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,388043,0.1106,151.2
+2026-06-04T15:58:57+00:00,CYTEONTO_002,papers/CyteOnto,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,261114,0.0751,125.6
+2026-06-04T16:08:57+00:00,CYTEONTO_003,papers/CyteOnto,timeout,,,,,600.0
+2026-06-04T16:12:00+00:00,GWAS_EPISTASIS_BIAS_001,papers/GWAS-Epistasis-Bias,ok,True,5.0369820108922107e-08,347935,0.1013,182.4
+2026-06-04T16:22:01+00:00,GWAS_EPISTASIS_BIAS_002,papers/GWAS-Epistasis-Bias,timeout,,,,,600.0
+2026-06-04T16:25:03+00:00,GWAS_EPISTASIS_BIAS_003,papers/GWAS-Epistasis-Bias,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,318345,0.0957,182.1
+2026-06-04T16:32:01+00:00,USHER_002,papers/USHER,ok,False,EXECUTION_REQUIRED — missing required dataset/model files: USHER/repo/USHER/data,1465464,0.3996,418.3
+2026-06-04T16:32:47+00:00,SENTIEON_CLI_001,papers/sentieon-cli,ok,True,CONSERVATIVE,103208,0.0303,45.7
+2026-06-04T16:33:41+00:00,GWPROT_001,papers/GWProt,ok,True,54 protein structures,36392,0.0163,54.5
+2026-06-04T16:36:18+00:00,GWPROT_002,papers/GWProt,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,557179,0.1491,157.2
+2026-06-04T16:42:40+00:00,LARIS_001,papers/LARIS,ok,True,8774,1670093,0.4439,381.8
+2026-06-04T16:48:12+00:00,LARIS_002,papers/LARIS,ok,False,2951,1847491,0.4838,331.8
+2026-06-04T16:55:47+00:00,LARIS_003,papers/LARIS,ok,True,SEMA4A,2433882,0.6374,455.6
+2026-06-04T16:58:18+00:00,SC_FRAMEWORK_001,papers/SC-Framework,ok,True,5000 cells,401885,0.1101,150.9
+2026-06-04T17:08:20+00:00,SEGMA_001,papers/segma,timeout,,,,,600.0
+2026-06-04T17:15:22+00:00,SCISTREECNA_001,papers/ScisTreeCNA,exit_1,,,,,422.1
+2026-06-04T17:24:42+00:00,SCISTREECNA_003,papers/ScisTreeCNA,ok,True,0.4827586206896552,2969257,0.7977,560.1
+2026-06-04T17:26:55+00:00,DISTORTIONS_001,papers/distortions,ok,True,36,687728,0.1835,132.5
+2026-06-04T17:31:43+00:00,DISTORTIONS_005,papers/distortions,ok,False,9,1334846,0.3513,288.0
+2026-06-04T17:35:32+00:00,DISTORTIONS_006,papers/distortions,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,914059,0.2476,229.1
+2026-06-04T17:36:11+00:00,ARCADIA_PUBLIC_002,papers/ARCADIA_public,ok,True,300 — source: configs/config.json,131462,0.0372,39.0
+2026-06-04T17:37:13+00:00,ARCADIA_PUBLIC_003,papers/ARCADIA_public,ok,True,162,142372,0.044,61.7
+2026-06-04T17:38:53+00:00,REGFORMER_002,papers/RegFormer,ok,True,0.8841,506623,0.1343,100.7
+2026-06-04T17:40:11+00:00,REGFORMER_003,papers/RegFormer,ok,True,512,103961,0.0327,77.5
+2026-06-04T17:44:15+00:00,FADVI_001,papers/fadvi,ok,False,EXECUTION_REQUIRED — saved model directory 'fadvi/notebooks/basic_usage/fadvi_sa,645255,0.1752,243.8
+2026-06-04T17:45:08+00:00,FADVI_003,papers/fadvi,ok,True,"10
+Sources: src/fadvi/_fadvi.py (FADVI.__init__ default n_latent_r=10), src/fadv",141239,0.0413,53.2
+2026-06-04T17:49:20+00:00,FADVI_007,papers/fadvi,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,655925,0.177,252.0
+2026-06-04T17:51:24+00:00,PPLM_001,papers/PPLM,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,690210,0.1842,122.7
+2026-06-04T17:55:10+00:00,PPLM_002,papers/PPLM,ok,True,Favorable,991120,0.267,226.5
+2026-06-04T17:59:00+00:00,PPLM_003,papers/PPLM,ok,True,"(122, 1280)",926878,0.2512,230.1
+2026-06-04T18:09:01+00:00,PPLM_004,papers/PPLM,timeout,True,-0.000396,,0,600.0
+2026-06-04T18:14:40+00:00,PPLM_005,papers/PPLM,ok,True,"(660, 122, 70)",1299539,0.3455,339.5
+2026-06-04T18:17:57+00:00,PPLM_006,papers/PPLM,ok,True,0.9431081,890188,0.2412,196.6
+2026-06-04T18:27:57+00:00,METAPOINT_001,papers/metapointfinder,timeout,True,1182 sequences,,0,600.1
+2026-06-04T18:30:01+00:00,METAPOINT_002,papers/metapointfinder,ok,True,37,569244,0.1577,123.7
+2026-06-04T18:31:35+00:00,METAPOINT_003,papers/metapointfinder,ok,False,EXECUTION_REQUIRED — input TSV metapointfinder/notebooks/make_dna_mutants/output,448605,0.1238,94.0
+2026-06-04T18:33:38+00:00,METAPOINT_004,papers/metapointfinder,ok,False,EXECUTION_REQUIRED — required input FASTA metapointfinder/notebooks/pad_to_10kb/,330794,0.0959,123.5
+2026-06-04T18:36:14+00:00,METAPOINT_005,papers/metapointfinder,ok,True,10000 bp,760697,0.2082,155.5
+2026-06-04T18:40:06+00:00,CROSSPPI_001,papers/CrossPPI,ok,False,5.64,532334,0.1517,229.7
+2026-06-04T18:49:29+00:00,CROSSPPI_003,papers/CrossPPI,ok,False,7.77,872031,0.2615,563.8
+2026-06-04T18:53:28+00:00,CROSSPPI_004,papers/CrossPPI,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,446989,0.1395,239.0
+2026-06-04T18:55:50+00:00,CROSSPPI_006,papers/CrossPPI,ok,False,218,246564,0.0741,141.2
+2026-06-04T18:59:29+00:00,SAM2_001,papers/sam2,ok,False,"Generated 3 masks (shape (3, 534, 800)) using checkpoints/sam2.1_hiera_tiny.pt o",1298677,0.3455,217.3
+2026-06-04T19:03:43+00:00,SAM2_002,papers/sam2,ok,False,"Generated masks saved to workspace/masks_output.npz (3 masks, shape (3, 1500, 22",1753967,0.4591,253.8
+2026-06-04T19:13:47+00:00,TABPFN_001,papers/tabpfn,timeout,,,,,600.0
+2026-06-04T19:18:38+00:00,TABPFN_002,papers/tabpfn,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,971417,0.2639,290.3
