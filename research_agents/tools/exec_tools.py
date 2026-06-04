@@ -14,8 +14,11 @@
 # New files are always written to workspace/. Commands always run from the
 # current run workspace, never from the shared repo. The shared repo stays
 # input-only; files or directories needed for execution must be staged into
-# workspace/ first. All commands use an isolated venv created by uv so they
-# never touch the system Python.
+# workspace/ first. This input-only invariant is filesystem-enforced:
+# execute_command snapshots repo/ before each command and, after it runs,
+# deletes any file the command created there and flags any modification or
+# deletion (see snapshot_repo_tree / revert_repo_writes). All commands use an
+# isolated venv created by uv so they never touch the system Python.
 
 import os
 import shutil
@@ -192,17 +195,117 @@ def _copy_file_or_directory(source: Path, destination: Path) -> str:
     return "file"
 
 
+def snapshot_repo_tree(root: Path) -> dict[str, tuple[int, int]]:
+    """Map each file under ``root`` (excluding ignored dirs) to (size, mtime_ns).
+
+    Used by the repo write-guard to detect — and revert — any write a command
+    makes into the input-only repo/ directory.  Metadata-only (one ``stat``
+    per file, no content reads), so the cost is negligible next to actually
+    running the command.
+    """
+    snapshot: dict[str, tuple[int, int]] = {}
+    for current_root, dirnames, filenames in root.walk():
+        dirnames[:] = [d for d in dirnames if d not in IGNORED_DIRS]
+        current_path = Path(current_root)
+        for filename in filenames:
+            path = current_path / filename
+            try:
+                stat = path.stat()
+            except OSError:
+                continue
+            snapshot[path.relative_to(root).as_posix()] = (stat.st_size, stat.st_mtime_ns)
+    return snapshot
+
+
+def revert_repo_writes(repo_root: Path, before: dict[str, tuple[int, int]]) -> str:
+    """Undo writes a just-run command made into the input-only repo/.
+
+    ``repo/`` is input-only — nothing the agent runs should modify it.  After a
+    command returns, re-snapshot the tree and:
+      * DELETE files the command created in repo/ (a full revert), pruning any
+        now-empty directories it created along the way; and
+      * REPORT files it modified or deleted — their prior content cannot be
+        restored without a baseline copy, so they are surfaced loudly rather
+        than left to silently pollute the shared repo.
+
+    Returns a warning string to prepend to the command output (so the agent
+    self-corrects and the run is visibly tainted), or "" if repo/ is untouched.
+    """
+    after = snapshot_repo_tree(repo_root)
+    created = sorted(p for p in after if p not in before)
+    modified = sorted(p for p in before if p in after and after[p] != before[p])
+    deleted = sorted(p for p in before if p not in after)
+
+    if not (created or modified or deleted):
+        return ""
+
+    reverted: list[str] = []
+    for rel in created:
+        file_path = repo_root / rel
+        try:
+            file_path.unlink()
+        except OSError:
+            continue
+        reverted.append(rel)
+        # Remove now-empty directories the command created, walking up to (but
+        # not including) repo_root.  rmdir only succeeds on an empty dir, so a
+        # directory that existed before (and still holds files) is left alone.
+        parent = file_path.parent
+        while parent != repo_root:
+            try:
+                parent.rmdir()
+            except OSError:
+                break
+            parent = parent.parent
+
+    def _fmt(paths: list[str]) -> str:
+        shown = ", ".join(paths[:10])
+        return shown + (f" … (+{len(paths) - 10} more)" if len(paths) > 10 else "")
+
+    lines = [
+        "⚠ BLOCKED WRITE TO repo/ — the repository is INPUT-ONLY. Never write into "
+        "repo/; write outputs to the workspace (the current directory) instead, e.g. "
+        "via write_file or a relative path.",
+    ]
+    if reverted:
+        lines.append(f"  reverted {len(reverted)} file(s) created in repo/: {_fmt(reverted)}")
+    if modified:
+        lines.append(
+            f"  MODIFIED {len(modified)} existing repo file(s) (content NOT restored): {_fmt(modified)}"
+        )
+    if deleted:
+        lines.append(
+            f"  DELETED {len(deleted)} existing repo file(s) (NOT restored): {_fmt(deleted)}"
+        )
+    return "\n".join(lines) + "\n\n"
+
+
+def _with_repo_guard(output: str, repo_root: Path | None, before: dict[str, tuple[int, int]] | None) -> str:
+    """Prepend a repo-write warning to ``output`` when repo/ was touched."""
+    if repo_root is None or before is None:
+        return output
+    warning = revert_repo_writes(repo_root, before)
+    return warning + output if warning else output
+
+
 def execute_command_text(
     workspace_path: str | Path,
     command: str,
     timeout: int = DEFAULT_TIMEOUT,
     venv_path: str | Path | None = None,
     env_vars: dict[str, str] | None = None,
+    repo_path: str | Path | None = None,
 ) -> str:
     """Run a shell command with cwd set to the given directory.
 
     If venv_path is provided, its platform-specific scripts directory is
     prepended to PATH so that python/pip resolve to the isolated venv.
+
+    If repo_path is provided, the repo/ tree is snapshotted before the command
+    and guarded after it: any file the command CREATED in repo/ is deleted
+    (repo/ is input-only), and modifications/deletions are flagged in the
+    returned output.  This makes the "repo is input-only" invariant
+    filesystem-enforced rather than prompt-only.
     """
     root = Path(workspace_path).resolve()
     if not root.is_dir():
@@ -210,6 +313,11 @@ def execute_command_text(
 
     # Clamp so a single command cannot exceed the hard per-command ceiling.
     timeout = min(timeout, MAX_TIMEOUT)
+
+    # Snapshot the input-only repo/ so any write the command makes into it can
+    # be reverted (created files) or flagged (modifications) after it returns.
+    repo_root = Path(repo_path).resolve() if repo_path is not None else None
+    repo_before = snapshot_repo_tree(repo_root) if repo_root is not None else None
 
     env = os.environ.copy()
     # Prepend the run's venv/bin to PATH so bare `python` / `pip` calls in
@@ -275,7 +383,7 @@ def execute_command_text(
                     + f"\n[stderr truncated at {MAX_OUTPUT_BYTES} bytes]"
                 )
             parts.append(f"\nSTDERR (partial):\n{partial_stderr}")
-        return "\n".join(parts)
+        return _with_repo_guard("\n".join(parts), repo_root, repo_before)
 
     stdout = result.stdout
     stderr = result.stderr
@@ -294,7 +402,7 @@ def execute_command_text(
     if stderr.strip():
         parts.append(f"\nSTDERR:\n{stderr}")
 
-    return "\n".join(parts)
+    return _with_repo_guard("\n".join(parts), repo_root, repo_before)
 
 
 def list_workspace_files_text(workspace_path: str | Path) -> str:
@@ -610,6 +718,7 @@ def execute_command(
         timeout,
         venv_path=context.context.venv_path,
         env_vars=env_vars,
+        repo_path=repo_path,
     )
 
 

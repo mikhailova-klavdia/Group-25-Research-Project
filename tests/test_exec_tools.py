@@ -9,6 +9,8 @@ from research_agents.tools.exec_tools import (
     list_paper_artifacts_text,
     list_workspace_files_text,
     read_workspace_file_text,
+    revert_repo_writes,
+    snapshot_repo_tree,
     stage_paper_artifact_text,
     stage_repo_path_text,
     venv_status_text,
@@ -195,6 +197,91 @@ class ExecuteCommandTests(unittest.TestCase):
 
     def test_timeout_is_clamped_to_one_hour(self):
         self.assertEqual(exec_tools.MAX_TIMEOUT, 3600)
+
+
+class RepoWriteGuardTests(unittest.TestCase):
+    """repo/ is input-only: execute_command must revert/flag any write into it."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        root = Path(self.tmpdir.name)
+        self.repo = root / "repo"
+        self.workspace = root / "workspace"
+        self.repo.mkdir()
+        self.workspace.mkdir()
+        # A pre-existing repo file the guard must protect.
+        (self.repo / "source.py").write_text("original\n", encoding="utf-8")
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+
+    # --- pure helpers ---
+
+    def test_snapshot_records_files_and_skips_ignored_dirs(self):
+        (self.repo / ".git").mkdir()
+        (self.repo / ".git" / "HEAD").write_text("ref\n", encoding="utf-8")
+        snap = snapshot_repo_tree(self.repo)
+        self.assertIn("source.py", snap)
+        self.assertNotIn(".git/HEAD", snap)
+
+    def test_revert_deletes_created_file_and_warns(self):
+        before = snapshot_repo_tree(self.repo)
+        (self.repo / "junk.txt").write_text("nope\n", encoding="utf-8")
+        warning = revert_repo_writes(self.repo, before)
+        self.assertFalse((self.repo / "junk.txt").exists())
+        self.assertIn("BLOCKED WRITE", warning)
+        self.assertIn("junk.txt", warning)
+
+    def test_revert_prunes_empty_created_dirs(self):
+        before = snapshot_repo_tree(self.repo)
+        (self.repo / "outdir").mkdir()
+        (self.repo / "outdir" / "result.csv").write_text("a\n", encoding="utf-8")
+        revert_repo_writes(self.repo, before)
+        self.assertFalse((self.repo / "outdir").exists())
+
+    def test_revert_keeps_preexisting_dir(self):
+        (self.repo / "pkg").mkdir()
+        (self.repo / "pkg" / "keep.py").write_text("keep\n", encoding="utf-8")
+        before = snapshot_repo_tree(self.repo)
+        (self.repo / "pkg" / "new.py").write_text("new\n", encoding="utf-8")
+        revert_repo_writes(self.repo, before)
+        self.assertFalse((self.repo / "pkg" / "new.py").exists())
+        self.assertTrue((self.repo / "pkg" / "keep.py").exists())
+
+    def test_revert_flags_modified_file_without_restoring(self):
+        before = snapshot_repo_tree(self.repo)
+        # Different length so the change is detected regardless of mtime granularity.
+        (self.repo / "source.py").write_text("tampered-and-clearly-longer\n", encoding="utf-8")
+        warning = revert_repo_writes(self.repo, before)
+        self.assertIn("MODIFIED", warning)
+        self.assertEqual((self.repo / "source.py").read_text(), "tampered-and-clearly-longer\n")
+
+    def test_revert_returns_empty_when_untouched(self):
+        before = snapshot_repo_tree(self.repo)
+        self.assertEqual(revert_repo_writes(self.repo, before), "")
+
+    # --- end-to-end through execute_command_text ---
+
+    def test_execute_command_reverts_write_into_repo(self):
+        target = self.repo / "created_by_cmd.txt"
+        result = execute_command_text(
+            self.workspace, f"echo polluted > '{target}'", repo_path=self.repo
+        )
+        self.assertFalse(target.exists())          # reverted
+        self.assertIn("BLOCKED WRITE", result)
+        self.assertIn("Exit code: 0", result)      # the command itself still ran
+
+    def test_execute_command_allows_workspace_write(self):
+        result = execute_command_text(
+            self.workspace, "echo fine > out.txt", repo_path=self.repo
+        )
+        self.assertTrue((self.workspace / "out.txt").exists())
+        self.assertNotIn("BLOCKED WRITE", result)
+
+    def test_execute_command_without_repo_path_is_unguarded(self):
+        # Backward-compatible: no repo_path means no snapshot and no warning.
+        result = execute_command_text(self.workspace, "echo hi")
+        self.assertNotIn("BLOCKED WRITE", result)
 
 
 class ListWorkspaceFilesTests(unittest.TestCase):
