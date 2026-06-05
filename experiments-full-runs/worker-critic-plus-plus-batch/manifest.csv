@@ -1,0 +1,47 @@
+id,status,correct,final_answer,ground_truth,total_tokens,estimated_cost_usd,elapsed_seconds
+ARCADIA_PUBLIC_001,correct,True,300,300,25566,0.008768,25.4
+ARCADIA_PUBLIC_002,correct,True,162,6,24609,0.009764,40.3
+CROSSPPI_001,blocked,False,EXECUTION_REQUIRED — required packages (torch and esm) are not available in the execution environment and pip install is,5.65,205779,0.06083,983.5
+CROSSPPI_002,blocked,False,EXECUTION_REQUIRED — missing dependencies prevented running the inference script; I attempted to run t.py but got Module,8.20,72550,0.021126,178.9
+CROSSPPI_003,wrong,False,-0.0115,9.6298,73467,0.024567,360.7
+CROSSPPI_004,wrong,False,218,216,330206,0.098263,546.8
+CYTEONTO_001,correct,True,4,4,41833,0.015122,56.4
+CYTEONTO_002,correct,True,stem cell,stem cell,42336,0.014649,40.9
+CYTEONTO_003,correct,True,ovum,ovum,34026,0.012164,35.2
+DISTORTIONS_001,correct,True,36,36,202395,0.060266,200.7
+DISTORTIONS_002,wrong,False,7,6,111474,0.038314,519.8
+DISTORTIONS_003,correct,True,800,800,133001,0.042392,169.5
+FADVI_001,correct,True,30,30,75829,0.023,40.1
+FADVI_002,correct,True,10,10,69036,0.021998,43.3
+FADVI_003,correct,True,30,30,47330,0.015376,34.3
+GWAS_EPISTASIS_BIAS_001,correct,True,5.03698201089221e-08,5.036982e-08,52405,0.016633,270.1
+GWAS_EPISTASIS_BIAS_002,correct,True,0,0,112361,0.043837,600.6
+GWAS_EPISTASIS_BIAS_003,blocked,False,EXECUTION_REQUIRED — I intended to run a modified simulation script but have not yet executed it; I will create and run ,0.79,19379,0.007708,216.9
+GWPROT_001,correct,True,54,54,88435,0.027798,51.9
+GWPROT_002,correct,True,4 unique ligand types,4,59731,0.022531,679.0
+LARIS_001,correct,True,8772,8772,137254,0.039787,62.6
+LARIS_002,correct,True,1985,1985,107548,0.031164,46.7
+LARIS_003,correct,True,SEMA4A,SEMA4A,115312,0.033905,47.2
+METAPOINTFINDER_001,correct,True,1182,1182,350762,0.09633,94.9
+METAPOINTFINDER_002,correct,True,37,37,440405,0.118494,100.7
+METAPOINTFINDER_003,blocked,False,EXECUTION_REQUIRED — the specified input file metapointfinder/notebooks/make_dna_mutants/output/sample_input.tsv is miss,20,87330,0.025569,49.1
+METAPOINTFINDER_004,correct,True,5000,5000,238235,0.074035,739.2
+METAPOINTFINDER_005,correct,True,10000 bp,10000,195352,0.060768,101.6
+PPLM_001,wrong,False,-7.6090136 kcal/mol,-8.226562,169733,0.052555,297.4
+PPLM_002,correct,True,Favorable,Favorable,29455,0.009767,27.8
+PPLM_003,wrong,False,"(122, 320)","(122, 1280)",814846,0.216301,524.5
+PPLM_004,blocked,False,"EXECUTION_REQUIRED — pretrained model file pplm/models/pplm_t33_650M.pt is missing, so the script cannot be run to produ",-0.000396,124848,0.035395,45.9
+PPLM_005,correct,True,"(660, 122, 70)","(660, 122, 70)",57220,0.021982,65.0
+PPLM_006,blocked,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not come from any successful command execution,0.94310874,146608,0.04462,370.3
+REGFORMER_001,correct,True,0.8841,0.8841,86645,0.025408,32.1
+REGFORMER_002,blocked,False,"EXECUTION_REQUIRED — required data files (RegFormer/notebooks/cell_emb/data/embeddings.npy, cell_labels.csv, gene_expres",512,121716,0.037602,67.6
+SAM2_001,blocked,False,EXECUTION_REQUIRED — execution blocked by missing Python packages in the runtime (ModuleNotFoundError for PIL/numpy/torc,~52 masks,359003,0.106285,972.7
+SAM2_002,blocked,False,"EXECUTION_REQUIRED — required dependencies (torch, hydra-core/omegaconf, and related packages) are not installed in the ",~54 masks,155114,0.046282,91.6
+SCISTREECNA_001,wrong,False,0.38596491228070173,0.3793103448275862,861757,0.240025,438.7
+SCISTREECNA_002,blocked,False,"EXECUTION_REQUIRED — The execution environment lacks CuPy/NVIDIA GPU support required by ScisTreeCNA, so I cannot run th",0.4827586206896552,64243,0.021426,46.7
+SC_FRAMEWORK_001,correct,True,5000 cells,5000,65413,0.020872,218.3
+SEGMA_001,correct,True,187 amino acids,187,113091,0.033901,55.8
+SENTIEON_CLI_001,correct,True,CONSERVATIVE,CONSERVATIVE,42442,0.013279,33.3
+TABPFN_001,blocked,False,EXECUTION_REQUIRED — TabPFN requires a one-time license acceptance / API key (set via TABPFN_TOKEN or interactive browse,"~0.97 accuracy / ~0.99 ROC AUC; beats RF, LogReg, SVC",272201,0.077572,593.7
+TABPFN_002,blocked,False,EXECUTION_REQUIRED — experiment could not be completed due to Python environment / dependency installation mismatch (req,~0.84 R^2 / ~0.45 RMSE; beats LinReg and RandomForest,630348,0.178984,685.4
+USHER_001,blocked,False,EXECUTION_REQUIRED — the specified Xenium/scRNA-seq .h5ad files and the alignment_model.pt are not present in this repo ,64603,59446,0.01994,53.1
