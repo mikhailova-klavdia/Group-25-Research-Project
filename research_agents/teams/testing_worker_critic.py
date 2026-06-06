@@ -113,6 +113,7 @@ def run_testing_worker_critic(
         entry_id=entry_id,
         worker_model=model,
         worker_factory=create_execution_agent_with_testing,
+        team_name="testing-worker-critic",
     )
     gap_input = build_gap_detection_input(
         question=question,

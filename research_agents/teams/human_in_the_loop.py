@@ -258,6 +258,7 @@ def run_human_in_the_loop(
         entry_id=entry_id,
         worker_model=model,
         worker_factory=create_execution_agent_hitl,
+        team_name="human-in-the-loop",
     )
 
     _stage(context, "Reviewing the result…")

@@ -298,6 +298,18 @@ def _build_critic_input(
     )
 
 
+def _announce_stage(team_name: str | None, stage_name: str) -> None:
+    """Print a short stage marker so multi-agent runs show live progress.
+
+    The shared orchestration path is used by several teams. Emitting the
+    marker here keeps worker / install / critic visibility consistent
+    across those teams without copy-pasting print statements into each
+    thin team wrapper.
+    """
+    team_label = team_name or "shared"
+    print(f"[team/{team_label}] {stage_name}...")
+
+
 def run_with_critic(
     context: ResearchContext,
     question: str,
@@ -308,6 +320,7 @@ def run_with_critic(
     max_retries: int = 1,
     worker_factory: WorkerFactory = create_react_agent,
     needs_execution: bool = False,
+    team_name: str | None = None,
 ) -> TeamRunResult:
     """Run worker, review with critic, and optionally retry once.
 
@@ -333,6 +346,10 @@ def run_with_critic(
         if feedback_for_retry:
             worker_input = f"{question}\n\n[RETRY HINT] {feedback_for_retry}"
 
+        stage_name = "Execution worker"
+        if attempt_index > 0:
+            stage_name += f" retry {attempt_index}"
+        _announce_stage(team_name, stage_name)
         worker_result = Runner.run_sync(
             worker,
             worker_input,
@@ -356,6 +373,7 @@ def run_with_critic(
 
         missing = _detect_missing_modules(capture.outputs)
         if missing and attempt_index < max_retries:
+            _announce_stage(team_name, f"Dependency install retry {attempt_index + 1}")
             install_event = _install_packages(context, missing, attempt=attempt_index + 1)
             install_events.append(install_event)
             if install_event.succeeded:
@@ -373,6 +391,7 @@ def run_with_critic(
             tool_outputs=capture.outputs,
             install_events=install_events,
         )
+        _announce_stage(team_name, "Critic review")
         critic_result = Runner.run_sync(
             critic,
             critic_input,
@@ -395,6 +414,7 @@ def run_with_critic(
             break
 
         if review.verdict == "redo_with_install" and review.missing_packages:
+            _announce_stage(team_name, f"Dependency install retry {attempt_index + 1}")
             install_event = _install_packages(
                 context,
                 review.missing_packages,

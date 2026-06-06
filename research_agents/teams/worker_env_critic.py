@@ -70,6 +70,11 @@ def _run_environment_agent(
     return result.final_output, capture
 
 
+def _announce_stage(stage_name: str) -> None:
+    """Print a short stage marker so env-first runs show active progress."""
+    print(f"[team/worker-env-critic] {stage_name}...")
+
+
 # ---------------------------------------------------------------------------
 # Team run function
 # ---------------------------------------------------------------------------
@@ -96,6 +101,7 @@ def run_worker_env_critic(
     all_captures: list[ToolOutputCapture] = []
 
     # ── Stage 1: Environment Agent ─────────────────────────────────────────
+    _announce_stage("Environment agent")
     env_report, env_capture = _run_environment_agent(context, question, model)
     all_captures.append(env_capture)
 
@@ -131,6 +137,7 @@ def run_worker_env_critic(
     worker = create_react_agent_plus_plus(model=model)
     worker_capture = ToolOutputCapture()
 
+    _announce_stage("Execution worker")
     worker_result = Runner.run_sync(
         worker,
         worker_input,
@@ -148,6 +155,7 @@ def run_worker_env_critic(
     # this the same way worker-critic does.
     missing = _detect_missing_modules(worker_capture.outputs)
     if missing:
+        _announce_stage("Dependency install retry 1")
         install_event = _install_packages(context, missing, attempt=1)
         install_events.append(install_event)
         if install_event.succeeded:
@@ -158,6 +166,7 @@ def run_worker_env_critic(
                 "Re-run the failed command and continue.\n\n"
                 f"QUESTION:\n{question}"
             )
+            _announce_stage("Execution worker retry 1")
             retry_result = Runner.run_sync(
                 worker,
                 hint,
@@ -187,6 +196,7 @@ def run_worker_env_critic(
         f"{format_environment_report_for_worker(env_report)}\n\n"
         + critic_input
     )
+    _announce_stage("Critic review")
     critic_review = Runner.run_sync(
         critic,
         critic_input_with_env,

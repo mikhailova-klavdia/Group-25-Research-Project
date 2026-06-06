@@ -13,6 +13,11 @@ from research_agents.orchestration import TeamRunResult, ToolOutputCapture, usag
 from research_agents.project import ResearchContext
 
 
+def _announce_stage(stage_name: str) -> None:
+    """Print a short stage marker so solo runs show live progress too."""
+    print(f"[team/solo] {stage_name}...")
+
+
 def run_solo(
     context: ResearchContext,
     question: str,
@@ -35,6 +40,7 @@ def run_solo(
 
     worker = create_react_agent(model=model)
     capture = ToolOutputCapture()
+    _announce_stage("Execution worker")
     result = Runner.run_sync(
         worker,
         question,

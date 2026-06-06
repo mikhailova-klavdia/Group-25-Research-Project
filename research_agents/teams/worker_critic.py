@@ -33,4 +33,5 @@ def run_worker_critic(
         entry_id=entry_id,
         worker_model=model,
         worker_factory=create_react_agent,
+        team_name="worker-critic",
     )

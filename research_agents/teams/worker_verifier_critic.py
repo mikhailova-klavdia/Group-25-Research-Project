@@ -100,6 +100,11 @@ def _build_verifier_input(
     )
 
 
+def _announce_stage(stage_name: str) -> None:
+    """Print a short stage marker so verifier runs expose the active agent."""
+    print(f"[team/worker-verifier-critic] {stage_name}...")
+
+
 # ---------------------------------------------------------------------------
 # Team run function
 # ---------------------------------------------------------------------------
@@ -126,6 +131,7 @@ def run_worker_verifier_critic(
     # ── Stage 1: worker ───────────────────────────────────────────────────
     worker = create_react_agent_improved(model=model)
     capture = ToolOutputCapture()
+    _announce_stage("Execution worker")
     worker_result = Runner.run_sync(
         worker,
         question,
@@ -143,10 +149,12 @@ def run_worker_verifier_critic(
     # execution attempt.
     missing = _detect_missing_modules(capture.outputs)
     if missing:
+        _announce_stage("Dependency install retry 1")
         install_event = _install_packages(context, missing, attempt=1)
         install_events.append(install_event)
         if install_event.succeeded:
             retry_capture = ToolOutputCapture()
+            _announce_stage("Execution worker retry 1")
             retry_result = Runner.run_sync(
                 worker,
                 question,
@@ -162,6 +170,7 @@ def run_worker_verifier_critic(
     # ── Stage 2: verifier ─────────────────────────────────────────────────
     verifier = create_verifier_agent(model=model)
     verifier_input = _build_verifier_input(question, ground_truth, answer, capture.outputs)
+    _announce_stage("Verifier review")
     verifier_result = Runner.run_sync(
         verifier,
         verifier_input,
@@ -192,6 +201,7 @@ def run_worker_verifier_critic(
         tool_outputs=capture.outputs,
         install_events=install_events,
     )
+    _announce_stage("Critic review")
     critic_review = Runner.run_sync(
         critic,
         critic_input,

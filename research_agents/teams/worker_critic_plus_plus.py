@@ -34,4 +34,5 @@ def run_worker_critic_plus_plus(
         worker_model=model,
         worker_factory=create_react_agent_plus_plus,
         needs_execution=True,
+        team_name="worker-critic-plus-plus",
     )

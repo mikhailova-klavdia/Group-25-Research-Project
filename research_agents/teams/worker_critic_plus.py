@@ -38,4 +38,5 @@ def run_worker_critic_plus(
         entry_id=entry_id,
         worker_model=model,
         worker_factory=create_react_agent_improved,
+        team_name="worker-critic-plus",
     )
