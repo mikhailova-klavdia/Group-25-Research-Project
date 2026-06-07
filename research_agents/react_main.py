@@ -165,6 +165,7 @@ def _build_record(
     extraction_report: dict | None = None,
     testing_report: dict | None = None,
     gap_report: dict | None = None,
+    gate_decision: dict | None = None,
     agent_usages: list[AgentUsage] | None = None,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
@@ -274,6 +275,8 @@ def _build_record(
         record["testing_report"] = testing_report
     if gap_report is not None:
         record["gap_report"] = gap_report
+    if gate_decision is not None:
+        record["gate_decision"] = gate_decision
     return record
 
 
@@ -308,6 +311,10 @@ def run_react_query(
     print(f"Pre-run token estimate (tiktoken): ~{pre_estimate:,}")
     print("-" * 60)
     t0 = time.time()
+    # Initialise optional fields so they are always defined after the try/except
+    # block, regardless of which team was used or whether an exception fires.
+    extraction_report = testing_report = gap_report = gate_decision = None
+    agent_usages: list = []
     try:
         team_result = team.run(context, question, ground_truth, entry_id, model)
         result = team_result.worker_result
@@ -318,6 +325,7 @@ def run_react_query(
         extraction_report = team_result.extraction_report
         testing_report = team_result.testing_report
         gap_report = team_result.gap_report
+        gate_decision = team_result.gate_decision
         agent_usages = team_result.agent_usages
     except MaxTurnsExceeded:
         print(
@@ -392,6 +400,7 @@ def run_react_query(
         extraction_report=extraction_report,
         testing_report=testing_report,
         gap_report=gap_report,
+        gate_decision=gate_decision,
         agent_usages=agent_usages,
     )
     record["elapsed_seconds"] = round(time.time() - t0, 1)
@@ -522,6 +531,16 @@ Examples:
     # --no-critic together raises a clear error rather than silently
     # picking one.
     parser.add_argument(
+        "--isolated",
+        action="store_true",
+        default=False,
+        help=(
+            "Put the venv and artifact cache inside each run dir rather than "
+            "sharing them per-paper.  Use for controlled experiments to prevent "
+            "cross-architecture contamination (e.g. gap-injection runs)."
+        ),
+    )
+    parser.add_argument(
         "--no-critic",
         dest="no_critic",
         action="store_true",
@@ -603,7 +622,11 @@ Examples:
         # The team's ``apply_setup`` flag decides whether resolve_project
         # honors the paper's ``[setup]`` table (PPLM weight download, etc.).
         try:
-            context = resolve_project(args.project, apply_setup=team.apply_setup)
+            context = resolve_project(
+                args.project,
+                apply_setup=team.apply_setup,
+                isolated=args.isolated,
+            )
         except ValueError as exc:
             print(f"Error resolving project: {exc}", file=sys.stderr)
             sys.exit(1)

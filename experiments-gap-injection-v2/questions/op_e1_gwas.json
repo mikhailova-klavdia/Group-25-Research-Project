@@ -1,0 +1,12 @@
+[
+  {
+    "id": "V2_E1_GWAS_001",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by interactions (lambda), using a sample size of 100000, with rho ranging from -0.3 to 0.3, lambda ranging from 0 to 0.171, a grid resolution of 100, and a GWAS significance threshold of 5.45. Save the output to the directory 'GWAS-Epistasis-Bias/notebooks/math_model_plots/output'. What is the null type I error rate (alpha_w) value reported in the output?",
+    "ground_truth": "5.036982e-08"
+  },
+  {
+    "id": "V2_E1_GWAS_002",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps (from 0.001 to 0.171), 500 target SNPs, 100 interaction pairs, 1000 additive SNPs, chromosome A size of 4034, significance threshold of 5.45, and random seed of 42. How many results are statistically significant at the genome-wide significance threshold of p-value less than 5e-8?",
+    "ground_truth": "0"
+  }
+]

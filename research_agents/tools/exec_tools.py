@@ -694,12 +694,14 @@ def execute_command(
     # The agent's prompt documents these; they're the contract between
     # the runtime and any helper scripts the agent might write.
     env_vars = {
-        "RESEARCH_PROJECT_PATH": str(context.context.project_dir.resolve()),
         "RESEARCH_REPO_PATH": str(repo_path),
         "RESEARCH_PAPER_PATH": str(context.context.paper_path.resolve()),
         "RESEARCH_RUN_PATH": str(context.context.run_dir.resolve()),
         "RESEARCH_WORKSPACE_PATH": str(context.context.workspace_path.resolve()),
         "RESEARCH_ARTIFACTS_PATH": str(context.context.artifacts_path.resolve()),
+        # Force the non-interactive Agg backend so plt.show() is a no-op and
+        # never blocks waiting for a GUI window that doesn't exist in batch runs.
+        "MPLBACKEND": "Agg",
     }
 
     # Prepend the repo root to PYTHONPATH so `import <repo-package>` works

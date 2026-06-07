@@ -1,0 +1,35 @@
+[
+  {
+    "timestamp": "2026-06-04T18:20:38.032629+00:00",
+    "run_id": "20260604T181956-892ffb3c",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-trained FADVI model from 'fadvi/notebooks/basic_usage/fadvi_save/' and extract the batch latent representat",
+    "pre_estimate_tokens": 1540,
+    "input_tokens": 73519,
+    "output_tokens": 2310,
+    "total_tokens": 75829,
+    "cost_usd": 0.023
+  },
+  {
+    "timestamp": "2026-06-04T18:21:31.572460+00:00",
+    "run_id": "20260604T182046-a6b60a9d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Create an AnnData object using the expression matrix from 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv', m",
+    "pre_estimate_tokens": 1671,
+    "input_tokens": 66328,
+    "output_tokens": 2708,
+    "total_tokens": 69036,
+    "cost_usd": 0.021998
+  },
+  {
+    "timestamp": "2026-06-04T18:22:15.702203+00:00",
+    "run_id": "20260604T182139-36a1c6b4",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the scRNA-seq data from 'fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad' (500 cells x 2000 genes) ",
+    "pre_estimate_tokens": 1643,
+    "input_tokens": 45305,
+    "output_tokens": 2025,
+    "total_tokens": 47330,
+    "cost_usd": 0.015376
+  }
+]

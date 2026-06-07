@@ -1,0 +1,7 @@
+[
+  {
+    "id": "V2_D1_SC_FRAMEWORK_001",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observations (cells) are in the dataset?",
+    "ground_truth": "5000"
+  }
+]

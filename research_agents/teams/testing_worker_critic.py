@@ -19,10 +19,16 @@ from research_agents.agents.gap_detection_agent import (
     canonicalize_gap_detection_report,
     create_gap_detection_agent,
 )
+from research_agents.agents.gate_agent import (
+    GateDecision,
+    apply_gate_verdict,
+    build_gate_input,
+    create_gate_agent,
+)
+from research_agents.agents.react_agent import create_react_agent_plus_plus
 from research_agents.agents.testing_agent import (
     TestingReport,
     canonicalize_testing_report,
-    create_execution_agent_with_testing,
     create_testing_agent,
     format_testing_report_for_worker,
 )
@@ -112,7 +118,7 @@ def run_testing_worker_critic(
         ground_truth=ground_truth,
         entry_id=entry_id,
         worker_model=model,
-        worker_factory=create_execution_agent_with_testing,
+        worker_factory=create_react_agent_plus_plus,
     )
     gap_input = build_gap_detection_input(
         question=question,
@@ -149,8 +155,30 @@ def run_testing_worker_critic(
     )
     gap_report: GapDetectionReport = canonicalize_gap_detection_report(gap_result.final_output)
 
+    _announce_stage("Gate")
+    gate_input = build_gate_input(
+        question=question,
+        final_answer=exec_result.answer.final_answer,
+        answer_status=exec_result.answer.answer_status,
+        gap_report=gap_report.model_dump(),
+    )
+    gate_result = Runner.run_sync(
+        create_gate_agent(model),
+        gate_input,
+        context=context,
+        max_turns=5,
+    )
+    gate_usage = usage_from_result(
+        gate_result,
+        stage="gate",
+        agent_name="Gate Agent",
+        model=model,
+    )
+    gate_decision: GateDecision = gate_result.final_output
+    final_answer = apply_gate_verdict(exec_result.answer, gate_decision)
+
     return TeamRunResult(
-        answer=exec_result.answer,
+        answer=final_answer,
         worker_result=exec_result.worker_result,
         captures=[extraction_capture, testing_capture, *exec_result.captures],
         reviews=exec_result.reviews,
@@ -158,10 +186,12 @@ def run_testing_worker_critic(
         extraction_report=extraction_report.model_dump(),
         testing_report=report.model_dump(),
         gap_report=gap_report.model_dump(),
+        gate_decision=gate_decision.model_dump(),
         agent_usages=[
             extraction_usage,
             testing_usage,
             *exec_result.agent_usages,
             gap_usage,
+            gate_usage,
         ],
     )

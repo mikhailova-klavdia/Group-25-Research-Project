@@ -1,0 +1,7 @@
+[
+  {
+    "id": "V2_D2_REGFORMER_001",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2 test runs with columns for Loss, PCC, and Spearman correlation (no header row). What is the Spearman correlation coefficient for the second test run (Run 1)?",
+    "ground_truth": "0.8841"
+  }
+]
