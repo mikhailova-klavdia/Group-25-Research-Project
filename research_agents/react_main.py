@@ -25,6 +25,7 @@
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -35,7 +36,9 @@ from agents.exceptions import MaxTurnsExceeded, ModelRefusalError
 from research_agents.config import OPENAI_API_KEY, DEFAULT_MODEL, ALTERNATE_MODEL
 from research_agents.agents.react_agent import REACT_INSTRUCTIONS, ReActAnswer
 from research_agents.orchestration import AgentUsage, ToolOutputCapture
-from research_agents.project import ResearchContext, resolve_project
+from research_agents.hitl import is_ask_human_output
+from research_agents.project import ResearchContext, delete_venv, resolve_project
+from research_agents.tracing import enable_local_tracing
 from research_agents.teams import DEFAULT_TEAM, TEAMS, TeamSpec
 from research_agents.token_utils import (
     append_cost_log,
@@ -166,19 +169,29 @@ def _build_record(
     testing_report: dict | None = None,
     gap_report: dict | None = None,
     agent_usages: list[AgentUsage] | None = None,
+    human_interactions: list[dict] | None = None,
+    help_provided: bool = False,
 ) -> dict:
     correct = _is_correct(output.final_answer, ground_truth)
 
-    if len(capture.outputs) != len(output.chain):
+    # ask_human results ("HUMAN REPLY: …" / NO_HUMAN_AVAILABLE) are real tool
+    # outputs captured in order, but the worker never self-reports ask_human as
+    # a chain step.  Zipping them into the model's chain positionally would
+    # stamp an operator reply onto an unrelated step and shift every later
+    # observation, so drop them before aligning real outputs with chain steps.
+    # The full ask_human transcript is preserved verbatim in human_interactions.
+    real_outputs = [out for out in capture.outputs if not is_ask_human_output(out)]
+
+    if len(real_outputs) != len(output.chain):
         print(
-            f"[WARNING] Tool calls captured ({len(capture.outputs)}) != "
+            f"[WARNING] Tool calls captured ({len(real_outputs)}) != "
             f"chain steps ({len(output.chain)}). "
             "Injecting real observations where counts align; remainder use LLM-written text."
         )
 
     chain_steps = []
     for i, s in enumerate(output.chain):
-        real_obs = capture.outputs[i] if i < len(capture.outputs) else s.observation
+        real_obs = real_outputs[i] if i < len(real_outputs) else s.observation
         chain_steps.append(
             {
                 "step": s.step,
@@ -228,6 +241,14 @@ def _build_record(
             }
             for event in install_events or []
         ],
+        # Complete operator-assistance log for this run.  ``human_help_requests``
+        # is the count downstream comparison scripts read directly; the list
+        # carries each Q&A so a run can be audited without parsing the trace.
+        "human_help_requests": len(human_interactions or []),
+        "human_interactions": human_interactions or [],
+        # RQ3 static-help variant: True when a per-paper help README was injected into the
+        # worker's input for this question (see README-assisted teams). False otherwise.
+        "help_provided": help_provided,
         "token_usage": {
             "pre_run_estimate": pre_estimate,
             # Legacy worker-result accounting kept for compatibility with
@@ -393,6 +414,8 @@ def run_react_query(
         testing_report=testing_report,
         gap_report=gap_report,
         agent_usages=agent_usages,
+        human_interactions=getattr(context, "human_interactions", None),
+        help_provided=getattr(context, "help_injected", False),
     )
     record["elapsed_seconds"] = round(time.time() - t0, 1)
 
@@ -413,6 +436,15 @@ def run_react_query(
         for review in critic_reviews:
             print(f"  Verdict: {review.verdict}")
             print(f"  Reasoning: {review.reasoning}")
+
+    human_interactions = record.get("human_interactions") or []
+    if human_interactions:
+        print(f"\nOperator assistance ({len(human_interactions)} request(s)):")
+        for n, qa in enumerate(human_interactions, 1):
+            q = " ".join(qa.get("question", "").split())
+            a = " ".join(qa.get("answer", "").split())
+            print(f"  [{n}] Q: {q[:200]}")
+            print(f"      A: {a[:200]}")
 
     if install_events:
         print(f"\nDependency installs ({len(install_events)}):")
@@ -527,6 +559,40 @@ Examples:
         action="store_true",
         help="Deprecated alias for --team solo (kept for backward compatibility).",
     )
+    parser.add_argument(
+        "--fresh-venv-per-question",
+        dest="fresh_venv_per_question",
+        action="store_true",
+        help=(
+            "Wipe and rebuild the per-paper venv around every question so each runs "
+            "from a clean environment (true 'separate experiment' isolation). Model "
+            "weights live outside the venv (framework caches + repo/ checkpoint dirs) "
+            "and are preserved. Slower, because seed dependencies reinstall per "
+            "question; a paper's questions must run sequentially."
+        ),
+    )
+    parser.add_argument(
+        "--max-turns",
+        dest="max_turns",
+        type=int,
+        default=None,
+        metavar="N",
+        help=(
+            "Cap each agent stage at N turns (Runner max_turns) to bound a stuck "
+            "question's token burn during a sweep. Defaults to 150 when omitted; "
+            "applied across all stages via the RESEARCH_MAX_TURNS env var."
+        ),
+    )
+    parser.add_argument(
+        "--trace",
+        action="store_true",
+        help=(
+            "Write a kill-safe local JSONL trace to runs/<run-id>/trace.jsonl per "
+            "question. Each span is flushed immediately, so a question killed at the "
+            "timeout still leaves a record of what the agent was doing (no traces "
+            "leave the machine)."
+        ),
+    )
 
     # --- single mode ---
     single = parser.add_argument_group("single question")
@@ -554,6 +620,11 @@ Examples:
 
     if args.model is None:
         args.model = DEFAULT_MODEL
+
+    # Propagate --max-turns to every agent stage across the fixed team.run
+    # boundary via the environment (read by config.resolve_max_turns()).
+    if args.max_turns is not None:
+        os.environ["RESEARCH_MAX_TURNS"] = str(args.max_turns)
 
     if not args.questions_file and not args.question:
         parser.error("Provide either --question (single) or --questions-file (batch).")
@@ -592,21 +663,46 @@ Examples:
 
     saved = []
 
+    # Per-paper venv path (mirrors resolve_project's ``<root>/.venv``).  Only
+    # used when --fresh-venv-per-question is set, to wipe the venv around each
+    # question.  Weights live outside the venv, so they survive the wipe.
+    project_venv_path = Path(args.project).expanduser().resolve() / ".venv"
+
     for i, entry in enumerate(entries, 1):
         entry_id = entry.get("id", f"Q{i:03d}")
         question = entry["question"]
         ground_truth = entry.get("ground_truth", "")
 
-        print(f"\n[{i}/{total}] ID={entry_id} — fresh workspace")
+        workspace_label = (
+            "fresh workspace + fresh venv"
+            if args.fresh_venv_per_question
+            else "fresh workspace"
+        )
+        print(f"\n[{i}/{total}] ID={entry_id} — {workspace_label}")
 
-        # Fresh workspace per question; the paper-level venv is reused.
-        # The team's ``apply_setup`` flag decides whether resolve_project
-        # honors the paper's ``[setup]`` table (PPLM weight download, etc.).
+        # In fresh-venv mode, wipe any existing venv so resolve_project rebuilds
+        # it from scratch for this question.  Done before the run as well as in
+        # the finally below, so a venv left behind by a hard-killed previous run
+        # isn't silently reused.
+        if args.fresh_venv_per_question:
+            delete_venv(project_venv_path)
+
+        # Fresh workspace per question.  The team's ``apply_setup`` flag decides
+        # whether resolve_project honors the paper's ``[setup]`` table (PPLM
+        # weight download, etc.); for the HITL team it is False, so rebuilding
+        # the venv reinstalls seed packages but does NOT re-trigger weight
+        # downloads — the weights are pre-placed outside the venv.
         try:
             context = resolve_project(args.project, apply_setup=team.apply_setup)
         except ValueError as exc:
             print(f"Error resolving project: {exc}", file=sys.stderr)
             sys.exit(1)
+
+        # With --trace, write a kill-safe per-step JSONL into THIS question's run
+        # dir. Each span is flushed open-write-close, so even a SIGKILL at the
+        # timeout leaves a usable record of what the agent was doing.
+        if args.trace:
+            enable_local_tracing(context.run_dir / "trace.jsonl")
 
         try:
             run_react_query(
@@ -621,6 +717,12 @@ Examples:
         except KeyboardInterrupt:
             print("\nInterrupted by user.", file=sys.stderr)
             sys.exit(130)
+        finally:
+            # Remove the rebuilt venv so nothing lingers between questions (and
+            # the next question starts clean even if this one crashed).  No-op
+            # when the flag is off or the venv is already gone.
+            if args.fresh_venv_per_question:
+                delete_venv(project_venv_path)
         saved.append(context.run_dir / f"{entry_id}.json")
 
     print(f"\n{'=' * 60}")

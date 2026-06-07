@@ -32,10 +32,16 @@ def test_registry_contains_all_shipped_teams():
         "solo",
         "worker-critic",
         "worker-critic-plus",
+        "worker-verifier-critic",
         "testing-worker-critic",
         "worker-critic-plus-plus",
         "human-in-the-loop",
         "worker-critic-plus-plus-hitl",
+        "worker-critic-assisted",
+        "worker-critic-plus-plus-assisted",
+        "worker-critic-readme",
+        "worker-critic-plus-plus-readme",
+        "worker-env-critic",
     }
 
 

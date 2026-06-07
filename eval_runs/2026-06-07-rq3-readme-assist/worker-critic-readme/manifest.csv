@@ -1,0 +1,47 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,used_help,elapsed_s
+2026-06-06T22:59:31+00:00,SC_FRAMEWORK_001,papers/SC-Framework,ok,True,5000 cells,282002,0.0781,yes,124.5
+2026-06-06T23:00:33+00:00,USHER_002,papers/USHER,ok,False,Required file 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' not found in repo af,220896,0.0624,yes,61.8
+2026-06-06T23:01:21+00:00,SEGMA_001,papers/segma,ok,True,187 amino acids,193063,0.0533,yes,47.7
+2026-06-06T23:04:42+00:00,ARCADIA_PUBLIC_002,papers/ARCADIA_public,ok,True,300 epochs,477095,0.1259,yes,68.8
+2026-06-06T23:05:45+00:00,ARCADIA_PUBLIC_003,papers/ARCADIA_public,ok,True,6,187094,0.0539,yes,62.8
+2026-06-06T23:08:45+00:00,GWPROT_001,papers/GWProt,ok,True,54,475954,0.1319,yes,179.7
+2026-06-06T23:09:15+00:00,GWPROT_002,papers/GWProt,ok,True,4,127774,0.0358,yes,30.1
+2026-06-06T23:10:28+00:00,REGFORMER_002,papers/RegFormer,ok,True,0.8841,280960,0.0772,yes,72.9
+2026-06-06T23:11:56+00:00,REGFORMER_003,papers/RegFormer,ok,False,Required file 'RegFormer/notebooks/cell_emb/data/embeddings.npy' not found in re,363626,0.101,yes,88.4
+2026-06-06T23:13:08+00:00,SCISTREECNA_001,papers/ScisTreeCNA,ok,False,Required file 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv',421379,0.1129,yes,71.6
+2026-06-06T23:14:00+00:00,SCISTREECNA_003,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — The requested ScisTreeCNA tutorial data files ('ScisTreeCNA,401386,0.1062,yes,52.2
+2026-06-06T23:40:16+00:00,TABPFN_001,papers/tabpfn,ok,False,"TabPFN: accuracy=0.9736842105, ROC AUC=0.9984121943, F1=0.9774436090. Comparison",470461,0.134,yes,373.7
+2026-06-06T23:50:55+00:00,CYTEONTO_001,papers/CyteOnto,ok,True,4,117673,0.0356,yes,37.0
+2026-06-06T23:51:38+00:00,CYTEONTO_002,papers/CyteOnto,ok,True,stem cell,114888,0.0351,yes,42.5
+2026-06-06T23:52:16+00:00,CYTEONTO_003,papers/CyteOnto,ok,True,ovum,117936,0.0356,yes,38.4
+2026-06-06T23:54:38+00:00,GWAS_EPISTASIS_BIAS_001,papers/GWAS-Epistasis-Bias,ok,True,5.0369820108922107e-08,214687,0.0611,yes,141.4
+2026-06-07T00:15:55+00:00,LARIS_001,papers/LARIS,ok,False,EXECUTION_REQUIRED — Required AnnData 'LARIS/notebooks/04_laris_tutorial/data/LA,422650,0.1157,yes,76.9
+2026-06-07T00:17:33+00:00,LARIS_002,papers/LARIS,ok,False,EXECUTION_REQUIRED — Required AnnData file 'LARIS/notebooks/04_laris_tutorial/da,391432,0.1062,yes,97.9
+2026-06-07T00:18:39+00:00,LARIS_003,papers/LARIS,ok,False,Required file 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/ad,499780,0.1332,yes,65.9
+2026-06-07T00:19:58+00:00,DISTORTIONS_001,papers/distortions,ok,False,37,382611,0.1071,yes,79.4
+2026-06-07T00:29:42+00:00,DISTORTIONS_005,papers/distortions,ok,True,6,430225,0.1203,yes,583.1
+2026-06-07T00:40:37+00:00,FADVI_001,papers/fadvi,ok,False,Required file 'fadvi/notebooks/basic_usage/fadvi_save/' not found in repo after ,239359,0.0685,yes,54.7
+2026-06-07T00:41:23+00:00,FADVI_003,papers/fadvi,ok,False,Required file 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv' not fo,204175,0.0601,yes,46.3
+2026-06-07T00:42:18+00:00,FADVI_007,papers/fadvi,ok,False,Required files 'fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad',194704,0.0583,yes,55.1
+2026-06-07T00:45:43+00:00,CROSSPPI_001,papers/CrossPPI,ok,False,5.64,583306,0.164,yes,204.6
+2026-06-07T00:51:41+00:00,CROSSPPI_003,papers/CrossPPI,ok,True,8.20,602793,0.1666,yes,358.7
+2026-06-07T00:52:48+00:00,CROSSPPI_004,papers/CrossPPI,ok,False,-0.0011,206518,0.0631,yes,66.9
+2026-06-07T00:54:07+00:00,CROSSPPI_006,papers/CrossPPI,ok,True,216,243466,0.0741,yes,79.2
+2026-06-07T00:55:05+00:00,METAPOINT_001,papers/metapointfinder,ok,True,1182 sequences,316238,0.0895,yes,58.0
+2026-06-07T00:56:05+00:00,METAPOINT_002,papers/metapointfinder,ok,True,37,526346,0.143,yes,59.3
+2026-06-07T00:57:11+00:00,METAPOINT_003,papers/metapointfinder,ok,False,106,226606,0.0669,yes,66.6
+2026-06-07T00:58:35+00:00,METAPOINT_004,papers/metapointfinder,ok,True,5000 bp,362870,0.1049,yes,83.5
+2026-06-07T00:59:34+00:00,METAPOINT_005,papers/metapointfinder,ok,True,10000 bp,358258,0.1006,yes,59.4
+2026-06-07T01:02:37+00:00,PPLM_001,papers/PPLM,ok,True,-8.2265625 kcal/mol,569914,0.1524,yes,182.8
+2026-06-07T01:05:40+00:00,PPLM_002,papers/PPLM,ok,True,Favorable (predicted affinity = -8.2265625),570216,0.1535,yes,183.3
+2026-06-07T01:10:47+00:00,PPLM_004,papers/PPLM,ok,True,-0.000396,564089,0.1531,yes,155.1
+2026-06-07T01:13:49+00:00,PPLM_005,papers/PPLM,ok,True,"(660, 122, 70)",1025591,0.2706,yes,182.3
+2026-06-07T04:49:01+00:00,SAM2_001,papers/sam2,ok,True,52 masks,1620070,0.4351,yes,701.2
+2026-06-07T04:59:20+00:00,SAM2_002,papers/sam2,ok,True,54 masks,2769671,0.7261,yes,618.8
+2026-06-07T05:11:55+00:00,TABPFN_002,papers/tabpfn,ok,False,"TabPFN: MSE=0.1442, MAE=0.2345, R2=0.8951; Ridge: MSE=0.5363, MAE=0.5349, R2=0.6",821878,0.2228,yes,754.5
+2026-06-07T05:17:02+00:00,GWAS_EPISTASIS_BIAS_002,papers/GWAS-Epistasis-Bias,ok,True,0,396710,0.1152,yes,307.3
+2026-06-07T05:22:40+00:00,GWAS_EPISTASIS_BIAS_003,papers/GWAS-Epistasis-Bias,ok,False,0.81,336809,0.0979,yes,338.0
+2026-06-07T05:40:13+00:00,DISTORTIONS_006,papers/distortions,ok,True,800,1130186,0.3089,yes,1052.9
+2026-06-07T05:43:12+00:00,PPLM_006,papers/PPLM,ok,True,0.9431081,528701,0.1451,yes,179.2
+2026-06-07T11:19:24+00:00,SENTIEON_CLI_001,papers/sentieon-cli,ok,True,CONSERVATIVE,2917635,0.7839,yes,527.6
+2026-06-07T11:21:30+00:00,PPLM_003,papers/PPLM,ok,True,"(122, 1280)",577220,0.1559,yes,125.7

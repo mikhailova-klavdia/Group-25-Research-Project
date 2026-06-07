@@ -1,0 +1,20 @@
+[
+  {
+    "id": "CYTEONTO_001",
+    "question": "Load the author cell type labels from 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' (CSV file with 'label' column containing cell type names). How many unique cell type labels are in this file?",
+    "ground_truth": "4",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.06.686964v1"
+  },
+  {
+    "id": "CYTEONTO_002",
+    "question": "Load the algorithm 1 predicted labels from 'CyteOnto/notebooks/adv_tutorial/data/algorithm1_labels.csv' (CSV file with 'label' column). What is the first label in the list?",
+    "ground_truth": "stem cell",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.06.686964v1"
+  },
+  {
+    "id": "CYTEONTO_003",
+    "question": "Load the algorithm 2 predicted labels from 'CyteOnto/notebooks/adv_tutorial/data/algorithm2_labels.csv' (CSV file with 'label' column). What is the last label in the list?",
+    "ground_truth": "ovum",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.06.686964v1"
+  }
+]

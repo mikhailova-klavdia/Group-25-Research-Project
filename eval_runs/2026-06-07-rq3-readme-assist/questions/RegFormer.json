@@ -1,0 +1,14 @@
+[
+  {
+    "id": "REGFORMER_002",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2 test runs with columns for Loss, PCC, and Spearman correlation (no header row). What is the Spearman correlation coefficient for the second test run (Run 1)?",
+    "ground_truth": "0.8841",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.01.24.634217v1"
+  },
+  {
+    "id": "REGFORMER_003",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels from 'RegFormer/notebooks/cell_emb/data/cell_labels.csv', and gene expression matrix from 'RegFormer/notebooks/cell_emb/data/gene_expression.csv'. Create an AnnData object with the gene expression as the main matrix and store the embeddings in obsm with key 'X_regformer'. What is the embedding dimension (number of features in the embedding)?",
+    "ground_truth": "512",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.01.24.634217v1"
+  }
+]

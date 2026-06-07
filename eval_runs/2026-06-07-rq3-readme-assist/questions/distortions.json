@@ -1,0 +1,20 @@
+[
+  {
+    "id": "DISTORTIONS_001",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell types are annotated in the 'cell.type' column?",
+    "ground_truth": "36",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.08.21.671523v1"
+  },
+  {
+    "id": "DISTORTIONS_005",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 cells x 1838 genes, pre-processed), run UMAP embedding using 10 nearest neighbors with 50 PCA components and spectral initialization, then perform Leiden clustering with resolution 0.5, 2 iterations, igraph flavor, and undirected mode. How many unique clusters are identified?",
+    "ground_truth": "6",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.08.21.671523v1"
+  },
+  {
+    "id": "DISTORTIONS_006",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 features) and metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. Sample 100 cells from each of 8 specific cell types: Ciliated_amphid_neuron, Pharyngeal_neuron, GLR, Glia, Body_wall_muscle, Pharyngeal_muscle, Hypodermis, and Intestine using stratified sampling with seed 42. How many total cells are in the sampled subset?",
+    "ground_truth": "800",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.08.21.671523v1"
+  }
+]

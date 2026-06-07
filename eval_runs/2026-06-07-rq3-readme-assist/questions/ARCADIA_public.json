@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ARCADIA_PUBLIC_002",
+    "question": "Using the run_pipeline tool, run the complete ARCADIA pipeline for the cite_seq dataset. According to the configuration file at ARCADIA_public/repo/ARCADIA_public/configs/config.json, what is the maximum number of training epochs configured?",
+    "ground_truth": "300",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.20.689521v1"
+  },
+  {
+    "id": "ARCADIA_PUBLIC_003",
+    "question": "Using the ARCADIA hyperparameter search tool, run a hyperparameter search with the dataset name 'cite_seq', maximum epochs set to 400, batch size set to 1024, latent dimension set to 60, number of layers set to 3, 1024 hidden units for RNA encoder, 512 hidden units for protein encoder, learning rate of 0.001, and gradient clipping value of 1.0. How many total parameter combinations are in the default search grid when exploring n_layers options of [3, 1, 6] and latent_dim options of [60, 30]?",
+    "ground_truth": "6",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.20.689521v1"
+  }
+]

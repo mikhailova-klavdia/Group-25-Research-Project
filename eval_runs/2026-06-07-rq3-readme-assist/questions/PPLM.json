@@ -1,0 +1,38 @@
+[
+  {
+    "id": "PPLM_001",
+    "question": "Using the PPLM binding affinity prediction tool, predict the binding affinity between the receptor protein sequence in the FASTA file at PPLM/notebooks/run_pplm-affinity/data/receptor.fasta and the ligand protein sequence in the FASTA file at PPLM/notebooks/run_pplm-affinity/data/ligand.fasta. What is the predicted binding affinity value in kcal/mol?",
+    "ground_truth": "-8.226562",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_002",
+    "question": "Using the PPLM binding affinity prediction tool with the receptor FASTA file at PPLM/notebooks/run_pplm-affinity/data/receptor.fasta and ligand FASTA file at PPLM/notebooks/run_pplm-affinity/data/ligand.fasta, is the predicted binding interaction favorable or unfavorable (based on whether the affinity value is negative or positive)?",
+    "ground_truth": "Favorable",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_003",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the shape of the embed_A embeddings in the output pickle file (format as tuple)?",
+    "ground_truth": "(122, 1280)",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_004",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the mean value of the embed_A embeddings in the output pickle file (rounded to 6 decimal places)?",
+    "ground_truth": "-0.000396",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_005",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the shape of the inter_attn (inter-protein attention) array in the output pickle file (format as tuple)?",
+    "ground_truth": "(660, 122, 70)",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  },
+  {
+    "id": "PPLM_006",
+    "question": "Using the PPLM protein-protein interaction prediction tool, predict the interaction probability between the first protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq1.fasta and the second protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq2.fasta, using GPU device 0. What is the predicted interaction score reported in the output?",
+    "ground_truth": "0.94310874",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1"
+  }
+]

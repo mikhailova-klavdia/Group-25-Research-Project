@@ -1,0 +1,8 @@
+[
+  {
+    "id": "SENTIEON_CLI_001",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/notebooks/run_dnascope/input/reference.fa, R1 fastq file at sentieon-cli/notebooks/run_dnascope/input/sample_R1.fastq.gz, R2 fastq file at sentieon-cli/notebooks/run_dnascope/input/sample_R2.fastq.gz, model bundle at sentieon-cli/notebooks/run_dnascope/input/model.bundle, dbSNP file at sentieon-cli/notebooks/run_dnascope/input/dbsnp.vcf.gz, BED file at sentieon-cli/notebooks/run_dnascope/input/target.bed, readgroup string '@RG\\tID:HG002-1\\tSM:HG002\\tLB:HG002-LB-1\\tPL:ILLUMINA', 2 threads, and output VCF at sentieon-cli/notebooks/run_dnascope/output/sample.vcf.gz. What pcr_indel_model setting does the DNAscope algorithm use in the dry run commands?",
+    "ground_truth": "CONSERVATIVE",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.14.688541v1"
+  }
+]

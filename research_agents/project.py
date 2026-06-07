@@ -27,6 +27,7 @@
 #   download_timeout = 3600
 
 import os
+import shutil
 import subprocess
 import sys
 import tomllib
@@ -97,6 +98,29 @@ class ResearchContext:
     # headless/batch runs means total silence (no behaviour change there).
     # Additive and defaulted, like ``human``.
     reporter: "Reporter | None" = None
+
+    # Complete log of operator assistance for this run: one entry per
+    # ``ask_human`` round-trip ({"question", "answer"}), appended at the tool
+    # boundary by ``ask_human`` itself.  Recorded here — not reconstructed from
+    # the worker's self-reported chain — so the saved record has an accurate
+    # count and transcript of every help request even when the worker omits the
+    # call from its chain.  Empty whenever ask_human is never used (the default
+    # for every headless/non-assisted run), so existing constructions and the
+    # saved schema for those runs are unaffected.
+    human_interactions: list[dict[str, str]] = field(default_factory=list)
+
+    # Optional path to a per-paper help file (``AGENT_HINTS.md``, placed alongside the repo)
+    # carrying steering tips for this paper's tasks.  Read by the ``read_help`` tool and used
+    # by the README-assisted teams; ``None`` (or the file simply absent) on every other run,
+    # where ``read_help`` reports that no help is attached.  Additive and defaulted, so
+    # existing constructions are unaffected.
+    help_path: "Path | None" = None
+
+    # Set True by the README-assisted teams when they inject the help file's text into the
+    # worker's input. The injected preamble is not stored in the chain (the saved question is
+    # kept clean), so this flag lets the saved record attest that help was actually provided
+    # for this question. False on every non-assisted run.
+    help_injected: bool = False
 
 
 def _venv_bin_name() -> str:
@@ -452,6 +476,8 @@ def resolve_project(project_dir: str, apply_setup: bool = False) -> ResearchCont
         workspace_path=workspace_path,
         venv_path=venv_path,
         artifacts_path=artifacts_path,
+        # Per-paper steering file, if a README-assisted runner placed one here.
+        help_path=root / "AGENT_HINTS.md",
     )
 
 
@@ -478,4 +504,26 @@ def fresh_workspace(base: ResearchContext) -> ResearchContext:
         workspace_path=workspace_path,
         venv_path=base.venv_path,
         artifacts_path=base.artifacts_path,
+        help_path=base.help_path,
     )
+
+
+def delete_venv(venv_path: Path) -> None:
+    """Remove a per-paper venv so the next run rebuilds it from scratch.
+
+    Used by react_main's ``--fresh-venv-per-question`` mode, where each
+    benchmark question must start from a clean Python environment (the HITL
+    setup engineer is part of what's being evaluated, so it has to rebuild the
+    venv every time rather than inherit a warm one from a previous question).
+
+    Model weights deliberately live OUTSIDE the venv — framework caches under
+    ``~/.cache`` / ``~/Library/Caches`` and the paper's ``repo/`` checkpoint
+    directories — so wiping ``<project>/.venv`` resets the interpreter and every
+    installed package without discarding any downloaded weights (which are large
+    and, for some papers, flaky to re-fetch).
+
+    A missing venv is a no-op, so callers can invoke this unconditionally both
+    before and after a run without first checking whether the path exists.
+    """
+    if venv_path.exists():
+        shutil.rmtree(venv_path)

@@ -8,6 +8,7 @@ from research_agents.project import (
     _ensure_venv,
     _run_setup_scripts,
     _venv_bin_name,
+    delete_venv,
     resolve_project,
 )
 
@@ -300,3 +301,50 @@ class ResolveProjectTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "Missing repo/"):
                 resolve_project(str(root))
+
+
+class DeleteVenvTests(unittest.TestCase):
+    """delete_venv must wipe the venv but never touch weights stored elsewhere."""
+
+    def test_delete_venv_removes_existing_venv(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            venv = Path(tmpdir) / ".venv"
+            (venv / "bin").mkdir(parents=True)
+            (venv / "bin" / "python").write_text("#!/bin/sh\n", encoding="utf-8")
+
+            delete_venv(venv)
+
+            self.assertFalse(venv.exists())
+
+    def test_delete_venv_missing_is_a_noop(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            venv = Path(tmpdir) / ".venv"
+            # Never created — calling delete on a missing path must not raise,
+            # so the batch loop can invoke it unconditionally before each run.
+            delete_venv(venv)
+            self.assertFalse(venv.exists())
+
+    def test_delete_venv_preserves_weights_outside_the_venv(self):
+        """Weights live outside the venv, so wiping the venv must leave them intact."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            venv = root / ".venv"
+            (venv / "bin").mkdir(parents=True)
+            (venv / "bin" / "python").write_text("#!/bin/sh\n", encoding="utf-8")
+
+            # Stand-ins for weights that live OUTSIDE the venv: a repo
+            # checkpoint and a framework-cache checkpoint.
+            repo_ckpt = root / "repo" / "weights" / "affinity_models.pkl"
+            repo_ckpt.parent.mkdir(parents=True)
+            repo_ckpt.write_text("WEIGHT", encoding="utf-8")
+            cache_ckpt = root / "torch_hub" / "esm2.pt"
+            cache_ckpt.parent.mkdir(parents=True)
+            cache_ckpt.write_text("ESM", encoding="utf-8")
+
+            delete_venv(venv)
+
+            self.assertFalse(venv.exists())
+            self.assertTrue(repo_ckpt.exists())
+            self.assertEqual(repo_ckpt.read_text(encoding="utf-8"), "WEIGHT")
+            self.assertTrue(cache_ckpt.exists())
+            self.assertEqual(cache_ckpt.read_text(encoding="utf-8"), "ESM")

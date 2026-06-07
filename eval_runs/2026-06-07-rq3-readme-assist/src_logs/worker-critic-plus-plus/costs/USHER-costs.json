@@ -1,0 +1,13 @@
+[
+  {
+    "timestamp": "2026-06-04T17:15:27.976034+00:00",
+    "run_id": "20260604T171432-08842d81",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 56544,
+    "output_tokens": 2902,
+    "total_tokens": 59446,
+    "cost_usd": 0.01994
+  }
+]

@@ -20,6 +20,7 @@ from research_agents.agents.hitl_agents import (
 )
 from research_agents.agents.react_agent import ReActAnswer
 from research_agents.hitl import (
+    HUMAN_REPLY_PREFIX,
     NO_HUMAN_REPLY,
     ConsoleHuman,
     ConsoleReporter,
@@ -28,6 +29,8 @@ from research_agents.hitl import (
     apply_integrity_guard,
     ask_human_text,
     execution_grounded,
+    is_ask_human_output,
+    record_human_interaction,
 )
 from research_agents.project import ResearchContext
 from research_agents.teams.human_in_the_loop import ReportingCapture
@@ -48,6 +51,44 @@ class AskHumanTextTests(unittest.TestCase):
     def test_passes_agent_label_without_error(self):
         human = FakeHuman(["ok"])
         self.assertEqual(ask_human_text(human, "q", agent="setup"), "HUMAN REPLY: ok")
+
+
+class IsAskHumanOutputTests(unittest.TestCase):
+    def test_real_reply_is_detected(self):
+        # The chain builder relies on this to drop operator replies from the
+        # positional observation substitution.
+        self.assertTrue(is_ask_human_output(ask_human_text(FakeHuman(["v2"]), "q")))
+        self.assertTrue(is_ask_human_output(f"{HUMAN_REPLY_PREFIX}use the open weights"))
+
+    def test_no_human_sentinel_is_detected(self):
+        self.assertTrue(is_ask_human_output(NO_HUMAN_REPLY))
+
+    def test_ordinary_tool_outputs_are_not_matched(self):
+        # Execution and read outputs must never be mistaken for ask_human.
+        self.assertFalse(is_ask_human_output("Exit code: 0\n\nSTDOUT:\n0.97"))
+        self.assertFalse(is_ask_human_output("Contents of paper.pdf:\n..."))
+        self.assertFalse(is_ask_human_output("Wrote 2917 characters to run.py"))
+        self.assertFalse(is_ask_human_output(""))
+
+
+class RecordHumanInteractionTests(unittest.TestCase):
+    def test_strips_prefix_and_appends_qa(self):
+        log: list[dict[str, str]] = []
+        record_human_interaction(log, "license gate?", f"{HUMAN_REPLY_PREFIX}use V2")
+        self.assertEqual(log, [{"question": "license gate?", "answer": "use V2"}])
+
+    def test_preserves_answer_without_prefix(self):
+        # removeprefix is a no-op when the marker is absent — nothing is dropped.
+        log: list[dict[str, str]] = []
+        record_human_interaction(log, "q", "raw answer")
+        self.assertEqual(log[0]["answer"], "raw answer")
+
+    def test_accumulates_in_order(self):
+        log: list[dict[str, str]] = []
+        record_human_interaction(log, "q1", f"{HUMAN_REPLY_PREFIX}a1")
+        record_human_interaction(log, "q2", f"{HUMAN_REPLY_PREFIX}a2")
+        self.assertEqual([e["question"] for e in log], ["q1", "q2"])
+        self.assertEqual([e["answer"] for e in log], ["a1", "a2"])
 
 
 class FakeHumanTests(unittest.TestCase):
@@ -146,6 +187,14 @@ class ResearchContextHumanFieldTests(unittest.TestCase):
         rep = ConsoleReporter()
         ctx = self._ctx(reporter=rep)
         self.assertIs(ctx.reporter, rep)
+
+    def test_human_interactions_defaults_to_empty_and_is_per_instance(self):
+        # Default must be a fresh list per context (no shared mutable default),
+        # so one question's assistance log never leaks into another's.
+        a, b = self._ctx(), self._ctx()
+        self.assertEqual(a.human_interactions, [])
+        a.human_interactions.append({"question": "q", "answer": "a"})
+        self.assertEqual(b.human_interactions, [])
 
 
 class TriageReportTests(unittest.TestCase):

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "TABPFN_001",
+    "question": "Download the **scikit-learn/breast-cancer-wisconsin dataset**, train a TabPFN model on it, and tell me the performance compared to other classifiers",
+    "ground_truth": "~0.97 accuracy / ~0.99 ROC AUC; beats RF, LogReg, SVC",
+    "repo_link": "https://github.com/PriorLabs/TabPFN"
+  },
+  {
+    "id": "TABPFN_002",
+    "question": "Download the **California Housing dataset** from sklearn, train a TabPFN model on it, and tell me the performance compared to other regressors",
+    "ground_truth": "~0.84 R^2 / ~0.45 RMSE; beats LinReg and RandomForest",
+    "repo_link": "https://github.com/PriorLabs/TabPFN"
+  }
+]

@@ -9,6 +9,7 @@
 from agents import Runner
 
 from research_agents.agents.react_agent import create_react_agent
+from research_agents.config import resolve_max_turns
 from research_agents.orchestration import TeamRunResult, ToolOutputCapture, usage_from_result
 from research_agents.project import ResearchContext
 
@@ -39,7 +40,7 @@ def run_solo(
         worker,
         question,
         context=context,
-        max_turns=150,
+        max_turns=resolve_max_turns(),
         hooks=capture,
     )
     return TeamRunResult(

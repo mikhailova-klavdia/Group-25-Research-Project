@@ -1,0 +1,189 @@
+[
+  {
+    "timestamp": "2026-06-04T17:26:53.959081+00:00",
+    "run_id": "20260604T172443-5fdafa7e",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell ty",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 36284,
+    "output_tokens": 1953,
+    "total_tokens": 38237,
+    "cost_usd": 0.012977
+  },
+  {
+    "timestamp": "2026-06-04T17:31:40.911827+00:00",
+    "run_id": "20260604T172656-c9884d4f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 56158,
+    "output_tokens": 3670,
+    "total_tokens": 59828,
+    "cost_usd": 0.021379
+  },
+  {
+    "timestamp": "2026-06-04T17:35:31.077487+00:00",
+    "run_id": "20260604T173144-ed5bdbe3",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1629,
+    "input_tokens": 44434,
+    "output_tokens": 2451,
+    "total_tokens": 46885,
+    "cost_usd": 0.016011
+  },
+  {
+    "timestamp": "2026-06-04T20:52:01.599909+00:00",
+    "run_id": "20260604T205119-00549324",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell ty",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 212203,
+    "output_tokens": 2373,
+    "total_tokens": 214576,
+    "cost_usd": 0.057797
+  },
+  {
+    "timestamp": "2026-06-04T20:53:10.930388+00:00",
+    "run_id": "20260604T205202-2a6d4c56",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 267286,
+    "output_tokens": 4920,
+    "total_tokens": 272206,
+    "cost_usd": 0.076662
+  },
+  {
+    "timestamp": "2026-06-04T20:54:49.212075+00:00",
+    "run_id": "20260604T205312-c5151944",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1629,
+    "input_tokens": 503061,
+    "output_tokens": 6085,
+    "total_tokens": 509146,
+    "cost_usd": 0.137935
+  },
+  {
+    "timestamp": "2026-06-05T08:05:30.268538+00:00",
+    "run_id": "20260605T080422-20640580",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell ty",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 350209,
+    "output_tokens": 3571,
+    "total_tokens": 353780,
+    "cost_usd": 0.094694
+  },
+  {
+    "timestamp": "2026-06-05T08:06:32.939946+00:00",
+    "run_id": "20260605T080531-a69ccc29",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 294988,
+    "output_tokens": 3406,
+    "total_tokens": 298394,
+    "cost_usd": 0.080559
+  },
+  {
+    "timestamp": "2026-06-05T08:07:51.282643+00:00",
+    "run_id": "20260605T080633-64b24117",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1629,
+    "input_tokens": 470458,
+    "output_tokens": 4550,
+    "total_tokens": 475008,
+    "cost_usd": 0.126715
+  },
+  {
+    "timestamp": "2026-06-06T21:20:59.287292+00:00",
+    "run_id": "20260606T212004-26e4b39b",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell ty",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 285001,
+    "output_tokens": 4304,
+    "total_tokens": 289305,
+    "cost_usd": 0.079858
+  },
+  {
+    "timestamp": "2026-06-06T21:21:44.852745+00:00",
+    "run_id": "20260606T212100-4cb5a15f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 184872,
+    "output_tokens": 3583,
+    "total_tokens": 188455,
+    "cost_usd": 0.053384
+  },
+  {
+    "timestamp": "2026-06-06T21:23:11.078497+00:00",
+    "run_id": "20260606T212145-bc1f5192",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1629,
+    "input_tokens": 483046,
+    "output_tokens": 6846,
+    "total_tokens": 489892,
+    "cost_usd": 0.134454
+  },
+  {
+    "timestamp": "2026-06-07T00:19:58.671391+00:00",
+    "run_id": "20260607T001840-03b29552",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell ty",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 368294,
+    "output_tokens": 5620,
+    "total_tokens": 373914,
+    "cost_usd": 0.103314
+  },
+  {
+    "timestamp": "2026-06-07T00:29:40.677051+00:00",
+    "run_id": "20260607T001959-221be57f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 412729,
+    "output_tokens": 6158,
+    "total_tokens": 418887,
+    "cost_usd": 0.115498
+  },
+  {
+    "timestamp": "2026-06-07T02:48:28.087968+00:00",
+    "run_id": "20260607T024744-b0260e45",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell ty",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 88658,
+    "output_tokens": 2416,
+    "total_tokens": 91074,
+    "cost_usd": 0.026996
+  },
+  {
+    "timestamp": "2026-06-07T02:53:42.562409+00:00",
+    "run_id": "20260607T024829-98b56ba1",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 192327,
+    "output_tokens": 6330,
+    "total_tokens": 198657,
+    "cost_usd": 0.060742
+  },
+  {
+    "timestamp": "2026-06-07T05:40:12.994217+00:00",
+    "run_id": "20260607T052241-88b7a2c0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1629,
+    "input_tokens": 412942,
+    "output_tokens": 5831,
+    "total_tokens": 418773,
+    "cost_usd": 0.114897
+  }
+]

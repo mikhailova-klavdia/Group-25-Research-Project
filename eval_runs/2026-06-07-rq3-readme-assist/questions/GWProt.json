@@ -1,0 +1,14 @@
+[
+  {
+    "id": "GWPROT_001",
+    "question": "Using the GWProt library, load all PDB files from 'GWProt/repo/GWProt/docs/Examples/Example_Data/KRAS Proteins/' directory to create GW_protein objects. How many protein structures are loaded?",
+    "ground_truth": "54",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.03.686256v1"
+  },
+  {
+    "id": "GWPROT_002",
+    "question": "Using the ligand metadata file at 'GWProt/repo/GWProt/docs/Examples/Example_Data/KRAS Ligands.csv', count how many unique ligand types are present in the KRAS protein dataset. What is the count of unique ligand types?",
+    "ground_truth": "4",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.03.686256v1"
+  }
+]

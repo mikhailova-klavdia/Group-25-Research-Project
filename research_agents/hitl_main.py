@@ -204,6 +204,7 @@ def _run_concise(context, question: str, model: str, entry_id: str, team) -> str
         team_name=team.name,
         critic_reviews=team_result.reviews,
         install_events=team_result.install_events,
+        human_interactions=getattr(context, "human_interactions", None),
     )
     out_path = context.run_dir / f"{entry_id}.json"
     out_path.write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")

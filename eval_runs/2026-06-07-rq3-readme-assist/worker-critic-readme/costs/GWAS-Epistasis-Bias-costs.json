@@ -1,0 +1,167 @@
+[
+  {
+    "timestamp": "2026-06-04T16:11:59.067932+00:00",
+    "run_id": "20260604T160858-52517644",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by in",
+    "pre_estimate_tokens": 1615,
+    "input_tokens": 62315,
+    "output_tokens": 3768,
+    "total_tokens": 66083,
+    "cost_usd": 0.023115
+  },
+  {
+    "timestamp": "2026-06-04T16:25:01.898423+00:00",
+    "run_id": "20260604T162201-9a9ad1c3",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps spanning from 0.001 to 0.171, 500 target SNPs, 100 interaction pa",
+    "pre_estimate_tokens": 1583,
+    "input_tokens": 74589,
+    "output_tokens": 5399,
+    "total_tokens": 79988,
+    "cost_usd": 0.029445
+  },
+  {
+    "timestamp": "2026-06-04T20:33:42.977552+00:00",
+    "run_id": "20260604T203158-4c196641",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by in",
+    "pre_estimate_tokens": 1615,
+    "input_tokens": 398592,
+    "output_tokens": 5923,
+    "total_tokens": 404515,
+    "cost_usd": 0.111494
+  },
+  {
+    "timestamp": "2026-06-04T20:34:50.351691+00:00",
+    "run_id": "20260604T203343-c264fcd0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps (from 0.001 to 0.171), 500 target SNPs, 100 interaction pairs, 10",
+    "pre_estimate_tokens": 1585,
+    "input_tokens": 56162,
+    "output_tokens": 4245,
+    "total_tokens": 60407,
+    "cost_usd": 0.02253
+  },
+  {
+    "timestamp": "2026-06-04T20:38:47.095112+00:00",
+    "run_id": "20260604T203451-e6ed7e52",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps spanning from 0.001 to 0.171, 500 target SNPs, 100 interaction pa",
+    "pre_estimate_tokens": 1583,
+    "input_tokens": 210610,
+    "output_tokens": 5163,
+    "total_tokens": 215773,
+    "cost_usd": 0.062978
+  },
+  {
+    "timestamp": "2026-06-05T07:57:30.333496+00:00",
+    "run_id": "20260605T075610-e94f9af8",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps (from 0.001 to 0.171), 500 target SNPs, 100 interaction pairs, 10",
+    "pre_estimate_tokens": 1585,
+    "input_tokens": 213303,
+    "output_tokens": 5367,
+    "total_tokens": 218670,
+    "cost_usd": 0.06406
+  },
+  {
+    "timestamp": "2026-06-05T07:58:39.212459+00:00",
+    "run_id": "20260605T075832-1bc0e941",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by in",
+    "pre_estimate_tokens": 1615,
+    "input_tokens": 19918,
+    "output_tokens": 406,
+    "total_tokens": 20324,
+    "cost_usd": 0.005792
+  },
+  {
+    "timestamp": "2026-06-06T21:07:01.257156+00:00",
+    "run_id": "20260606T210556-d3c169f5",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by in",
+    "pre_estimate_tokens": 1615,
+    "input_tokens": 177221,
+    "output_tokens": 3688,
+    "total_tokens": 180909,
+    "cost_usd": 0.051681
+  },
+  {
+    "timestamp": "2026-06-06T21:10:02.193122+00:00",
+    "run_id": "20260606T210702-cf695fd8",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps (from 0.001 to 0.171), 500 target SNPs, 100 interaction pairs, 10",
+    "pre_estimate_tokens": 1585,
+    "input_tokens": 401708,
+    "output_tokens": 6402,
+    "total_tokens": 408110,
+    "cost_usd": 0.113231
+  },
+  {
+    "timestamp": "2026-06-06T21:17:37.254880+00:00",
+    "run_id": "20260606T211003-9b99d84f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps spanning from 0.001 to 0.171, 500 target SNPs, 100 interaction pa",
+    "pre_estimate_tokens": 1583,
+    "input_tokens": 173878,
+    "output_tokens": 5533,
+    "total_tokens": 179411,
+    "cost_usd": 0.054536
+  },
+  {
+    "timestamp": "2026-06-06T23:54:37.540552+00:00",
+    "run_id": "20260606T235217-604ca767",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by in",
+    "pre_estimate_tokens": 1615,
+    "input_tokens": 204511,
+    "output_tokens": 3552,
+    "total_tokens": 208063,
+    "cost_usd": 0.058232
+  },
+  {
+    "timestamp": "2026-06-07T02:30:43.655085+00:00",
+    "run_id": "20260607T022812-e35970ec",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate a theoretical heatmap showing inflation ratio R as a function of correlation (rho) and variance explained by in",
+    "pre_estimate_tokens": 1615,
+    "input_tokens": 57213,
+    "output_tokens": 3127,
+    "total_tokens": 60340,
+    "cost_usd": 0.020557
+  },
+  {
+    "timestamp": "2026-06-07T02:34:38.147447+00:00",
+    "run_id": "20260607T023045-3cd28471",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps (from 0.001 to 0.171), 500 target SNPs, 100 interaction pairs, 10",
+    "pre_estimate_tokens": 1585,
+    "input_tokens": 73049,
+    "output_tokens": 5398,
+    "total_tokens": 78447,
+    "cost_usd": 0.029058
+  },
+  {
+    "timestamp": "2026-06-07T05:17:02.214637+00:00",
+    "run_id": "20260607T051156-2b6d5612",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps (from 0.001 to 0.171), 500 target SNPs, 100 interaction pairs, 10",
+    "pre_estimate_tokens": 1585,
+    "input_tokens": 355837,
+    "output_tokens": 7236,
+    "total_tokens": 363073,
+    "cost_usd": 0.103431
+  },
+  {
+    "timestamp": "2026-06-07T05:22:39.876098+00:00",
+    "run_id": "20260607T051703-79bceb6d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the OLS-based GWAS simulation with 10 lambda steps spanning from 0.001 to 0.171, 500 target SNPs, 100 interaction pa",
+    "pre_estimate_tokens": 1583,
+    "input_tokens": 319907,
+    "output_tokens": 6825,
+    "total_tokens": 326732,
+    "cost_usd": 0.093627
+  }
+]

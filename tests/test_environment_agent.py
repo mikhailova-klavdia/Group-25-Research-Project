@@ -184,10 +184,15 @@ class TeamRegistryTests(unittest.TestCase):
         "solo",
         "worker-critic",
         "worker-critic-plus",
+        "worker-verifier-critic",
         "worker-critic-plus-plus",
         "testing-worker-critic",
         "human-in-the-loop",
         "worker-critic-plus-plus-hitl",
+        "worker-critic-assisted",
+        "worker-critic-plus-plus-assisted",
+        "worker-critic-readme",
+        "worker-critic-plus-plus-readme",
         "worker-env-critic",
     }
 

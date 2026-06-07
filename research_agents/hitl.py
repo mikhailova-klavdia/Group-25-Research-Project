@@ -34,6 +34,14 @@ NO_HUMAN_REPLY = (
     "autonomously using your best judgment and standard practice; do not wait."
 )
 
+# Prefix stamped on every real operator reply so it is unmistakable in the
+# agent's observation (and the saved chain).  Promoted to a named constant
+# because two other places key off it: the chain builder filters ask_human
+# results out of the positional observation substitution (they are real tool
+# outputs but the worker does not self-report ask_human as a chain step), and
+# ``record_human_interaction`` strips it for the clean transcript.
+HUMAN_REPLY_PREFIX = "HUMAN REPLY: "
+
 
 class HumanChannel(Protocol):
     """Anything that can answer an agent's question from a human.
@@ -139,7 +147,45 @@ def ask_human_text(
     if human is None:
         return NO_HUMAN_REPLY
     answer = human.ask(question, agent=agent)
-    return f"HUMAN REPLY: {answer}"
+    return f"{HUMAN_REPLY_PREFIX}{answer}"
+
+
+def is_ask_human_output(text: str) -> bool:
+    """Return True if ``text`` is an ``ask_human`` tool result (unit-tested).
+
+    An ask_human result is always either a real operator reply (prefixed with
+    ``HUMAN REPLY:``) or the degrade-to-autonomous sentinel (``NO_HUMAN_…``).
+    The chain builder uses this to drop ask_human outputs from the positional
+    observation substitution: they are real tool outputs captured in order, but
+    the worker does not emit ask_human as a self-reported chain step, so zipping
+    them in would stamp an operator reply onto an unrelated step and shift every
+    later observation.  No ordinary tool result starts with these markers
+    (execution → ``Exit code:``, reads → ``Contents of…``), so the match is safe.
+    """
+    stripped = (text or "").lstrip()
+    return stripped.startswith(HUMAN_REPLY_PREFIX) or stripped.startswith(
+        "NO_HUMAN_AVAILABLE:"
+    )
+
+
+def record_human_interaction(
+    interactions: list[dict[str, str]],
+    question: str,
+    reply: str,
+) -> None:
+    """Append one operator round-trip to a run's assistance log (unit-tested).
+
+    Stores the agent's ``question`` and the operator's answer with the
+    ``HUMAN REPLY:`` marker stripped, so the saved transcript reads cleanly.
+    Kept pure (no SDK, no context) so the recording logic is testable without
+    booting a run; the ``ask_human`` tool wires it to ``context.human_interactions``.
+    """
+    interactions.append(
+        {
+            "question": question,
+            "answer": reply.removeprefix(HUMAN_REPLY_PREFIX),
+        }
+    )
 
 
 @function_tool
@@ -155,7 +201,16 @@ def ask_human(context: RunContextWrapper[ResearchContext], question: str) -> str
     no operator is attached to this run.
     """
     human = getattr(context.context, "human", None)
-    return ask_human_text(human, question)
+    reply = ask_human_text(human, question)
+    # Log every *real* operator round-trip onto the context so the saved chain
+    # carries a complete, channel-agnostic transcript of assistance (count +
+    # each Q&A).  Skip the no-operator case: ask_human degraded to autonomous,
+    # so nothing was actually asked of a human and there is nothing to record.
+    if human is not None:
+        interactions = getattr(context.context, "human_interactions", None)
+        if interactions is not None:
+            record_human_interaction(interactions, question, reply)
+    return reply
 
 
 # A normal ``execute_command`` result always starts with "Exit code: N";

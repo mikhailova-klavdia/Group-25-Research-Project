@@ -44,6 +44,10 @@ from research_agents.teams.worker_critic import run_worker_critic
 from research_agents.teams.worker_critic_plus import run_worker_critic_plus
 from research_agents.teams.worker_critic_plus_plus import run_worker_critic_plus_plus
 from research_agents.teams.worker_critic_plus_plus_hitl import run_worker_critic_plus_plus_hitl
+from research_agents.teams.worker_critic_assisted import run_worker_critic_assisted
+from research_agents.teams.worker_critic_plus_plus_assisted import run_worker_critic_plus_plus_assisted
+from research_agents.teams.worker_critic_readme import run_worker_critic_readme
+from research_agents.teams.worker_critic_plus_plus_readme import run_worker_critic_plus_plus_readme
 from research_agents.teams.worker_verifier_critic import run_worker_verifier_critic
 from research_agents.teams.worker_env_critic import run_worker_env_critic
 
@@ -162,6 +166,52 @@ TEAMS: dict[str, TeamSpec] = {
         ),
         run=run_worker_critic_plus_plus_hitl,
         apply_setup=False,
+    ),
+    "worker-critic-assisted": TeamSpec(
+        name="worker-critic-assisted",
+        description=(
+            "RQ3: worker-critic + an ask_human tool answered by an operator (the Claude "
+            "Code session via SessionFileHuman). Lean worker+critic, no triage/setup — "
+            "isolates the effect of operator assistance vs the worker-critic baseline. "
+            "Set RESEARCH_ASK_HUMAN=session to attach the operator; otherwise ask_human "
+            "degrades to autonomous."
+        ),
+        run=run_worker_critic_assisted,
+        apply_setup=False,
+    ),
+    "worker-critic-plus-plus-assisted": TeamSpec(
+        name="worker-critic-plus-plus-assisted",
+        description=(
+            "RQ3: worker-critic-plus-plus + an ask_human tool answered by an operator "
+            "(the Claude Code session via SessionFileHuman). Isolates operator assistance "
+            "vs the worker-critic-plus-plus baseline. Set RESEARCH_ASK_HUMAN=session to "
+            "attach the operator; otherwise ask_human degrades to autonomous."
+        ),
+        run=run_worker_critic_plus_plus_assisted,
+        apply_setup=False,
+    ),
+    "worker-critic-readme": TeamSpec(
+        name="worker-critic-readme",
+        description=(
+            "RQ3 (static help): worker-critic + a per-paper help README (AGENT_HINTS.md, "
+            "placed alongside the repo) of steering tips authored from the team's earlier "
+            "autonomous failures. The worker reads it via read_help and also receives it as "
+            "a TASK HINTS preamble. Isolates the effect of static help vs the worker-critic "
+            "baseline. apply_setup=False (matches the worker-critic baseline)."
+        ),
+        run=run_worker_critic_readme,
+        apply_setup=False,
+    ),
+    "worker-critic-plus-plus-readme": TeamSpec(
+        name="worker-critic-plus-plus-readme",
+        description=(
+            "RQ3 (static help): worker-critic-plus-plus + a per-paper help README of steering "
+            "tips. Same mechanism as worker-critic-readme but with the plus-plus worker. "
+            "Isolates static help vs the worker-critic-plus-plus baseline. apply_setup=True "
+            "(matches the plus-plus baseline, which runs up-front setup/weight downloads)."
+        ),
+        run=run_worker_critic_plus_plus_readme,
+        apply_setup=True,
     ),
     "worker-env-critic": TeamSpec(
     name="worker-env-critic",

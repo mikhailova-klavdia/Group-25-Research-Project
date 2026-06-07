@@ -37,3 +37,30 @@ MODEL_COSTS: dict[str, dict] = {
     },
 }
 
+# Default per-agent turn cap (Runner.run_sync max_turns).  150 is deliberately
+# generous so a multi-step reproduction never dies mid-plan.  Batch eval runs
+# tighten this via react_main's --max-turns flag to bound a stuck question's
+# token burn.
+DEFAULT_MAX_TURNS = 150
+
+
+def resolve_max_turns(default: int = DEFAULT_MAX_TURNS) -> int:
+    """Return the per-agent turn cap, honoring a ``RESEARCH_MAX_TURNS`` override.
+
+    react_main's ``--max-turns`` flag exports ``RESEARCH_MAX_TURNS`` so the cap
+    crosses the fixed ``team.run(...)`` boundary (which has no max_turns
+    parameter) into every agent stage.  Read at call time — not import time —
+    so a value set in ``main()`` is visible to the teams in the same process.
+    A missing, non-integer, or non-positive value falls back to ``default``,
+    preserving the previous behavior for callers that don't opt in.
+    """
+    raw = os.environ.get("RESEARCH_MAX_TURNS")
+    if raw:
+        try:
+            value = int(raw)
+        except ValueError:
+            return default
+        if value > 0:
+            return value
+    return default
+

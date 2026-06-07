@@ -1,6 +1,9 @@
 # Claude Code
 .claude/
 
+# RQ3 ask_human handoff — transient operator Q&A files
+.ask_human/
+
 # OpenAI Codex
 .codex/
 

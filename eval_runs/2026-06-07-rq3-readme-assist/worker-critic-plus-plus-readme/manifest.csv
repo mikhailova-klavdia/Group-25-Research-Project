@@ -1,0 +1,47 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,used_help,elapsed_s
+2026-06-07T01:25:49+00:00,SC_FRAMEWORK_001,papers/SC-Framework,ok,True,5000,84079,0.0265,yes,118.8
+2026-06-07T01:26:32+00:00,USHER_002,papers/USHER,ok,False,"EXECUTION_REQUIRED — required dataset files (xenium_scGPT.h5ad, scRNAseq_scGPT.h",104373,0.0338,yes,43.1
+2026-06-07T01:27:17+00:00,SEGMA_001,papers/segma,ok,True,187,76650,0.0263,yes,45.5
+2026-06-07T01:27:54+00:00,ARCADIA_PUBLIC_002,papers/ARCADIA_public,ok,True,300 epochs,30307,0.0098,yes,13.5
+2026-06-07T01:28:16+00:00,ARCADIA_PUBLIC_003,papers/ARCADIA_public,ok,True,6,40111,0.0141,yes,22.1
+2026-06-07T01:36:12+00:00,GWPROT_001,papers/GWProt,ok,True,54,936054,0.2794,yes,476.4
+2026-06-07T01:36:30+00:00,GWPROT_002,papers/GWProt,ok,True,4,33255,0.0119,yes,17.5
+2026-06-07T01:37:07+00:00,REGFORMER_002,papers/RegFormer,ok,False,EXECUTION_REQUIRED — requested file 'RegFormer/notebooks/drug/data/random_test.c,81781,0.0274,yes,36.9
+2026-06-07T01:38:02+00:00,REGFORMER_003,papers/RegFormer,ok,True,512,117088,0.0391,yes,55.2
+2026-06-07T02:12:52+00:00,SAM2_002,papers/sam2,ok,True,54,767857,0.215,yes,359.6
+2026-06-07T02:16:21+00:00,TABPFN_001,papers/tabpfn,ok,False,"TabPFN: accuracy=0.9825, ROC AUC=0.9954; LogisticRegression: accuracy=0.9474, RO",232361,0.0708,yes,209.5
+2026-06-07T02:27:17+00:00,CYTEONTO_001,papers/CyteOnto,ok,True,4,77506,0.027,yes,54.3
+2026-06-07T02:27:49+00:00,CYTEONTO_002,papers/CyteOnto,ok,True,stem cell,54110,0.0185,yes,31.4
+2026-06-07T02:28:11+00:00,CYTEONTO_003,papers/CyteOnto,ok,True,ovum,40653,0.0131,yes,21.9
+2026-06-07T02:30:44+00:00,GWAS_EPISTASIS_BIAS_001,papers/GWAS-Epistasis-Bias,ok,True,5.036982009266e-08,135952,0.046,yes,153.0
+2026-06-07T02:34:38+00:00,GWAS_EPISTASIS_BIAS_002,papers/GWAS-Epistasis-Bias,ok,True,0,248727,0.0888,yes,234.6
+2026-06-07T02:45:39+00:00,LARIS_001,papers/LARIS,ok,True,8772,187229,0.0546,yes,60.2
+2026-06-07T02:46:48+00:00,LARIS_002,papers/LARIS,ok,True,1985,275353,0.0769,yes,69.6
+2026-06-07T02:47:43+00:00,LARIS_003,papers/LARIS,ok,False,EXECUTION_REQUIRED — the required AnnData file tests/data/adata_tonsil.h5ad is n,122715,0.0371,yes,54.8
+2026-06-07T02:48:28+00:00,DISTORTIONS_001,papers/distortions,ok,False,8,99533,0.0306,yes,44.6
+2026-06-07T02:53:43+00:00,DISTORTIONS_005,papers/distortions,ok,False,9,206842,0.0643,yes,315.7
+2026-06-07T03:04:48+00:00,FADVI_001,papers/fadvi,ok,True,30,134444,0.0403,yes,64.1
+2026-06-07T03:06:08+00:00,FADVI_003,papers/fadvi,ok,True,10 columns,98208,0.0311,yes,80.3
+2026-06-07T03:07:09+00:00,FADVI_007,papers/fadvi,ok,True,30,90741,0.0299,yes,60.2
+2026-06-07T03:12:26+00:00,CROSSPPI_001,papers/CrossPPI,ok,False,5.64,480404,0.1483,yes,317.5
+2026-06-07T03:18:28+00:00,CROSSPPI_003,papers/CrossPPI,ok,True,8.20 pKD,272230,0.0788,yes,362.1
+2026-06-07T03:19:52+00:00,CROSSPPI_004,papers/CrossPPI,ok,False,-0.0011,90045,0.0314,yes,83.7
+2026-06-07T03:21:01+00:00,CROSSPPI_006,papers/CrossPPI,ok,True,216,54222,0.0206,yes,69.1
+2026-06-07T03:22:03+00:00,METAPOINT_001,papers/metapointfinder,ok,True,1182 sequences,309034,0.0843,yes,61.7
+2026-06-07T03:22:40+00:00,METAPOINT_002,papers/metapointfinder,ok,False,19,27912,0.0124,yes,36.8
+2026-06-07T03:24:16+00:00,METAPOINT_003,papers/metapointfinder,ok,False,12,166815,0.0531,yes,96.8
+2026-06-07T03:35:05+00:00,METAPOINT_005,papers/metapointfinder,ok,True,10000 bp,50987,0.0182,yes,48.3
+2026-06-07T05:44:39+00:00,SCISTREECNA_001,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — the required input files 'test_data_reads.csv' and 'test_da,386039,0.1097,yes,86.6
+2026-06-07T05:46:58+00:00,SCISTREECNA_003,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — the scistreecna package requires CuPy/CUDA (not installed i,678774,0.1922,yes,138.7
+2026-06-07T05:52:07+00:00,SAM2_001,papers/sam2,ok,True,52 masks,644224,0.1875,yes,309.5
+2026-06-07T06:10:46+00:00,TABPFN_002,papers/tabpfn,ok,False,"TabPFN MSE: 0.161779, R2: 0.878598; LinearRegression MSE: 0.536969, R2: 0.597049",942996,0.2749,yes,1118.6
+2026-06-07T06:13:52+00:00,GWAS_EPISTASIS_BIAS_003,papers/GWAS-Epistasis-Bias,ok,True,0.79,222306,0.0756,yes,186.6
+2026-06-07T06:16:28+00:00,DISTORTIONS_006,papers/distortions,ok,True,800,257988,0.0818,yes,155.9
+2026-06-07T06:17:33+00:00,METAPOINT_004,papers/metapointfinder,ok,True,5000 bp,123043,0.0395,yes,64.9
+2026-06-07T06:44:17+00:00,PPLM_001,papers/PPLM,ok,True,-8.2265625 kcal/mol,230353,0.07,yes,1603.4
+2026-06-07T06:51:20+00:00,PPLM_002,papers/PPLM,ok,True,favorable (predicted binding affinity = -8.2265625),108627,0.037,yes,423.6
+2026-06-07T07:03:28+00:00,PPLM_004,papers/PPLM,ok,True,-0.000396,180338,0.0564,yes,366.7
+2026-06-07T07:09:14+00:00,PPLM_005,papers/PPLM,ok,True,"(660, 122, 70)",197889,0.0594,yes,346.2
+2026-06-07T07:16:10+00:00,PPLM_006,papers/PPLM,ok,True,0.9431081,301215,0.0883,yes,415.7
+2026-06-07T11:27:26+00:00,SENTIEON_CLI_001,papers/sentieon-cli,ok,True,CONSERVATIVE,1718617,0.466,yes,356.8
+2026-06-07T11:33:31+00:00,PPLM_003,papers/PPLM,ok,True,"(122, 1280)",155200,0.0489,yes,364.1

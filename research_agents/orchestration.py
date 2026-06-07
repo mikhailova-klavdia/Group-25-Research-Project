@@ -19,7 +19,7 @@ from agents import Agent, RunHooks, Runner
 
 from research_agents.agents.critic_agent import CriticReview, create_critic_agent
 from research_agents.agents.react_agent import ReActAnswer, create_react_agent
-from research_agents.config import DEFAULT_MODEL
+from research_agents.config import DEFAULT_MODEL, resolve_max_turns
 from research_agents.hitl import apply_integrity_guard
 from research_agents.project import ResearchContext, _find_python_in_venv
 from research_agents.tools.exec_tools import MAX_TIMEOUT
@@ -337,7 +337,7 @@ def run_with_critic(
             worker,
             worker_input,
             context=context,
-            max_turns=150,
+            max_turns=resolve_max_turns(),
             hooks=capture,
         )
         agent_usages.append(

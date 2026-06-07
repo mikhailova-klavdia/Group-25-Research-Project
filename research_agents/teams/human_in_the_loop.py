@@ -17,6 +17,7 @@ from typing import Any
 
 from agents import Runner
 
+from research_agents.config import resolve_max_turns
 from research_agents.agents.hitl_agents import (
     EnvReport,
     TriageReport,
@@ -121,7 +122,7 @@ def _run_triage_stage(
         create_triage_agent(model),
         triage_input,
         context=context,
-        max_turns=150,
+        max_turns=resolve_max_turns(),
         hooks=capture,
     )
     triage: TriageReport = result.final_output
@@ -149,7 +150,7 @@ def _run_readonly_stage(
         create_readonly_agent(model),
         answer_input,
         context=context,
-        max_turns=150,
+        max_turns=resolve_max_turns(),
         hooks=capture,
     )
     return result, capture, usage_from_result(
@@ -174,7 +175,7 @@ def _run_setup_stage(
 
     first_capture = _capture(context)
     result = Runner.run_sync(
-        create_setup_agent(model), setup_input, context=context, max_turns=150, hooks=first_capture
+        create_setup_agent(model), setup_input, context=context, max_turns=resolve_max_turns(), hooks=first_capture
     )
     usages = [
         usage_from_result(
@@ -197,7 +198,7 @@ def _run_setup_stage(
             "person is needed to unblock you) and return an updated EnvReport."
         )
         retry_result = Runner.run_sync(
-            create_setup_agent(model), nudge, context=context, max_turns=150, hooks=retry_capture
+            create_setup_agent(model), nudge, context=context, max_turns=resolve_max_turns(), hooks=retry_capture
         )
         usages.append(
             usage_from_result(

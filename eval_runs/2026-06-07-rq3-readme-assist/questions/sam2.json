@@ -1,0 +1,14 @@
+[
+  {
+    "id": "SAM2_001",
+    "question": "Use sam2.1_hiera_tiny checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/notebooks/images/groceries.jpg'",
+    "ground_truth": "~52 masks",
+    "repo_link": "https://github.com/facebookresearch/sam2"
+  },
+  {
+    "id": "SAM2_002",
+    "question": "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/notebooks/images/cars.jpg'",
+    "ground_truth": "~54 masks",
+    "repo_link": "https://github.com/facebookresearch/sam2"
+  }
+]
