@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 # Force UTF-8 stdout/stderr on Windows so Unicode box-drawing characters
@@ -36,9 +37,7 @@ ROOT         = Path(__file__).parent
 PAPERS_DIR   = ROOT / "Papers"          # 74 tagged folders e.g. 01-3M-CyteOnto
 AGENT_DIR    = ROOT / "papers"          # where react_main expects paper workspaces
 QA_DIR       = ROOT / "question-answers"
-QUESTIONS_CSV = (
-    ROOT / "Paper2AgentBench" / "eval" / "100_compbio_repos" / "300_questions.csv"
-)
+QUESTIONS_CSV = ROOT / "benchmark_42.csv"
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
@@ -255,12 +254,18 @@ def run_question(
     model: str | None,
     team: str | None,
     timeout: int | None = 120,
+    isolated: bool = False,
 ) -> tuple[int, bool]:
     """Call react_main for a single question. Returns (exit_code, timed_out).
 
     Pass timeout=None to run with no time limit (used when the venv is being
     created for the first time, so installation time does not count against
     the question budget).
+
+    When isolated=True, --isolated is forwarded to react_main so each question
+    gets its own venv and artifact cache inside its run dir.  Required when
+    multiple architectures run in parallel against the same paper dir to
+    prevent venv race conditions.
     """
     cmd = [
         "uv", "run", "python", "-m", "research_agents.react_main",
@@ -274,9 +279,17 @@ def run_question(
         cmd += ["--model", model]
     if team:
         cmd += ["--team", team]
+    if isolated:
+        cmd += ["--isolated"]
+    # Include team in the partial-file name so parallel architectures running
+    # the same question ID don't overwrite each other's telemetry.
+    team_tag = (team or "default").replace("-", "_")
+    partial_path = AGENT_DIR / slug / f".partial_{team_tag}_{entry['id']}.json"
     child_env = os.environ.copy()
     child_env["PYTHONUTF8"] = "1"
     child_env["PYTHONIOENCODING"] = "utf-8"
+    child_env["MPLBACKEND"] = "Agg"
+    child_env["PARTIAL_RESULT_PATH"] = str(partial_path)
     proc = subprocess.Popen(cmd, cwd=ROOT, env=child_env)
     try:
         proc.wait(timeout=timeout)
@@ -285,6 +298,36 @@ def run_question(
         proc.kill()
         proc.wait()
         return -1, True
+
+
+def write_timeout_result(folder_name: str, entry: dict, elapsed: float, partial_data: dict | None = None) -> None:
+    """Write a minimal result JSON for a question that was killed by the timeout.
+
+    react_main never gets a chance to flush its own JSON when the process is
+    killed, so we write one here so read_latest_result always finds something.
+    If partial_data is provided (captured tool outputs), it is embedded so the
+    chain of tool calls is not lost.
+    """
+    run_dir = AGENT_DIR / folder_name / "runs" / f"timeout-{time.strftime('%Y%m%dT%H%M%S')}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "id": entry["id"],
+        "question": entry["question"],
+        "ground_truth": entry.get("ground_truth", ""),
+        "final_answer": "TIMEOUT",
+        "answer_status": "blocked",
+        "blocker_type": "timeout",
+        "blocker_explanation": f"Process killed after {elapsed:.0f}s wall-clock timeout.",
+        "blocker_evidence": [f"Killed by run_eval.py after {elapsed:.0f}s"],
+        "correct": False,
+        "elapsed_seconds": round(elapsed, 1),
+        "chain": [],
+        "partial_tool_outputs": partial_data.get("tool_outputs", []) if partial_data else [],
+        "token_usage": {"input_tokens": 0, "output_tokens": 0, "estimated_cost_usd": 0.0},
+    }
+    (run_dir / f"{entry['id']}.json").write_text(
+        json.dumps(payload, indent=2), encoding="utf-8"
+    )
 
 
 def fmt_duration(seconds: float) -> str:
@@ -354,11 +397,31 @@ def main() -> None:
         ),
     )
     parser.add_argument(
-        "--timeout", type=int, default=120, metavar="SECONDS",
+        "--timeout", type=int, default=600, metavar="SECONDS",
         help=(
             "Per-question wall-clock time limit in seconds. "
-            "Questions that exceed this are killed and automatically "
-            "skipped in future runs. Default: 120 (2 min)."
+            "Questions that exceed this are killed and a timeout result "
+            "is saved automatically. Default: 120 (2 min)."
+        ),
+    )
+    parser.add_argument(
+        "--isolated",
+        action="store_true",
+        default=False,
+        help=(
+            "Give each question its own venv and artifact cache (--isolated in react_main). "
+            "Required when running multiple architectures in parallel against the same "
+            "paper dirs to prevent venv race conditions."
+        ),
+    )
+    parser.add_argument(
+        "--parallel",
+        type=int,
+        default=1,
+        metavar="N",
+        help=(
+            "Run up to N questions concurrently. Requires --isolated. "
+            "Default 1 = sequential. E.g. --parallel 8 fires 8 questions at once."
         ),
     )
     parser.add_argument(
@@ -416,6 +479,10 @@ def main() -> None:
     total_questions = sum(len(qs) for _, _, _, _, qs, _ in plan)
     print(f"\nTotal: {len(plan)} repos, {total_questions} questions\n{'='*60}\n")
 
+    if args.parallel > 1 and not args.isolated:
+        print("[ERROR] --parallel requires --isolated to prevent venv race conditions.", file=sys.stderr)
+        sys.exit(1)
+
     # ── Run ────────────────────────────────────────────────────────────────
     session_input   = 0
     session_output  = 0
@@ -424,62 +491,80 @@ def main() -> None:
     done            = 0
     session_start   = time.time()
 
+    # Pre-setup all workspaces before any questions fire.
     for rank, folder_name, id_slug, folder, questions, url in plan:
         setup_workspace(folder_name, folder)
         write_qa_file(id_slug, questions)
 
-        print(f"\n{'='*60}")
-        print(f"  Repo [{rank:02d}] {folder_name}  —  {len(questions)} question(s)")
-        print(f"{'='*60}")
+    def _run_one(folder_name, entry, url):
+        """Run one question and return result tuple."""
+        q_start = time.time()
+        rc, timed_out = run_question(
+            folder_name, entry, url, args.model, args.team,
+            args.timeout, isolated=args.isolated,
+        )
+        q_duration = time.time() - q_start
+        team_tag = (args.team or "default").replace("-", "_")
+        partial_path = AGENT_DIR / folder_name / f".partial_{team_tag}_{entry['id']}.json"
 
-        skips = load_skips(folder_name)
+        if timed_out:
+            partial_data = None
+            if partial_path.exists():
+                try:
+                    partial_data = json.loads(partial_path.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+            if read_latest_result(folder_name, entry["id"])[0] is None:
+                write_timeout_result(folder_name, entry, q_duration, partial_data)
+            if partial_path.exists():
+                partial_path.unlink(missing_ok=True)
 
-        for i, entry in enumerate(questions, 1):
-            print(f"\n  ── Q {i}/{len(questions)} · {entry['id']} ──")
-            print(f"  {entry['question'][:100]}{'…' if len(entry['question']) > 100 else ''}")
+        if not args.isolated:
+            venv_path = AGENT_DIR / folder_name / ".venv"
+            if venv_path.exists():
+                shutil.rmtree(venv_path, ignore_errors=True)
 
-            # Skip check — bypass if --ignore-skips passed
-            if not args.ignore_skips and entry["id"] in skips:
-                info = skips[entry["id"]]
-                reason = info.get("abort_reason", "unknown")
-                when = info.get("skipped_at", "manually")
-                print(f"  [SKIP] {reason} (recorded {when}) — skipping.")
-                print(f"         Pass --ignore-skips to force a re-run.")
+        correct, inp, out, cost = read_latest_result(folder_name, entry["id"])
+        return entry["id"], correct, inp, out, cost, q_duration, timed_out, rc
+
+    if args.parallel <= 1:
+        # Sequential — preserves per-repo grouping and live progress output.
+        for rank, folder_name, id_slug, folder, questions, url in plan:
+            print(f"\n{'='*60}")
+            print(f"  Repo [{rank:02d}] {folder_name}  —  {len(questions)} question(s)")
+            print(f"{'='*60}")
+            for i, entry in enumerate(questions, 1):
+                print(f"\n  ── Q {i}/{len(questions)} · {entry['id']} ──")
+                print(f"  {entry['question'][:100]}{'…' if len(entry['question']) > 100 else ''}")
+                entry_id, correct, inp, out, cost, q_duration, timed_out, rc = _run_one(folder_name, entry, url)
+                if rc != 0 and not timed_out:
+                    print(f"  [WARN] react_main exited {rc} for {entry_id}")
+                session_input += inp; session_output += out; session_cost += cost
+                if correct: session_correct += 1
                 done += 1
-                continue
-
-            # If the venv doesn't exist yet, skip the time limit — the run
-            # will spend most of its time on package installation, not the
-            # actual question, so killing it early would be wrong.
-            effective_timeout = args.timeout if _venv_ready(folder_name) else None
-            if effective_timeout is None:
-                print(f"  [no timeout] venv not ready yet — running without time limit")
-
-            q_start = time.time()
-            rc, timed_out = run_question(folder_name, entry, url, args.model, args.team, effective_timeout)
-            q_duration = time.time() - q_start
-
-            if rc != 0 and not timed_out:
-                print(f"  [WARN] react_main exited {rc} for {entry['id']}")
-
-            correct, inp, out, cost = read_latest_result(folder_name, entry["id"])
-            session_input   += inp
-            session_output  += out
-            session_cost    += cost
-            if correct:
-                session_correct += 1
-            done += 1
-
-            if timed_out:
-                save_skip(folder_name, entry["id"], "time_limit")
-                skips[entry["id"]] = {"abort_reason": "time_limit"}
-                print(f"  [TIMEOUT] {entry['id']} killed after {args.timeout}s — added to skipped.json.")
-
-            verdict = "✓ correct" if correct else ("✗ wrong" if correct is False else "? unknown")
-            if timed_out:
-                verdict = "⚠ timed out"
-            print(f"\n  This question  : {verdict}  |  took {fmt_duration(q_duration)}  |  in={inp:,}  out={out:,}  ${cost:.4f}")
-            print_session_total(done, total_questions, session_correct, session_input, session_output, session_cost, session_start)
+                verdict = "⚠ timed out" if timed_out else ("✓ correct" if correct else ("✗ wrong" if correct is False else "? unknown"))
+                print(f"\n  This question  : {verdict}  |  took {fmt_duration(q_duration)}  |  in={inp:,}  out={out:,}  ${cost:.4f}")
+                print_session_total(done, total_questions, session_correct, session_input, session_output, session_cost, session_start)
+                if not args.isolated:
+                    print(f"  [venv] cleared for next question")
+    else:
+        # Parallel — all questions fire concurrently up to --parallel workers.
+        print(f"[parallel] launching {total_questions} questions across {args.parallel} workers\n")
+        all_tasks = [
+            (folder_name, entry, url)
+            for _, folder_name, _, _, questions, url in plan
+            for entry in questions
+        ]
+        with ThreadPoolExecutor(max_workers=args.parallel) as pool:
+            futures = {pool.submit(_run_one, fn, e, u): (fn, e) for fn, e, u in all_tasks}
+            for future in as_completed(futures):
+                entry_id, correct, inp, out, cost, q_duration, timed_out, rc = future.result()
+                session_input += inp; session_output += out; session_cost += cost
+                if correct: session_correct += 1
+                done += 1
+                verdict = "⚠ timed out" if timed_out else ("✓ correct" if correct else ("✗ wrong" if correct is False else "? unknown"))
+                print(f"  {entry_id:<32} {verdict:<12} {fmt_duration(q_duration):>8}  in={inp:,}  out={out:,}  ${cost:.4f}")
+                print_session_total(done, total_questions, session_correct, session_input, session_output, session_cost, session_start)
 
     # ── Final summary ──────────────────────────────────────────────────────
     elapsed = time.time() - session_start

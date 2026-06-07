@@ -39,7 +39,7 @@ def run_solo(
         worker,
         question,
         context=context,
-        max_turns=150,
+        max_turns=50,
         hooks=capture,
     )
     return TeamRunResult(

@@ -359,6 +359,7 @@ def _ensure_venv(
                 "uv",
                 "pip",
                 "install",
+                "--no-cache",
                 "--python",
                 str(python_exe),
                 *seed_packages,
@@ -383,17 +384,21 @@ def _ensure_venv(
         _run_setup_scripts(venv_path, repo_path, config)
 
 
-def resolve_project(project_dir: str, apply_setup: bool = False) -> ResearchContext:
+def resolve_project(
+    project_dir: str,
+    apply_setup: bool = False,
+    isolated: bool = False,
+) -> ResearchContext:
     """Validate a project directory and return a ResearchContext.
 
-    The venv now lives at ``<project_dir>/.venv/`` (per-paper, shared
-    across questions) instead of ``<project_dir>/runs/<run-id>/.venv/``
-    (the previous per-question layout).  First call for a paper creates
-    the venv; subsequent calls reuse it.  Workspaces and run outputs
-    stay per-run under ``runs/<run-id>/``.
+    By default the venv lives at ``<project_dir>/.venv/`` (per-paper, shared
+    across questions) and artifacts at ``<project_dir>/.artifacts/``.
 
-    A sibling ``<project_dir>/.artifacts/`` directory is also created for
-    reusable files that future runs can stage back into their workspace.
+    When ``isolated=True`` both the venv and artifacts are placed inside the
+    per-run directory (``runs/<run-id>/.venv/`` and ``runs/<run-id>/.artifacts/``)
+    so no state leaks between runs even for the same paper.  This is the mode
+    used for controlled experiments where cross-run contamination would bias
+    results (e.g. one architecture's pip installs being visible to another).
 
     Setting ``apply_setup=True`` opts into the per-paper
     ``.research_config.toml`` ``[setup]`` table (download scripts +
@@ -428,19 +433,21 @@ def resolve_project(project_dir: str, apply_setup: bool = False) -> ResearchCont
     workspace_path = run_dir / "workspace"
     workspace_path.mkdir()
 
-    # Per-paper reusable artifact cache.  Unlike run workspaces, this is
-    # intentionally shared across questions for large downloads and
-    # generated files that later questions can reuse.
-    artifacts_path = root / ".artifacts"
-    artifacts_path.mkdir(exist_ok=True)
+    if isolated:
+        # Per-run isolation: venv and artifacts live inside the run dir so
+        # no installed packages or cached files escape to sibling runs.
+        artifacts_path = run_dir / ".artifacts"
+        artifacts_path.mkdir(exist_ok=True)
+        config = _read_paper_config(root)
+        venv_path = run_dir / ".venv"
+    else:
+        # Default: per-paper shared venv and artifact cache.  First call
+        # creates them; subsequent questions for the same paper reuse them.
+        artifacts_path = root / ".artifacts"
+        artifacts_path.mkdir(exist_ok=True)
+        config = _read_paper_config(root)
+        venv_path = root / ".venv"
 
-    # Per-paper shared venv.  Read optional config first so we can pin
-    # the Python version and pre-install paper-specific packages.  The
-    # repo path is passed through so [setup] scripts (e.g. PPLM's
-    # weights/download.sh) can run from the correct cwd, but they only
-    # actually fire when the caller passed apply_setup=True.
-    config = _read_paper_config(root)
-    venv_path = root / ".venv"
     _ensure_venv(venv_path, config=config, repo_path=repo_path, apply_setup=apply_setup)
 
     return ResearchContext(

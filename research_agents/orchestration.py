@@ -9,6 +9,7 @@ then retries the worker once.
 """
 
 import json
+import os
 import re
 import subprocess
 from collections.abc import Callable
@@ -72,10 +73,30 @@ class ToolOutputCapture(RunHooks[ResearchContext]):
 
     def __init__(self) -> None:
         self.outputs: list[str] = []
+        # Written after every tool call so a timeout kill leaves something readable.
+        self._partial_path: str | None = os.environ.get("PARTIAL_RESULT_PATH")
 
     async def on_tool_end(self, context: Any, agent: Any, tool: Any, result: str) -> None:
-        """Store the real tool result for later chain validation."""
+        """Store the real tool result and flush partial state to disk."""
         self.outputs.append(str(result))
+        if self._partial_path:
+            try:
+                tool_name = getattr(tool, "name", str(tool))
+                partial = {
+                    "partial": True,
+                    "tool_calls": len(self.outputs),
+                    "last_tool": tool_name,
+                    "tool_outputs": [
+                        {"index": i + 1, "output": o[:2000]}
+                        for i, o in enumerate(self.outputs)
+                    ],
+                }
+                from pathlib import Path
+                Path(self._partial_path).write_text(
+                    json.dumps(partial, indent=2, ensure_ascii=False), encoding="utf-8"
+                )
+            except Exception:
+                pass
 
 
 @dataclass
@@ -166,6 +187,10 @@ class TeamRunResult:
     # from the worker answer because a blocked benchmark answer and a
     # reproducibility-gap diagnosis are related but not interchangeable.
     gap_report: dict[str, Any] | None = None
+    # Optional gate verdict from the gate agent (testing-worker-critic only).
+    # Records whether the gap evidence caused the answer to be passed,
+    # warned, or blocked, so the modification is traceable in the JSON.
+    gate_decision: dict[str, Any] | None = None
     # Per-agent usage for every stage the team ran.  Stored at the team
     # boundary so ``react_main`` can write one consistent JSON schema for
     # single-agent, worker+critic, and multi-stage teams alike.
@@ -216,7 +241,10 @@ def _install_packages(context: ResearchContext, modules: list[str], attempt: int
             output=f"No Python interpreter found in venv: {context.venv_path}",
         )
 
-    command = ["uv", "pip", "install", "--python", str(python_exe), *packages]
+    # --no-cache forces a fresh download every time so parallel runs of
+    # different architectures cannot gain an unfair speed advantage from
+    # a warm wheel cache populated by a sibling run.
+    command = ["uv", "pip", "install", "--no-cache", "--python", str(python_exe), *packages]
     try:
         result = subprocess.run(
             command,
@@ -337,7 +365,7 @@ def run_with_critic(
             worker,
             worker_input,
             context=context,
-            max_turns=150,
+            max_turns=50,
             hooks=capture,
         )
         agent_usages.append(

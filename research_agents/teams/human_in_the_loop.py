@@ -121,7 +121,7 @@ def _run_triage_stage(
         create_triage_agent(model),
         triage_input,
         context=context,
-        max_turns=150,
+        max_turns=50,
         hooks=capture,
     )
     triage: TriageReport = result.final_output
@@ -149,7 +149,7 @@ def _run_readonly_stage(
         create_readonly_agent(model),
         answer_input,
         context=context,
-        max_turns=150,
+        max_turns=50,
         hooks=capture,
     )
     return result, capture, usage_from_result(
