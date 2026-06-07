@@ -1,0 +1,90 @@
+[
+  {
+    "timestamp": "2026-06-04T16:31:58.697364+00:00",
+    "run_id": "20260604T162503-d1289380",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 50219,
+    "output_tokens": 2933,
+    "total_tokens": 53152,
+    "cost_usd": 0.018421
+  },
+  {
+    "timestamp": "2026-06-04T20:40:42.684559+00:00",
+    "run_id": "20260604T203848-f0c7c6f7",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 243658,
+    "output_tokens": 3601,
+    "total_tokens": 247259,
+    "cost_usd": 0.068116
+  },
+  {
+    "timestamp": "2026-06-05T07:59:47.219155+00:00",
+    "run_id": "20260605T075832-39c8b761",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 250160,
+    "output_tokens": 4618,
+    "total_tokens": 254778,
+    "cost_usd": 0.071776
+  },
+  {
+    "timestamp": "2026-06-06T20:32:11.807699+00:00",
+    "run_id": "20260606T203108-e54b0251",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 225263,
+    "output_tokens": 3105,
+    "total_tokens": 228368,
+    "cost_usd": 0.062526
+  },
+  {
+    "timestamp": "2026-06-06T23:00:33.547973+00:00",
+    "run_id": "20260606T225932-741dc8e7",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 211099,
+    "output_tokens": 3401,
+    "total_tokens": 214500,
+    "cost_usd": 0.059577
+  },
+  {
+    "timestamp": "2026-06-07T01:26:31.976503+00:00",
+    "run_id": "20260607T012549-487c4a95",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 94806,
+    "output_tokens": 3805,
+    "total_tokens": 98611,
+    "cost_usd": 0.031311
+  },
+  {
+    "timestamp": "2026-06-07T16:27:54.100893+00:00",
+    "run_id": "20260607T162644-f2979a7f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 281250,
+    "output_tokens": 3873,
+    "total_tokens": 285123,
+    "cost_usd": 0.078059
+  },
+  {
+    "timestamp": "2026-06-07T17:40:12.532935+00:00",
+    "run_id": "20260607T173858-1dc36205",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data f",
+    "pre_estimate_tokens": 1647,
+    "input_tokens": 213284,
+    "output_tokens": 3437,
+    "total_tokens": 216721,
+    "cost_usd": 0.060195
+  }
+]

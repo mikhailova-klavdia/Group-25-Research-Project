@@ -1,0 +1,8 @@
+[
+  {
+    "id": "USHER_002",
+    "question": "Load the Xenium data from 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' (38280 cells Ã— 342 genes), the scRNA-seq data from 'USHER/repo/USHER/datasets/scRNAseq_scGPT.h5ad' (26323 cells Ã— 25425 genes), and the pre-trained USHER alignment model from 'USHER/repo/USHER/datasets/scGPT_example/alignment_model.pt' (with hidden dimension 512). Prepare scGPT embedding AnnData objects, apply USHER alignment to transform Xenium embeddings to the scRNA-seq space, and concatenate the aligned datasets. What is the total number of cells in the final combined aligned dataset?",
+    "ground_truth": "64603",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.20.689462v1"
+  }
+]

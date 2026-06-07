@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2026-06-04T16:32:46.115885+00:00",
+    "run_id": "20260604T163202-2de58977",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 25536,
+    "output_tokens": 1552,
+    "total_tokens": 27088,
+    "cost_usd": 0.009488
+  },
+  {
+    "timestamp": "2026-06-04T20:41:49.078892+00:00",
+    "run_id": "20260604T204043-d1b4c24c",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 242891,
+    "output_tokens": 3295,
+    "total_tokens": 246186,
+    "cost_usd": 0.067313
+  },
+  {
+    "timestamp": "2026-06-05T08:00:48.512299+00:00",
+    "run_id": "20260605T075832-3a691478",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 849848,
+    "output_tokens": 8033,
+    "total_tokens": 857881,
+    "cost_usd": 0.228528
+  },
+  {
+    "timestamp": "2026-06-06T20:33:18.470147+00:00",
+    "run_id": "20260606T203311-56aa8f01",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 15295,
+    "output_tokens": 296,
+    "total_tokens": 15591,
+    "cost_usd": 0.004416
+  },
+  {
+    "timestamp": "2026-06-06T23:03:33.563397+00:00",
+    "run_id": "20260606T230122-fa93098e",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 443107,
+    "output_tokens": 6424,
+    "total_tokens": 449531,
+    "cost_usd": 0.123625
+  },
+  {
+    "timestamp": "2026-06-07T01:27:40.459267+00:00",
+    "run_id": "20260607T012718-8b1fde55",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 34936,
+    "output_tokens": 2020,
+    "total_tokens": 36956,
+    "cost_usd": 0.012774
+  },
+  {
+    "timestamp": "2026-06-07T11:19:24.045058+00:00",
+    "run_id": "20260607T111037-f75fd5ce",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 921848,
+    "output_tokens": 11453,
+    "total_tokens": 933301,
+    "cost_usd": 0.253368
+  },
+  {
+    "timestamp": "2026-06-07T11:27:26.641281+00:00",
+    "run_id": "20260607T112131-d8ce4d42",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 1256361,
+    "output_tokens": 11354,
+    "total_tokens": 1267715,
+    "cost_usd": 0.336798
+  },
+  {
+    "timestamp": "2026-06-07T16:32:07.529446+00:00",
+    "run_id": "20260607T162854-b7353b07",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run sentieon-cli dnascope with dry_run mode enabled using the following inputs: reference genome at sentieon-cli/noteboo",
+    "pre_estimate_tokens": 1716,
+    "input_tokens": 1273068,
+    "output_tokens": 12852,
+    "total_tokens": 1285920,
+    "cost_usd": 0.343971
+  }
+]

@@ -41,6 +41,8 @@ def test_registry_contains_all_shipped_teams():
         "worker-critic-plus-plus-assisted",
         "worker-critic-readme",
         "worker-critic-plus-plus-readme",
+        "solo-readme",
+        "human-in-the-loop-readme",
         "worker-env-critic",
     }
 

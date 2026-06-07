@@ -48,6 +48,8 @@ from research_agents.teams.worker_critic_assisted import run_worker_critic_assis
 from research_agents.teams.worker_critic_plus_plus_assisted import run_worker_critic_plus_plus_assisted
 from research_agents.teams.worker_critic_readme import run_worker_critic_readme
 from research_agents.teams.worker_critic_plus_plus_readme import run_worker_critic_plus_plus_readme
+from research_agents.teams.solo_readme import run_solo_readme
+from research_agents.teams.human_in_the_loop_readme import run_human_in_the_loop_readme
 from research_agents.teams.worker_verifier_critic import run_worker_verifier_critic
 from research_agents.teams.worker_env_critic import run_worker_env_critic
 
@@ -212,6 +214,29 @@ TEAMS: dict[str, TeamSpec] = {
         ),
         run=run_worker_critic_plus_plus_readme,
         apply_setup=True,
+    ),
+    "solo-readme": TeamSpec(
+        name="solo-readme",
+        description=(
+            "RQ3 (static help): the solo single-worker team + a per-paper help README "
+            "(AGENT_HINTS.md) of steering tips authored from the solo & HITL autonomous "
+            "failures. Uses the read_help worker and injects the help as a TASK HINTS preamble. "
+            "Isolates static help vs the solo baseline. apply_setup=False (matches solo)."
+        ),
+        run=run_solo_readme,
+        apply_setup=False,
+    ),
+    "human-in-the-loop-readme": TeamSpec(
+        name="human-in-the-loop-readme",
+        description=(
+            "RQ3 (static help): the autonomous HITL crew + a per-paper help README, injected "
+            "into the question and propagated through triage -> setup -> execution. The HITL "
+            "architecture is unchanged (only the help is added). Isolates static help vs the "
+            "human-in-the-loop baseline. apply_setup=False (matches HITL; sets up the venv "
+            "interactively). Run headless via react_main (ask_human degrades to autonomous)."
+        ),
+        run=run_human_in_the_loop_readme,
+        apply_setup=False,
     ),
     "worker-env-critic": TeamSpec(
     name="worker-env-critic",

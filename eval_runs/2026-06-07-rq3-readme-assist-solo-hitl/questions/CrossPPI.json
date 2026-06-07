@@ -1,0 +1,26 @@
+[
+  {
+    "id": "CROSSPPI_001",
+    "question": "Use the CrossPPI binding affinity predictor to analyze a RAS-RAF protein interaction. The ligand sequence is MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLAARTVESRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQHKLRKLNPPDESGPGCMSCKCVLS (189 residues). The receptor sequence is MPSKKQRGSKSKKAAGAAGTSSAGKKPNQKGKGGKNGRGQSSTGNFPGKRAKFVNNQRESFSGPIKRNYIAQVQERGLQQLFELLESDLFSRSTPLADKIRQLVNFWKTSLKEKQQKIENNIKFLGSRKTTGNRLQARLQVF (142 residues). Use the pre-trained models from the save directory. What is the ensemble predicted pKD value (rounded to 2 decimal places)?",
+    "ground_truth": "5.65",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  },
+  {
+    "id": "CROSSPPI_003",
+    "question": "Use the CrossPPI binding affinity predictor to predict the pKD value for a protein-protein interaction. The ligand protein sequence is MGDKPIWEQIGSSFIQHYYQLFDNDRTQLGAIYIDASCLTWEGQQFQGKAAIVEKLSSLPFQKIQHSITAQDHQPTPDSCIISMVVGQLKADEDPIMGFHQMFLLKNINDAWVCTNDMFRLALHNFG (127 residues, CDC42-like protein). The receptor protein sequence is MAAQGEPQVQFKLVLVGDGGTGKTTFVKRHLTGEFEKKYVATLGVEVHPLVFHTNRGPIKFNVWDTAGQEKFGGLRDGYYIQAQCAIIMFDVTSRVTYKNVPNWHRDLVRVCENIPIVLCGNKVDIKDRKVKAKSIVFHRKKNLQYYDISAKSNYNFEKPFLWLARKLIGDPNLEFVAMPALAPPEVVMDPALAAQYEHDLEVAQTTALPDEDDDL (216 residues, RAC1-like protein). Use the pre-trained models from the save directory. What is the ensemble predicted pKD value (rounded to 2 decimal places)?",
+    "ground_truth": "8.20",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  },
+  {
+    "id": "CROSSPPI_004",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the KRAS protein sequence MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLAARTVESRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQHKLRKLNPPDESGPGCMSCKCVLS with complex ID TEST003, using maximum sequence length of 1000 residues. What is the mean value of the first residue embedding vector (rounded to 4 decimal places)?",
+    "ground_truth": "9.6298",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  },
+  {
+    "id": "CROSSPPI_006",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the RAC1 receptor protein sequence MAAQGEPQVQFKLVLVGDGGTGKTTFVKRHLTGEFEKKYVATLGVEVHPLVFHTNRGPIKFNVWDTAGQEKFGGLRDGYYIQAQCAIIMFDVTSRVTYKNVPNWHRDLVRVCENIPIVLCGNKVDIKDRKVKAKSIVFHRKKNLQYYDISAKSNYNFEKPFLWLARKLIGDPNLEFVAMPALAPPEVVMDPALAAQYEHDLEVAQTTALPDEDDDL with complex ID EMB002, using maximum sequence length of 1000 residues, and save the output to CrossPPI/notebooks/embedding_generator/output/EMB002_test.npy. What is the number of rows in the generated embedding array (which corresponds to the sequence length)?",
+    "ground_truth": "216",
+    "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1"
+  }
+]

@@ -1,0 +1,47 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,used_help,elapsed_s
+2026-06-07T16:26:12+00:00,SC_FRAMEWORK_001,papers/SC-Framework,ok,True,5000,241688,0.0659,yes,66.9
+2026-06-07T16:27:54+00:00,USHER_002,papers/USHER,ok,False,EXECUTION_REQUIRED — Required dataset and model files referenced in the question,285123,0.0781,yes,71.0
+2026-06-07T16:28:53+00:00,SEGMA_001,papers/segma,ok,True,187 amino acids,282301,0.0777,yes,59.5
+2026-06-07T16:32:07+00:00,SENTIEON_CLI_001,papers/sentieon-cli,ok,True,CONSERVATIVE,1285920,0.344,yes,194.0
+2026-06-07T16:32:43+00:00,ARCADIA_PUBLIC_002,papers/ARCADIA_public,ok,True,300 epochs,141754,0.0387,yes,36.1
+2026-06-07T16:33:27+00:00,ARCADIA_PUBLIC_003,papers/ARCADIA_public,ok,True,6,183885,0.0518,yes,43.1
+2026-06-07T16:35:50+00:00,GWPROT_001,papers/GWProt,ok,True,54,486777,0.1309,yes,143.7
+2026-06-07T16:36:28+00:00,GWPROT_002,papers/GWProt,ok,True,4,98106,0.027,yes,37.4
+2026-06-07T16:39:29+00:00,REGFORMER_002,papers/RegFormer,ok,True,0.8841,356524,0.0945,yes,181.4
+2026-06-07T16:40:47+00:00,REGFORMER_003,papers/RegFormer,ok,False,Required file 'RegFormer/notebooks/cell_emb/data/embeddings.npy' not found in re,407397,0.1116,yes,78.3
+2026-06-07T16:41:51+00:00,SCISTREECNA_001,papers/ScisTreeCNA,ok,False,Required file 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv',300729,0.0827,yes,63.9
+2026-06-07T16:42:39+00:00,SCISTREECNA_003,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — required input files 'ScisTreeCNA/notebooks/scistreecna_bas,386780,0.1022,yes,48.0
+2026-06-07T16:43:27+00:00,SAM2_001,papers/sam2,ok,False,EXECUTION_REQUIRED — I located the tiny checkpoint and the groceries.jpg image i,387615,0.1022,yes,47.6
+2026-06-07T16:44:10+00:00,SAM2_002,papers/sam2,ok,False,37,166205,0.0476,yes,43.5
+2026-06-07T16:48:05+00:00,TABPFN_001,papers/tabpfn,ok,False,"TabPFN: accuracy=0.973684, ROC AUC=0.995370 — It achieved the highest accuracy (",743852,0.2073,yes,234.1
+2026-06-07T16:52:44+00:00,TABPFN_002,papers/tabpfn,ok,False,"TabPFN R2=0.8570, MSE=0.19463; RandomForest R2=0.7871, MSE=0.28976; LinearRegres",783333,0.2112,yes,279.4
+2026-06-07T16:53:30+00:00,CYTEONTO_001,papers/CyteOnto,ok,False,Required file 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' not found,115508,0.035,yes,46.0
+2026-06-07T16:54:00+00:00,CYTEONTO_002,papers/CyteOnto,ok,True,stem cell,108693,0.0308,yes,30.2
+2026-06-07T16:54:46+00:00,CYTEONTO_003,papers/CyteOnto,ok,True,ovum,126893,0.0393,yes,45.9
+2026-06-07T16:55:44+00:00,GWAS_EPISTASIS_BIAS_001,papers/GWAS-Epistasis-Bias,ok,True,5.0369820092655004e-08,264054,0.0743,yes,57.8
+2026-06-07T16:57:48+00:00,GWAS_EPISTASIS_BIAS_002,papers/GWAS-Epistasis-Bias,ok,True,0,364038,0.1043,yes,123.8
+2026-06-07T16:59:30+00:00,GWAS_EPISTASIS_BIAS_003,papers/GWAS-Epistasis-Bias,ok,True,0.79,366754,0.1031,yes,102.4
+2026-06-07T17:00:32+00:00,LARIS_001,papers/LARIS,ok,False,EXECUTION_REQUIRED — Required AnnData file 'adata_tonsil.h5ad' (tutorial dataset,539342,0.1421,yes,62.4
+2026-06-07T17:01:22+00:00,LARIS_002,papers/LARIS,ok,True,1985,336330,0.09,yes,49.3
+2026-06-07T17:02:39+00:00,LARIS_003,papers/LARIS,ok,False,Required file 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/ad,605394,0.1622,yes,76.8
+2026-06-07T17:03:19+00:00,DISTORTIONS_001,papers/distortions,ok,False,Required file 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv' not ,338548,0.0899,yes,40.9
+2026-06-07T17:06:03+00:00,DISTORTIONS_005,papers/distortions,ok,True,6,600282,0.1634,yes,164.1
+2026-06-07T17:07:43+00:00,DISTORTIONS_006,papers/distortions,ok,True,800,538906,0.144,yes,99.2
+2026-06-07T17:09:10+00:00,FADVI_001,papers/fadvi,ok,False,Required file 'fadvi/notebooks/basic_usage/fadvi_save/' not found in repo after ,325475,0.0904,yes,87.5
+2026-06-07T17:10:05+00:00,FADVI_003,papers/fadvi,ok,False,Required file 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv' not fo,207537,0.0589,yes,55.0
+2026-06-07T17:11:06+00:00,FADVI_007,papers/fadvi,ok,False,Required file 'fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad' ,181536,0.0536,yes,60.5
+2026-06-07T17:13:10+00:00,CROSSPPI_001,papers/CrossPPI,ok,False,5.64,281309,0.0811,yes,124.5
+2026-06-07T17:15:06+00:00,CROSSPPI_003,papers/CrossPPI,ok,True,8.20,283883,0.0779,yes,116.0
+2026-06-07T17:16:43+00:00,CROSSPPI_004,papers/CrossPPI,ok,False,-0.0011,198891,0.0601,yes,96.5
+2026-06-07T17:18:11+00:00,CROSSPPI_006,papers/CrossPPI,ok,True,216,208933,0.0611,yes,87.8
+2026-06-07T17:18:51+00:00,METAPOINT_001,papers/metapointfinder,ok,False,312,157120,0.044,yes,40.5
+2026-06-07T17:20:01+00:00,METAPOINT_002,papers/metapointfinder,ok,False,38,489100,0.1305,yes,69.6
+2026-06-07T17:21:08+00:00,METAPOINT_003,papers/metapointfinder,ok,False,Required file 'metapointfinder/notebooks/make_dna_mutants/output/sample_input.ts,233809,0.0668,yes,67.2
+2026-06-07T17:23:08+00:00,METAPOINT_004,papers/metapointfinder,ok,True,5000 bp,475668,0.131,yes,119.8
+2026-06-07T17:23:21+00:00,METAPOINT_005,papers/metapointfinder,ok,False,EXECUTION_REQUIRED — I must run the pad_sequences tool on the repository to prod,21401,0.0066,yes,13.1
+2026-06-07T17:26:52+00:00,PPLM_001,papers/PPLM,ok,True,-8.2265625 kcal/mol,663168,0.178,yes,210.7
+2026-06-07T17:29:47+00:00,PPLM_002,papers/PPLM,ok,True,Favorable (predicted affinity = -8.2265625),653868,0.1745,yes,175.4
+2026-06-07T17:31:54+00:00,PPLM_003,papers/PPLM,ok,True,"(122, 1280)",663083,0.1768,yes,126.8
+2026-06-07T17:33:28+00:00,PPLM_004,papers/PPLM,ok,True,-0.000396,544957,0.1456,yes,93.9
+2026-06-07T17:34:55+00:00,PPLM_005,papers/PPLM,ok,True,"(660, 122, 70)",488372,0.13,yes,86.9
+2026-06-07T17:37:08+00:00,PPLM_006,papers/PPLM,ok,True,0.9431081,435583,0.1172,yes,133.3

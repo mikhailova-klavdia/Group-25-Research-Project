@@ -1,0 +1,178 @@
+[
+  {
+    "timestamp": "2026-06-04T17:38:53.048000+00:00",
+    "run_id": "20260604T173713-f2012067",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 250074,
+    "output_tokens": 2749,
+    "total_tokens": 252823,
+    "cost_usd": 0.068017
+  },
+  {
+    "timestamp": "2026-06-04T17:40:10.529487+00:00",
+    "run_id": "20260604T173854-fbb6526b",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 45018,
+    "output_tokens": 2361,
+    "total_tokens": 47379,
+    "cost_usd": 0.015977
+  },
+  {
+    "timestamp": "2026-06-04T20:57:06.844972+00:00",
+    "run_id": "20260604T205611-4a5dd10c",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 264232,
+    "output_tokens": 3197,
+    "total_tokens": 267429,
+    "cost_usd": 0.072452
+  },
+  {
+    "timestamp": "2026-06-04T20:58:34.067354+00:00",
+    "run_id": "20260604T205707-a2456525",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 442791,
+    "output_tokens": 5421,
+    "total_tokens": 448212,
+    "cost_usd": 0.12154
+  },
+  {
+    "timestamp": "2026-06-05T08:08:54.057882+00:00",
+    "run_id": "20260605T080752-2834b895",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 264813,
+    "output_tokens": 3670,
+    "total_tokens": 268483,
+    "cost_usd": 0.073543
+  },
+  {
+    "timestamp": "2026-06-05T08:10:32.318377+00:00",
+    "run_id": "20260605T080855-28d34255",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 367180,
+    "output_tokens": 6369,
+    "total_tokens": 373549,
+    "cost_usd": 0.104533
+  },
+  {
+    "timestamp": "2026-06-06T20:37:43.991366+00:00",
+    "run_id": "20260606T203640-907d1f76",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 286065,
+    "output_tokens": 3597,
+    "total_tokens": 289662,
+    "cost_usd": 0.07871
+  },
+  {
+    "timestamp": "2026-06-06T20:38:42.261995+00:00",
+    "run_id": "20260606T203745-2060675d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 331146,
+    "output_tokens": 3940,
+    "total_tokens": 335086,
+    "cost_usd": 0.090666
+  },
+  {
+    "timestamp": "2026-06-06T23:10:27.909827+00:00",
+    "run_id": "20260606T230915-8cc43963",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 269766,
+    "output_tokens": 3202,
+    "total_tokens": 272968,
+    "cost_usd": 0.073846
+  },
+  {
+    "timestamp": "2026-06-06T23:11:56.238913+00:00",
+    "run_id": "20260606T231028-eb50e969",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 349244,
+    "output_tokens": 4784,
+    "total_tokens": 354028,
+    "cost_usd": 0.096879
+  },
+  {
+    "timestamp": "2026-06-07T01:37:06.793379+00:00",
+    "run_id": "20260607T013630-83b77e9d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 72258,
+    "output_tokens": 3335,
+    "total_tokens": 75593,
+    "cost_usd": 0.024734
+  },
+  {
+    "timestamp": "2026-06-07T01:38:01.988063+00:00",
+    "run_id": "20260607T013707-08c87eb7",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 105120,
+    "output_tokens": 4845,
+    "total_tokens": 109965,
+    "cost_usd": 0.03597
+  },
+  {
+    "timestamp": "2026-06-07T16:39:29.305390+00:00",
+    "run_id": "20260607T163628-37fd162e",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 353429,
+    "output_tokens": 3095,
+    "total_tokens": 356524,
+    "cost_usd": 0.094547
+  },
+  {
+    "timestamp": "2026-06-07T16:40:47.647653+00:00",
+    "run_id": "20260607T163930-203001d6",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 401808,
+    "output_tokens": 5589,
+    "total_tokens": 407397,
+    "cost_usd": 0.11163
+  },
+  {
+    "timestamp": "2026-06-07T18:06:13.611519+00:00",
+    "run_id": "20260607T180452-72c15583",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the drug response prediction results from 'RegFormer/notebooks/drug/data/random_test.csv'. This CSV file contains 2",
+    "pre_estimate_tokens": 1556,
+    "input_tokens": 124636,
+    "output_tokens": 1689,
+    "total_tokens": 126325,
+    "cost_usd": 0.034537
+  },
+  {
+    "timestamp": "2026-06-07T18:10:09.434710+00:00",
+    "run_id": "20260607T180614-39a552b0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated RegFormer cell embeddings from 'RegFormer/notebooks/cell_emb/data/embeddings.npy', cell labels fr",
+    "pre_estimate_tokens": 1595,
+    "input_tokens": 100786,
+    "output_tokens": 3785,
+    "total_tokens": 104571,
+    "cost_usd": 0.032767
+  }
+]

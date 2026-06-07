@@ -1,0 +1,90 @@
+[
+  {
+    "timestamp": "2026-06-04T16:58:17.445692+00:00",
+    "run_id": "20260604T165548-a17f1806",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 34769,
+    "output_tokens": 1416,
+    "total_tokens": 36185,
+    "cost_usd": 0.011524
+  },
+  {
+    "timestamp": "2026-06-04T20:48:52.983629+00:00",
+    "run_id": "20260604T204724-620f28d8",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 235518,
+    "output_tokens": 3699,
+    "total_tokens": 239217,
+    "cost_usd": 0.066278
+  },
+  {
+    "timestamp": "2026-06-05T08:02:39.207115+00:00",
+    "run_id": "20260605T080130-8758c6e0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 181597,
+    "output_tokens": 2750,
+    "total_tokens": 184347,
+    "cost_usd": 0.050899
+  },
+  {
+    "timestamp": "2026-06-06T20:31:06.940131+00:00",
+    "run_id": "20260606T202856-b51ee8c1",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 180744,
+    "output_tokens": 2395,
+    "total_tokens": 183139,
+    "cost_usd": 0.049976
+  },
+  {
+    "timestamp": "2026-06-06T22:52:59.793459+00:00",
+    "run_id": "20260606T225055-9951026a",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 185509,
+    "output_tokens": 2738,
+    "total_tokens": 188247,
+    "cost_usd": 0.051853
+  },
+  {
+    "timestamp": "2026-06-06T22:59:31.244140+00:00",
+    "run_id": "20260606T225728-8030fa86",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 270324,
+    "output_tokens": 3556,
+    "total_tokens": 273880,
+    "cost_usd": 0.074693
+  },
+  {
+    "timestamp": "2026-06-07T01:25:48.411010+00:00",
+    "run_id": "20260607T012351-ae1f7b2a",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 75107,
+    "output_tokens": 2519,
+    "total_tokens": 77626,
+    "cost_usd": 0.023815
+  },
+  {
+    "timestamp": "2026-06-07T16:26:11.574446+00:00",
+    "run_id": "20260607T162506-fab56779",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observatio",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 238584,
+    "output_tokens": 3104,
+    "total_tokens": 241688,
+    "cost_usd": 0.065854
+  }
+]

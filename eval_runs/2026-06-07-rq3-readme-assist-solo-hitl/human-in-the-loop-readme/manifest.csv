@@ -1,0 +1,52 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,used_help,elapsed_s
+2026-06-07T17:38:57+00:00,SC_FRAMEWORK_001,papers/SC-Framework,ok,True,5000 cells,334857,0.0943,yes,109.0
+2026-06-07T17:40:12+00:00,USHER_002,papers/USHER,ok,False,"64,603 cells
+
+Sources: Paper (Sec. 3.1 and A.5 reporting 38,280 Xenium cells and",293044,0.0814,yes,75.3
+2026-06-07T17:43:25+00:00,SEGMA_001,papers/segma,ok,True,187 amino acids,490939,0.1387,yes,192.2
+2026-06-07T17:47:02+00:00,SENTIEON_CLI_001,papers/sentieon-cli,ok,True,CONSERVATIVE,1155957,0.3071,yes,217.3
+2026-06-07T17:47:50+00:00,ARCADIA_PUBLIC_002,papers/ARCADIA_public,ok,True,300,192858,0.0515,yes,48.0
+2026-06-07T17:58:36+00:00,ARCADIA_PUBLIC_003,papers/ARCADIA_public,ok,True,6,131804,0.0376,yes,645.9
+2026-06-07T18:02:22+00:00,GWPROT_001,papers/GWProt,ok,True,54,815762,0.2176,yes,225.7
+2026-06-07T18:04:51+00:00,GWPROT_002,papers/GWProt,ok,True,4,403044,0.1135,yes,149.2
+2026-06-07T18:06:13+00:00,REGFORMER_002,papers/RegFormer,ok,True,0.8841,328091,0.0869,yes,82.6
+2026-06-07T18:10:10+00:00,REGFORMER_003,papers/RegFormer,ok,False,EXECUTION_REQUIRED — the required data files RegFormer/notebooks/cell_emb/data/e,799482,0.2174,yes,236.3
+2026-06-07T18:13:55+00:00,SCISTREECNA_001,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — required input files 'test_data_reads.csv' and 'test_data_t,1146595,0.3066,yes,225.6
+2026-06-07T18:20:02+00:00,SCISTREECNA_003,papers/ScisTreeCNA,exit_1,,,,,,366.4
+2026-06-07T18:24:08+00:00,SAM2_001,papers/sam2,ok,True,52 masks,1306053,0.3456,yes,246.6
+2026-06-07T18:29:18+00:00,SAM2_002,papers/sam2,ok,True,54,1697944,0.4459,yes,309.7
+2026-06-07T18:33:26+00:00,TABPFN_001,papers/tabpfn,ok,False,TabPFN (v2) achieved accuracy=0.9825 and ROC AUC=0.9954 on the sklearn breast-ca,739428,0.2029,yes,247.5
+2026-06-07T18:43:18+00:00,TABPFN_002,papers/tabpfn,ok,False,"TabPFN: MSE=0.158016, R2=0.878818; LinearRegression: MSE=0.528984, R2=0.594323; ",530161,0.1482,yes,592.4
+2026-06-07T18:45:51+00:00,CYTEONTO_001,papers/CyteOnto,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,498897,0.1387,yes,152.8
+2026-06-07T18:46:48+00:00,CYTEONTO_002,papers/CyteOnto,ok,True,stem cell,95761,0.0291,yes,56.6
+2026-06-07T18:48:28+00:00,CYTEONTO_003,papers/CyteOnto,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,137930,0.0437,yes,100.2
+2026-06-07T18:51:58+00:00,GWAS_EPISTASIS_BIAS_001,papers/GWAS-Epistasis-Bias,ok,True,5.0369820108922107e-08,658426,0.1845,yes,210.6
+2026-06-07T18:55:07+00:00,GWAS_EPISTASIS_BIAS_002,papers/GWAS-Epistasis-Bias,ok,True,0,472888,0.1399,yes,188.9
+2026-06-07T18:57:45+00:00,GWAS_EPISTASIS_BIAS_003,papers/GWAS-Epistasis-Bias,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,201289,0.0659,yes,157.4
+2026-06-07T19:04:33+00:00,LARIS_001,papers/LARIS,ok,True,8774,2566223,0.6662,yes,408.5
+2026-06-07T19:09:17+00:00,LARIS_002,papers/LARIS,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,2136789,0.5569,yes,284.2
+2026-06-07T19:10:14+00:00,LARIS_003,papers/LARIS,ok,True,SEMA4A,452609,0.1188,yes,56.2
+2026-06-07T19:13:19+00:00,DISTORTIONS_001,papers/distortions,ok,True,36 unique cell types,1093438,0.2863,yes,185.4
+2026-06-07T19:17:06+00:00,DISTORTIONS_005,papers/distortions,ok,False,9,892908,0.2396,yes,226.8
+2026-06-07T19:20:16+00:00,DISTORTIONS_006,papers/distortions,ok,True,800 cells,787350,0.2148,yes,190.5
+2026-06-07T19:24:05+00:00,FADVI_001,papers/fadvi,ok,True,30,675743,0.1819,yes,228.6
+2026-06-07T19:24:49+00:00,FADVI_003,papers/fadvi,ok,True,"10
+
+sources: src/fadvi/_fadvae.py (FADVAE.__init__ default n_latent_r=10), src/f",139944,0.0397,yes,44.4
+2026-06-07T19:28:38+00:00,FADVI_007,papers/fadvi,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,542517,0.1484,yes,228.6
+2026-06-07T19:33:37+00:00,CROSSPPI_001,papers/CrossPPI,ok,False,5.64,681057,0.1921,yes,299.1
+2026-06-07T19:43:48+00:00,CROSSPPI_003,papers/CrossPPI,ok,False,EXECUTION_REQUIRED — need to run the repository's inference script to obtain the,2169568,0.5924,yes,610.8
+2026-06-07T19:46:37+00:00,CROSSPPI_004,papers/CrossPPI,ok,False,EXECUTION_REQUIRED — HTTPS model download failed due to SSL certificate verifica,318084,0.0968,yes,168.7
+2026-06-07T19:49:59+00:00,CROSSPPI_006,papers/CrossPPI,ok,True,216,566845,0.1597,yes,201.7
+2026-06-07T19:52:41+00:00,METAPOINT_001,papers/metapointfinder,ok,True,1182 sequences,515599,0.1467,yes,162.1
+2026-06-07T19:54:49+00:00,METAPOINT_002,papers/metapointfinder,ok,True,37,344458,0.0996,yes,128.1
+2026-06-07T19:57:19+00:00,METAPOINT_003,papers/metapointfinder,ok,False,100 sequences,590877,0.1649,yes,150.1
+2026-06-07T19:59:04+00:00,METAPOINT_004,papers/metapointfinder,ok,False,EXECUTION_REQUIRED — Auto-flagged by the integrity guard: this answer did not co,288313,0.0825,yes,105.1
+2026-06-07T20:01:25+00:00,METAPOINT_005,papers/metapointfinder,ok,True,10000 bp,483045,0.1357,yes,140.9
+2026-06-07T20:04:24+00:00,PPLM_001,papers/PPLM,ok,True,-8.2265625 kcal/mol,859760,0.2293,yes,178.7
+2026-06-07T20:07:44+00:00,PPLM_002,papers/PPLM,ok,True,favorable,978470,0.2617,yes,200.7
+2026-06-07T20:12:49+00:00,PPLM_003,papers/PPLM,ok,True,"(122, 1280)",957528,0.2642,yes,304.7
+2026-06-07T20:16:38+00:00,PPLM_004,papers/PPLM,ok,True,-0.000396,1053523,0.2852,yes,227.9
+2026-06-07T20:20:06+00:00,PPLM_005,papers/PPLM,ok,True,"(660, 122, 70)",953615,0.2543,yes,207.8
+2026-06-07T20:23:02+00:00,PPLM_006,papers/PPLM,ok,True,0.9431081,857139,0.2302,yes,176.2
+2026-06-07T20:35:32+00:00,SCISTREECNA_003,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — ScisTreeCNA invoked CUDA RawKernel APIs (cupy.RawKernel) no,3766886,1.0109,yes,619.6
