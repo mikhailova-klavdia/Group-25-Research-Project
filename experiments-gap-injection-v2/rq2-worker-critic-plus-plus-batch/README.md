@@ -3,9 +3,9 @@
 **Team:** `worker-critic-plus-plus`
 **Questions:** 16 (Op-E1 ×6, Op-E2 ×2, Op-D1 ×4, Op-D2 ×4)
 **Score:** 8 / 16 bypass-correct (B)
-**Total cost:** $0.6866
-**Total tokens:** 2,264,031
-**Total wall-clock:** 18.9 min
+**Total cost:** $1.2225
+**Total tokens:** 4,233,431
+**Total wall-clock:** 23.3 min
 
 Best run selected per question where multiple runs exist.
 

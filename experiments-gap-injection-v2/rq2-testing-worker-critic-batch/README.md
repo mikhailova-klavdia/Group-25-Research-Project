@@ -3,8 +3,8 @@
 **Team:** `testing-worker-critic`
 **Questions:** 16 (Op-E1 ×6, Op-E2 ×2, Op-D1 ×4, Op-D2 ×4)
 **Score:** 2 / 16 bypass-correct (B)
-**Total cost:** $0.8524
-**Total tokens:** 2,849,848
+**Total cost:** $2.3412
+**Total tokens:** 7,708,162
 **Total wall-clock:** 49.7 min
 
 Best run selected per question (single run per question for this team).
