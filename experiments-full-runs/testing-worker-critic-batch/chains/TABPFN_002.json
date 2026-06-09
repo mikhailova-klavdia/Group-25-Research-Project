@@ -1,0 +1,587 @@
+{
+  "id": "TABPFN_002",
+  "team": "testing-worker-critic",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://arxiv.org/abs/2501.16936",
+  "question": "Download the **California Housing dataset** from sklearn, train a TabPFN model on it, and tell me the performance compared to other regressors",
+  "ground_truth": "~0.84 R^2 / ~0.45 RMSE; beats LinReg and RandomForest",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "List the repository to understand its layout and find examples / source files relevant to running regression experiments.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\repo:\n.gitignore\n.pre-commit-config.yaml\nCHANGELOG.md\nLICENSE\nREADME.md\nSECURITY.md\nTELEMETRY.md\nTHIRD-PARTY-NOTICES.md\npyproject.toml\n.gemini/config.yaml\n.github/CODEOWNERS\n.github/PULL_REQUEST_TEMPLATE.md\n.github/dependabot.yml\n.github/ISSUE_TEMPLATE/bug_report.yml\n.github/ISSUE_TEMPLATE/doc_improvement.yml\n.github/ISSUE_TEMPLATE/feature_request.yml\n.github/workflows/check-changelog.yml\n.github/workflows/ci.yml\n.github/workflows/claude-code-review.yml\n.github/workflows/claude.yml\n.github/workflows/nightly-notebook-check.yml\n.github/workflows/release-create-pr.yml\n.github/workflows/release-publish.yml\n.github/workflows/release-tag-on-merge.yml\nchangelog/978.changed.md\nchangelog/981.added.md\nchangelog/982.added.md\nchangelog/983.changed.md\nchangelog/987.added.md\nchangelog/992.fixed.md\nchangelog/README.md\nexamples/benchmarking_tabpfn.py\nexamples/finetune_classifier.py\nexamples/finetune_regressor.py\nexamples/kv_cache_fast_prediction.py\nexamples/plot_regression_distribution.py\nexamples/sagemaker.py\nexamples/save_and_load_model.py\nexamples/tabpfn_for_binary_classification.py\nexamples/tabpfn_for_multiclass_classification.py\nexamples/tabpfn_for_regression.py\nexamples/tabpfn_with_tuning.py\nexamples/notebooks/Databricks_MLflow.ipynb\nscripts/__init__.py\nscripts/convert_checkpoint_to_safetensors.py\nscripts/download_all_models.py\nsrc/tabpfn/__init__.py\nsrc/tabpfn/base.py\nsrc/tabpfn/browser_auth.py\nsrc/tabpfn/checkpoint.py\nsrc/tabpfn/classifier.py\nsrc/tabpfn/constants.py\nsrc/tabpfn/errors.py\nsrc/tabpfn/inference.py\nsrc/tabpfn/inference_config.py\nsrc/tabpfn/inference_tuning.py\nsrc/tabpfn/model_loading.py\nsrc/tabpfn/parallel_execute.py\nsrc/tabpfn/regressor.py\nsrc/tabpfn/settings.py\nsrc/tabpfn/utils.py\nsrc/tabpfn/validation.py\nsrc/tabpfn/architectures/__init__.py\nsrc/tabpfn/architectures/interface.py\nsrc/tabpfn/architectures/kv_cache.py\nsrc/tabpfn/architectures/tabpfn_v2_5.py\nsrc/tabpfn/architectures/tabpfn_v2_6.py\nsrc/tabpfn/architectures/tabpfn_v3.py\nsrc/tabpfn/architectures/base/__init__.py\nsrc/tabpfn/architectures/base/bar_distribution.py\nsrc/tabpfn/architectures/base/config.py\nsrc/tabpfn/architectures/base/layer.py\nsrc/tabpfn/architectures/base/memory.py\nsrc/tabpfn/architectures/base/mlp.py\nsrc/tabpfn/architectures/base/thinking_tokens.py\nsrc/tabpfn/architectures/base/transformer.py\nsrc/tabpfn/architectures/base/attention/__init__.py\nsrc/tabpfn/architectures/base/attention/full_attention.py\nsrc/tabpfn/architectures/encoders/__init__.py\nsrc/tabpfn/architectures/encoders/pipeline_interfaces.py\nsrc/tabpfn/architectures/encoders/steps/__init__.py\nsrc/tabpfn/architectures/encoders/steps/_ops.py\nsrc/tabpfn/architectures/encoders/steps/feature_group_projections_encoder_step.py\nsrc/tabpfn/architectures/encoders/steps/feature_transform_encoder_step.py\nsrc/tabpfn/architectures/encoders/steps/frequency_feature_encoder_step.py\nsrc/tabpfn/architectures/encoders/steps/multiclass_classification_target_encoder_step.py\nsrc/tabpfn/architectures/encoders/steps/nan_handling_encoder_step.py\nsrc/tabpfn/architectures/encoders/steps/normalize_feature_groups_encoder_step.py\nsrc/tabpfn/architectures/encoders/steps/remove_duplicate_features_encoder_step.py\nsrc/tabpfn/architectures/encoders/steps/remove_empty_features_encoder_step.py\nsrc/tabpfn/architectures/shared/__init__.py\nsrc/tabpfn/architectures/shared/attention_gqa_check.py\nsrc/tabpfn/architectures/shared/chunked_evaluate.py\nsrc/tabpfn/architectures/shared/column_embeddings.py\nsrc/tabpfn/architectures/shared/compile_utils.py\nsrc/tabpfn/architectures/shared/fa3_backend.py\nsrc/tabpfn/architectures/shared/fa3_setup.md\nsrc/tabpfn/architectures/shared/mlx_backend.py\nsrc/tabpfn/architectures/shared/scaled_dot_product_attention.py\nsrc/tabpfn/finetuning/__init__.py\nsrc/tabpfn/finetuning/_torch_compat.py\nsrc/tabpfn/finetuning/data_util.py\nsrc/tabpfn/finetuning/finetuned_base.py\nsrc/tabpfn/finetuning/finetuned_classifier.py\nsrc/tabpfn/finetuning/finetuned_regressor.py\nsrc/tabpfn/finetuning/logging.py\nsrc/tabpfn/finetuning/train_util.py\nsrc/tabpfn/misc/_sklearn_compat.py\nsrc/tabpfn/misc/debug_versions.py\nsrc/tabpfn/model/__init__.py\nsrc/tabpfn/model/attention.py\nsrc/tabpfn/model/bar_distribution.py\nsrc/tabpfn/model/config.py\nsrc/tabpfn/model/encoders.py\nsrc/tabpfn/model/layer.py\nsrc/tabpfn/model/loading.py\nsrc/tabpfn/model/memory.py\nsrc/tabpfn/model/mlp.py\nsrc/tabpfn/model/preprocessing.py\nsrc/tabpfn/model/transformer.py\nsrc/tabpfn/preprocessing/__init__.py\nsrc/tabpfn/preprocessing/clean.py\nsrc/tabpfn/preprocessing/configs.py\nsrc/tabpfn/preprocessing/datamodel.py\nsrc/tabpfn/preprocessing/ensemble.py\nsrc/tabpfn/preprocessing/label_encoder.py\nsrc/tabpfn/preprocessing/modality_detection.py\nsrc/tabpfn/preprocessing/pipeline_factory.py\nsrc/tabpfn/preprocessing/pipeline_interface.py\nsrc/tabpfn/preprocessing/presets.py\nsrc/tabpfn/preprocessing/transform.py\nsrc/tabpfn/preprocessing/type_detection.py\nsrc/tabpfn/preprocessing/steps/__init__.py\nsrc/tabpfn/preprocessing/steps/adaptive_quantile_transformer.py\nsrc/tabpfn/preprocessing/steps/add_fingerprint_features_step.py\nsrc/tabpfn/preprocessing/steps/add_svd_features_step.py\nsrc/tabpfn/preprocessing/steps/differentiable_z_norm_step.py\nsrc/tabpfn/preprocessing/steps/encode_categorical_features_step.py\nsrc/tabpfn/preprocessing/steps/kdi_transformer.py\nsrc/tabpfn/preprocessing/steps/nan_handling_polynomial_features_step.py\nsrc/tabpfn/preprocessing/steps/preprocessing_helpers.py\nsrc/tabpfn/preprocessing/steps/remove_constant_features_step.py\nsrc/tabpfn/preprocessing/steps/reshape_feature_distribution_step.py\nsrc/tabpfn/preprocessing/steps/safe_power_transformer.py\nsrc/tabpfn/preprocessing/steps/shuffle_features_step.py\nsrc/tabpfn/preprocessing/steps/squashing_scaler_transformer.py\nsrc/tabpfn/preprocessing/steps/utils.py\nsrc/tabpfn/preprocessing/torch/__init__.py\nsrc/tabpfn/preprocessing/torch/factory.py\nsrc/tabpfn/preprocessing/torch/gpu_preprocessing_metadata.py\nsrc/tabpfn/preprocessing/torch/ops.py\nsrc/tabpfn/preprocessing/torch/pipeline_interface.py\nsrc/tabpfn/preprocessing/torch/steps.py\nsrc/tabpfn/preprocessing/torch/torch_quantile_transformer.py\nsrc/tabpfn/preprocessing/torch/torch_soft_clip_outliers.py\nsrc/tabpfn/preprocessing/torch/torch_squashing_scaler.py\nsrc/tabpfn/preprocessing/torch/torch_standard_scaler.py\nsrc/tabpfn/preprocessing/torch/torch_svd.py\nsrc/tabpfn/visualisation/__init__.py\nsrc/tabpfn/visualisation/regression_distribution.py\ntests/README.md\ntests/__init__.py\ntests/conftest.py\ntests/quick_test.py\ntests/test_browser_auth.py\ntests/test_checkpoint.py\ntests/test_classifier_interface.py\ntests/test_config.py\ntests/test_consistency.py\ntests/test_debug_versions.py\ntests/test_download_fallbacks.py\ntests/test_estimators.py\ntests/test_finetuning_classifier.py\ntests/test_finetuning_logging.py\ntests/test_finetuning_regressor.py\ntests/test_ft_utils.py\ntests/test_inference.py\ntests/test_inference_config.py\ntests/test_inference_tuning.py\ntests/test_model_loading.py\ntests/test_model_move_backwards_compatibility.py\ntests/test_notebook_installs.py\ntests/test_parallel_execute.py\ntests/test_regressor_interface.py\ntests/test_save_load_fitted_model.py\ntests/test_settings.py\ntests/test_telemetry_disabled.py\ntests/test_thinking_tokens.py\ntests/test_transformer.py\ntests/test_utils.py\ntests/test_visualisation.py\ntests/utils.py\ntests/reference_predictions/darwin_arm64/classifier_iris_dataset_several_devices_v2.6.json\ntests/reference_predictions/darwin_arm64/classifier_iris_dataset_several_devices_v3.json\ntests/reference_predictions/darwin_arm64/classifier_iris_dataset_v2.6.json\ntests/reference_predictions/darwin_arm64/classifier_iris_dataset_v3.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_3_estimators_v2.6.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_3_estimators_v3.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_differentiable_input_v2.6.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_differentiable_input_v3.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_v2.5.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_v2.6.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_v2.json\ntests/reference_predictions/darwin_arm64/classifier_tiny_dataset_v3.json\ntests/reference_predictions/darwin_arm64/regressor_tiny_dataset_several_devices_v2.6.json\ntests/reference_predictions/darwin_arm64/regressor_tiny_dataset_several_devices_v3.json\ntests/reference_predictions/darwin_arm64/regressor_tiny_dataset_v2.5.json\ntests/reference_predictions/darwin_arm64/regressor_tiny_dataset_v2.6.json\ntests/reference_predictions/darwin_arm64/regressor_tiny_dataset_v2.json\ntests/reference_predictions/darwin_arm64/regressor_tiny_dataset_v3.json\ntests/test_architectures/__init__.py\ntests/test_architectures/test_attention_backends.py\ntests/test_architectures/test_chunked_evaluate.py\ntests/test_architectures/test_init.py\ntests/test_architectures/test_mlx_backend.py\ntests/test_architectures/test_tabpfn_v2_5.py\ntests/test_architectures/test_tabpfn_v2_6.py\ntests/test_architectures/test_tabpfn_v3.py\ntests/test_encoders/__init__.py\ntests/test_encoders/test_encoders.py\ntests/test_encoders/test_ops.py\ntests/test_encoders/test_projections.py\ntests/test_model/__init__.py\ntests/test_model/test_attention.py\ntests/test_model/test_bar_distribution.py\ntests/test_model/test_seperate_train_inference.py\ntests/test_preprocessing/__init__.py\ntests/test_preprocessing/test_adaptive_quantile_transformer.py\ntests/test_preprocessing/test_add_fingerprint_features_step.py\ntests/test_preprocessing/test_add_svd_features_step.py\ntests/test_preprocessing/test_data_cleaning.py\ntests/test_preprocessing/test_datamodel.py\ntests/test_preprocessing/test_differentiable_znorm_step.py\ntests/test_preprocessing/test_encode_categorical_features_step.py\ntests/test_preprocessing/test_ensemble.py\ntests/test_preprocessing/test_kdi_transformer.py\ntests/test_preprocessing/test_label_encoder.py\ntests/test_preprocessing/test_modality_detection.py\ntests/test_preprocessing/test_nan_handling_polynomial_features_step.py\ntests/test_preprocessing/test_pipeline_consistency.py\ntests/test_preprocessing/test_power_transformer.py\ntests/test_preprocessing/test_preprocessing_steps.py\ntests/test_preprocessing/test_remove_constant_features_step.py\ntests/test_preprocessing/test_reshape_feature_distribution_step.py\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_none_numeric.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_none_onehot.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_none_ordinal.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_none_ordinal_shuffled.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_none_ordinal_with_svd.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_none_with_svd.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_quantile_append_original.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_quantile_uni.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_quantile_uni_coarse.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_robust.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_robust_onehot.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_safepower.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_safepower_box.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_squashing_scaler.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/basic_squashing_with_svd_quarter.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/combined_all_options.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/fingerprint_none_numeric.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/fingerprint_quantile_uni_coarse.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/fingerprint_squashing_scaler.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/poly_3_none_numeric.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/poly_3_quantile_uni_coarse.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/poly_all_none_numeric.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/poly_all_quantile_uni_coarse.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/rotate_none_numeric.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/rotate_squashing_scaler.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/shuffle_none_numeric.json\ntests/test_preprocessing/reference_preprocessing/pipeline_consistency/darwin_arm64/shuffle_squashing_scaler.json\ntests/test_torch_preprocessing/__init__.py\ntests/test_torch_preprocessing/test_gpu_preprocessing_consistency.py\ntests/test_torch_preprocessing/test_pipeline_interface.py\ntests/test_torch_preprocessing/test_torch_quantile_transformer.py\ntests/test_torch_preprocessing/test_torch_shuffle_features_step.py\ntests/test_torch_preprocessing/test_torch_soft_clip_outliers.py\ntests/test_torch_preprocessing/test_torch_squashing_scaler.py\ntests/test_torch_preprocessing/test_torch_standard_scaler.py\ntests/test_torch_preprocessing/test_torch_svd.py",
+      "reflection": "Repository contains regression examples and the TabPFN source; next search for model/data references and artifact files."
+    },
+    {
+      "step": 2,
+      "thought": "Locate any shipped model/checkpoint artifact files (common suffix .pth) to see if weights are included in the repo.",
+      "action": "find_repo_files({\"pattern\":\".pth\",\"include_binary\":true})",
+      "observation": "No filenames matched '.pth' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\repo",
+      "reflection": "No .pth checkpoints shipped; check for other artifact suffixes (.pt, .npy) next."
+    },
+    {
+      "step": 3,
+      "thought": "Search for .pt artifacts which may include small packaged tensors shipped with the package.",
+      "action": "find_repo_files({\"pattern\":\".pt\",\"include_binary\":true})",
+      "observation": "Filename results for '.pt' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\repo:\nsrc/tabpfn/architectures/shared/tabpfn_col_embedding.pt [artifact, 376.6 KB]",
+      "reflection": "A small .pt helper file is present, but full pretrained model weights are not present in repo. Next, check for .npy artifacts (none expected)."
+    },
+    {
+      "step": 4,
+      "thought": "Search for .npy artifacts (common serialized arrays) in case precomputed datasets or results are included.",
+      "action": "find_repo_files({\"pattern\":\".npy\",\"include_binary\":true})",
+      "observation": "No filenames matched '.npy' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\repo",
+      "reflection": "No precomputed NumPy artifacts. Next, search the repo for references to the California Housing loader to see example usage."
+    },
+    {
+      "step": 5,
+      "thought": "Find any code that references fetch_california_housing to confirm example/data usage locations.",
+      "action": "search_repo({\"query\":\"fetch_california_housing\"})",
+      "observation": "Search results for 'fetch_california_housing' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\repo:\nexamples/finetune_regressor.py:67: data = sklearn.datasets.fetch_california_housing(as_frame=True)",
+      "reflection": "There is an example that uses California Housing (finetune_regressor.py). The simple regression example uses diabetes — read it to see the intended usage pattern."
+    },
+    {
+      "step": 6,
+      "thought": "Open the canonical regression example to see how to adapt it to California Housing and how TabPFNRegressor is used.",
+      "action": "read_repo_file({\"relative_path\":\"examples/tabpfn_for_regression.py\"})",
+      "observation": "Contents of C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\repo\\examples\\tabpfn_for_regression.py:\n#  Copyright (c) Prior Labs GmbH 2026.\n\"\"\"Example of using TabPFN for regression.\n\nThis example demonstrates how to use TabPFNRegressor on a regression task\nusing the diabetes dataset from scikit-learn.\n\"\"\"\n\nfrom sklearn.datasets import load_diabetes\nfrom sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score\nfrom sklearn.model_selection import train_test_split\n\nfrom tabpfn import TabPFNRegressor\n\n# Load data\nX, y = load_diabetes(return_X_y=True)\nX_train, X_test, y_train, y_test = train_test_split(\n    X,\n    y,\n    test_size=0.33,\n    random_state=42,\n)\n\n# Initialize a regressor\nreg = TabPFNRegressor()\nreg.fit(X_train, y_train)\n\n# Predict a point estimate (using the mean)\npredictions = reg.predict(X_test)\nprint(\"Mean Squared Error (MSE):\", mean_squared_error(y_test, predictions))\nprint(\"Mean Absolute Error (MAE):\", mean_absolute_error(y_test, predictions))\nprint(\"R-squared (R^2):\", r2_score(y_test, predictions))\n\n# Predict quantiles\nquantiles = [0.25, 0.5, 0.75]\nquantile_predictions = reg.predict(\n    X_test,\n    output_type=\"quantiles\",\n    quantiles=quantiles,\n)\nfor q, q_pred in zip(quantiles, quantile_predictions):\n    print(f\"Quantile {q} MAE:\", mean_absolute_error(y_test, q_pred))\n# Predict with mode\nmode_predictions = reg.predict(X_test, output_type=\"mode\")\nprint(\"Mode MAE:\", mean_absolute_error(y_test, mode_predictions))\n",
+      "reflection": "Example shows exact API to call TabPFNRegressor for training/prediction. To run on California Housing, swap the dataset loader. Next verify runtime packages are installed in the environment."
+    },
+    {
+      "step": 7,
+      "thought": "Check the shared per-paper venv to see which Python packages are already installed so I know whether execution is possible here.",
+      "action": "venv_status()",
+      "observation": "Venv path: C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\runs\\20260607T110525-eea15a17\\.venv\nPython: Python 3.12.13\nFree disk: 286.0 GiB\nInstalled packages: 2\npip==26.1.2\ntyping_extensions==4.15.0",
+      "reflection": "Torch, scikit-learn and other dependencies required by tabpfn are not installed in this runtime. Installing these (torch>=2.5, scikit-learn, etc.) and ensuring model-weight download/auth is possible is required before running the experiment."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: High-severity execution and missing-artifact gaps (missing runtime dependencies and absent pretrained TabPFN weights) directly prevent running the workflow and producing the requested results. (gaps: Missing runtime Python dependencies (torch, scikit-learn, etc.); Pretrained TabPFN model weights absent in repo / gated by license/token)",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. High-severity execution and missing-artifact gaps (missing runtime dependencies and absent pretrained TabPFN weights) directly prevent running the workflow and producing the requested results. Original answer was: EXECUTION_REQUIRED — required Python dependencies (torch, scikit-learn, and others) are not installed in the runtime, preventing running TabPFN and training on the California Housing dataset.",
+    "blocker_evidence": [
+      "venv_status(): Installed packages: pip==26.1.2, typing_extensions==4.15.0 (no torch, no scikit-learn).",
+      "pyproject.toml dependencies include: \"torch>=2.5\", \"scikit-learn>=1.2.0\" (so these must be installed).",
+      "examples/tabpfn_for_regression.py: uses TabPFNRegressor().fit(...) pattern; example uses sklearn dataset loader (diabetes) and would need sklearn available to run."
+    ]
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "redo_with_install",
+      "reasoning": "The reasoning chain demonstrates thorough exploration of the repository, identifying the absence of pretrained model weights within the repo and finding a suitable example for running regression on the California Housing dataset. However, the execution is blocked because essential dependencies (torch, scikit-learn, pydantic-settings, huggingface-hub, and others) are missing from the runtime environment. The worker recognizes the missing dependencies and correctly refrains from running the model, reporting an EXECUTION_REQUIRED status due to missing dependencies. They also supply detailed evidence from environment status and pyproject.toml dependency listings. They have not attempted to install the missing packages during the chain, hence the verdict should be redo_with_install, with installation of these missing packages required before the workflow can proceed and produce valid output.",
+      "missing_packages": [
+        "torch",
+        "scikit-learn",
+        "pydantic-settings",
+        "huggingface-hub",
+        "numpy",
+        "matplotlib"
+      ],
+      "suggested_action": "Install the required Python packages including torch, scikit-learn, pydantic-settings, huggingface-hub, numpy, and matplotlib using pip (e.g., 'pip install -e .[viz]' from the repo root). After installation, retry running the regression example on California Housing to obtain model performance and comparisons."
+    }
+  ],
+  "install_events": [
+    {
+      "attempt": 1,
+      "modules": [
+        "typing_extensions"
+      ],
+      "packages": [
+        "typing_extensions"
+      ],
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--no-cache",
+        "--python",
+        "C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\26-NbM-tabpfn\\runs\\20260607T110525-eea15a17\\.venv\\Scripts\\python.exe",
+        "typing_extensions"
+      ],
+      "exit_code": 0,
+      "output": "Using Python 3.12.13 environment at: Papers\\26-NbM-tabpfn\\runs\\20260607T110525-eea15a17\\.venv\nResolved 1 package in 183ms\nPrepared 1 package in 41ms\nInstalled 1 package in 17ms\n + typing-extensions==4.15.0",
+      "succeeded": true
+    }
+  ],
+  "token_usage": {
+    "pre_run_estimate": 1525,
+    "input_tokens": 117707,
+    "output_tokens": 3932,
+    "total_tokens": 121639,
+    "estimated_cost_usd": 0.03729075,
+    "aggregate": {
+      "input_tokens": 887464,
+      "output_tokens": 19237,
+      "total_tokens": 906701,
+      "estimated_cost_usd": 0.26168685
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 350721,
+        "output_tokens": 4240,
+        "total_tokens": 354961,
+        "estimated_cost_usd": 0.09616025
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 271224,
+        "output_tokens": 4014,
+        "total_tokens": 275238,
+        "estimated_cost_usd": 0.07583400000000001
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 124123,
+        "output_tokens": 3264,
+        "total_tokens": 127387,
+        "estimated_cost_usd": 0.03755875
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 117707,
+        "output_tokens": 3932,
+        "total_tokens": 121639,
+        "estimated_cost_usd": 0.03729075
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 9675,
+        "output_tokens": 261,
+        "total_tokens": 9936,
+        "estimated_cost_usd": 0.0042876
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 13104,
+        "output_tokens": 3157,
+        "total_tokens": 16261,
+        "estimated_cost_usd": 0.00959
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 910,
+        "output_tokens": 369,
+        "total_tokens": 1279,
+        "estimated_cost_usd": 0.0009655
+      }
+    ]
+  },
+  "extraction_report": {
+    "paper_summary": "TabPFN is a transformer-based tabular foundation model trained on millions of synthetic datasets to perform in-context learning for tabular prediction. It provides fast, out-of-the-box regression and classification for small-to-medium datasets (<=10k samples, <=500 features), returns predictive distributions (not just point estimates), and compares favorably to tree-based baselines in the paper.",
+    "research_objective": "Provide a pretrained tabular foundation model (TabPFN) that can be applied zero-/few-shot to new tabular datasets (including regression), giving accurate predictions and uncertainty estimates with minimal tuning and compute.",
+    "identified_experiments": [
+      "Train/apply TabPFNRegressor on a single dataset and report regression metrics (MSE/MAE/R^2) and predictive distributions (per-sample quantiles).",
+      "Benchmark TabPFNRegressor vs other regressors (e.g., Ridge, RandomForest, XGBoost, CatBoost, LightGBM, AutoGluon) — fit/predict time and regression metrics.",
+      "Visualize predicted output distributions for individual test points and extract embeddings / feature densities.",
+      "Train TabPFN regressor on a dataset (single-run)",
+      "Benchmark TabPFNRegressor vs other regressors",
+      "Visualize predicted distributions and extract embeddings"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "Train TabPFN regressor on a dataset (single-run)",
+        "paper_reference": "Fig. 3 (regression toy examples), Fig. 4/Extended Data Table 2 (regression benchmarks)",
+        "confidence": "high",
+        "objective": "Load a dataset (e.g., sklearn.datasets.fetch_california_housing), fit TabPFNRegressor, compute MSE/MAE/R^2 and optionally output predictive quantiles/distribution.",
+        "repo_entrypoints": [
+          "examples/tabpfn_for_regression.py",
+          "src/tabpfn/regressor.py",
+          "examples/plot_regression_distribution.py"
+        ],
+        "config_files": [
+          "src/tabpfn/settings.py",
+          "pyproject.toml"
+        ],
+        "required_inputs": [
+          "sklearn.datasets.fetch_california_housing (or X, y NumPy arrays)",
+          "Pretrained TabPFN regressor checkpoint (auto-download via model_path='auto' into cache directory)"
+        ],
+        "expected_outputs": [
+          "Printed metrics: MSE, MAE, R^2",
+          "Optional: quantile predictions (lists of arrays) or full predicted distribution objects",
+          "Optional: PNG of predicted distribution (examples/plot_regression_distribution.py)"
+        ],
+        "dependency_hints": [
+          "torch (PyTorch)",
+          "numpy, scikit-learn",
+          "tabpfn (this repo / pip install .)",
+          "huggingface_hub (for model download)",
+          "matplotlib (for plotting, optional)",
+          "GPU recommended for speed but CPU supported (may be limited by pretraining limits)"
+        ],
+        "ambiguity_notes": [
+          "examples/tabpfn_for_regression.py uses the diabetes dataset; swap to fetch_california_housing and adapt train_test_split to match desired splits.",
+          "Default model version is V3 per settings; which exact checkpoint/version to use (v2/v2.5/v2.6/v3) is unspecified — different versions may require license acceptance / gated HF repo access.",
+          "Model weights are downloaded automatically unless a local path is provided; gated-model downloads may require browser-based license acceptance (handled by tabpfn.browser_auth)."
+        ],
+        "notes": "This is the canonical single-dataset inference workflow; use TabPFNRegressor.create_default_for_version(...) to pin a model version if needed."
+      },
+      {
+        "workflow_name": "Benchmark TabPFNRegressor vs other regressors",
+        "paper_reference": "Fig. 4, Extended Data Table 2, and 'Detailed evaluation protocol' (regression benchmarks)",
+        "confidence": "medium",
+        "objective": "Run TabPFN and a set of baseline regressors on California Housing (or other benchmark datasets) with consistent train/test splits and report timing + metrics; adapt examples/benchmarking_tabpfn.py (classification example) for regression.",
+        "repo_entrypoints": [
+          "examples/benchmarking_tabpfn.py (adapt for regression)",
+          "examples/tabpfn_with_tuning.py (shows tuning API patterns)",
+          "scripts/download_all_models.py (optional to pre-download checkpoints)"
+        ],
+        "config_files": [
+          "src/tabpfn/settings.py",
+          "examples/ (no formal config files; benchmarking scripts define parameters inline)"
+        ],
+        "required_inputs": [
+          "sklearn.datasets.fetch_california_housing (or pre-downloaded CSV/NumPy arrays)",
+          "Optional: model checkpoints (auto-downloaded) and installed baseline libraries: xgboost, lightgbm, catboost, autogluon (if used)"
+        ],
+        "expected_outputs": [
+          "Tabular summary comparing models: MSE/MAE/R^2, fit time, predict time",
+          "Per-model predicted values and optionally saved artifacts (plots, CSVs)"
+        ],
+        "dependency_hints": [
+          "xgboost, lightgbm, catboost, autogluon (optional, for baselines)",
+          "pandas (for result tables)",
+          "joblib, filelock (used by model download/loading)"
+        ],
+        "ambiguity_notes": [
+          "Repository has a classification benchmarking example; no out-of-the-box regression benchmarking script — requires minor adaptation (use sklearn regressors and metrics).",
+          "Which baseline regressors to include is unspecified by the user; choose e.g., Ridge, RandomForestRegressor, XGBoost, CatBoost, LightGBM, and optionally AutoGluon for ensemble."
+        ],
+        "notes": "Follow the evaluation protocol in the paper (90% train / 10% test, 10 repetitions) if reproducing paper-style normalized comparisons; simpler single-split comparisons are common for quick checks."
+      },
+      {
+        "workflow_name": "Visualize predicted distributions and extract embeddings",
+        "paper_reference": "Fig. 3b (distribution), Fig. 6 (density estimation, embeddings)",
+        "confidence": "high",
+        "objective": "After fitting TabPFNRegressor, produce per-sample predictive distributions and optionally extract embeddings for downstream tasks.",
+        "repo_entrypoints": [
+          "examples/plot_regression_distribution.py",
+          "src/tabpfn/regressor.py -> get_embeddings()",
+          "src/tabpfn/visualisation/regression_distribution.py"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "Fitted TabPFNRegressor (from fit) and test X",
+          "Matplotlib for plotting"
+        ],
+        "expected_outputs": [
+          "PNG plots of per-sample predicted distributions",
+          "NumPy arrays of embeddings (shape: n_estimators x n_samples x embedding_dim or simplified shape)"
+        ],
+        "dependency_hints": [
+          "matplotlib, numpy"
+        ],
+        "ambiguity_notes": [
+          "Plotting functions in examples use the diabetes dataset; swap to California Housing and select representative test rows."
+        ],
+        "notes": "get_embeddings() returns embeddings from the model's final layer; examples show how to visualize."
+      }
+    ],
+    "repo_entrypoints": [
+      "examples/tabpfn_for_regression.py",
+      "src/tabpfn/regressor.py",
+      "examples/plot_regression_distribution.py",
+      "examples/benchmarking_tabpfn.py (adapt for regression)",
+      "examples/tabpfn_with_tuning.py (shows tuning API patterns)",
+      "scripts/download_all_models.py (optional to pre-download checkpoints)",
+      "src/tabpfn/regressor.py -> get_embeddings()",
+      "src/tabpfn/visualisation/regression_distribution.py",
+      "examples/benchmarking_tabpfn.py",
+      "examples/tabpfn_with_tuning.py",
+      "scripts/download_all_models.py",
+      "src/tabpfn/model_loading.py",
+      "src/tabpfn/settings.py"
+    ],
+    "config_files": [
+      "src/tabpfn/settings.py",
+      "pyproject.toml",
+      "examples/ (no formal config files; benchmarking scripts define parameters inline)"
+    ],
+    "input_artifacts": [
+      "sklearn.datasets.fetch_california_housing (or X, y NumPy arrays)",
+      "Pretrained TabPFN regressor checkpoint (auto-download via model_path='auto' into cache directory)",
+      "sklearn.datasets.fetch_california_housing (or pre-downloaded CSV/NumPy arrays)",
+      "Optional: model checkpoints (auto-downloaded) and installed baseline libraries: xgboost, lightgbm, catboost, autogluon (if used)",
+      "Fitted TabPFNRegressor (from fit) and test X",
+      "Matplotlib for plotting"
+    ],
+    "expected_outputs": [
+      "Printed metrics: MSE, MAE, R^2",
+      "Optional: quantile predictions (lists of arrays) or full predicted distribution objects",
+      "Optional: PNG of predicted distribution (examples/plot_regression_distribution.py)",
+      "Tabular summary comparing models: MSE/MAE/R^2, fit time, predict time",
+      "Per-model predicted values and optionally saved artifacts (plots, CSVs)",
+      "PNG plots of per-sample predicted distributions",
+      "NumPy arrays of embeddings (shape: n_estimators x n_samples x embedding_dim or simplified shape)"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "Fig. 3 (regression qualitative examples)",
+        "repo_assets": [
+          "examples/plot_regression_distribution.py",
+          "src/tabpfn/regressor.py",
+          "src/tabpfn/visualisation/regression_distribution.py"
+        ],
+        "rationale": "plot_regression_distribution.py fits TabPFNRegressor and plots per-sample predictive distributions; src/regressor implements regression outputs and distribution handling."
+      },
+      {
+        "paper_reference": "Fig. 4 / Extended Data Table 2 (regression benchmarks)",
+        "repo_assets": [
+          "examples/benchmarking_tabpfn.py",
+          "examples/tabpfn_with_tuning.py",
+          "scripts/download_all_models.py",
+          "src/tabpfn/model_loading.py"
+        ],
+        "rationale": "benchmarking_tabpfn.py shows how to compare TabPFN against baselines (classification example) and can be adapted to regression; model_loading handles checkpoint download needed for reproducing benchmarks."
+      },
+      {
+        "paper_reference": "User guide / Methods: 'Data preparation' and 'Inference details'",
+        "repo_assets": [
+          "src/tabpfn/settings.py",
+          "src/tabpfn/regressor.py",
+          "src/tabpfn/model_loading.py"
+        ],
+        "rationale": "These modules control preprocessing defaults, inference modes, model version selection, and automatic checkpoint downloads referenced in the paper's user guide."
+      }
+    ],
+    "ambiguous_mappings": [
+      "The paper reports normalized aggregated benchmark scores (normalized per-dataset across many datasets) — reproducing that requires running multiple datasets and the normalization protocol (not a single California Housing run).",
+      "Which baseline regressors to compare against was not specified by the user; the repo provides classification benchmarking as example but no ready-made regression benchmarking script covering XGBoost/CatBoost/LightGBM ensembles.",
+      "Default model version used by the API is V3 (src/tabpfn/settings.py). The paper comparisons used models and evaluation protocols tied to specific versions — selecting a version (V2/V2.5/V2.6/V3) affects results.",
+      "examples/tabpfn_for_regression.py uses the diabetes dataset; swap to fetch_california_housing and adapt train_test_split to match desired splits.",
+      "Default model version is V3 per settings; which exact checkpoint/version to use (v2/v2.5/v2.6/v3) is unspecified — different versions may require license acceptance / gated HF repo access.",
+      "Model weights are downloaded automatically unless a local path is provided; gated-model downloads may require browser-based license acceptance (handled by tabpfn.browser_auth).",
+      "Repository has a classification benchmarking example; no out-of-the-box regression benchmarking script — requires minor adaptation (use sklearn regressors and metrics).",
+      "Which baseline regressors to include is unspecified by the user; choose e.g., Ridge, RandomForestRegressor, XGBoost, CatBoost, LightGBM, and optionally AutoGluon for ensemble.",
+      "Plotting functions in examples use the diabetes dataset; swap to California Housing and select representative test rows."
+    ],
+    "missing_information": [
+      "User did not specify which baseline regressors to include for comparison (e.g., scikit-learn Ridge/RandomForest, XGBoost, CatBoost, LightGBM, AutoGluon).",
+      "Evaluation protocol (single train/test split vs. 10 repetitions with 90%/10% splits as in paper) was not specified.",
+      "Whether to pin a specific TabPFN model version or accept the default auto-download (which may require HF license acceptance for gated models) is unspecified."
+    ],
+    "notes": "The repository contains runnable examples that can be adapted to run TabPFNRegressor on sklearn's California Housing dataset and to compare against other regressors. Executing the workflows (data download, model download, fitting, and metric computation) requires a runtime with the dependencies installed (PyTorch, scikit-learn, etc.) and may require accepting gated HuggingFace repo licenses for some model versions."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "Train TabPFNRegressor on California Housing",
+        "status": "blocked",
+        "paper_reference": null,
+        "files_staged": [
+          "src/tabpfn",
+          "examples/tabpfn_for_regression.py"
+        ],
+        "commands_run": [
+          "python -c \"import sys, os; sys.path.insert(0, os.path.join(os.getcwd(), 'src')); import tabpfn; print('OK', getattr(tabpfn, '__version__', 'no-version'))\""
+        ],
+        "observed_outputs": [],
+        "missing_inputs": [
+          "Python dependencies: typing_extensions, torch, scikit-learn, pydantic-settings, huggingface-hub, (matplotlib optional)",
+          "Pretrained TabPFN model weights (auto-download may require license acceptance / HF token)"
+        ],
+        "dependency_issues": [
+          "ModuleNotFoundError: No module named 'typing_extensions' (import of package failed)",
+          "Environment currently missing scikit-learn and torch (observed by test imports)"
+        ],
+        "runtime_errors": [
+          "Traceback (most recent call last): ModuleNotFoundError: No module named 'typing_extensions'"
+        ],
+        "retryable": true,
+        "confidence_notes": "Attempting to import the package from staged src/ failed immediately due to missing Python dependencies; running the training workflow requires installing the listed dependencies and ensuring model weights can be downloaded (or pre-downloaded)."
+      },
+      {
+        "workflow_name": "Benchmark TabPFNRegressor vs other regressors",
+        "status": "blocked",
+        "paper_reference": null,
+        "files_staged": [
+          "examples/benchmarking_tabpfn.py"
+        ],
+        "commands_run": [
+          "none (blocked by package import/deps)"
+        ],
+        "observed_outputs": [],
+        "missing_inputs": [
+          "tabpfn package importable (install dependencies / pip install -e .)",
+          "Baseline libraries (install as needed): xgboost, lightgbm, catboost, autogluon (optional), pandas",
+          "Pretrained TabPFN model weights and possible HF license acceptance"
+        ],
+        "dependency_issues": [
+          "Package import failed due to typing_extensions missing (see workflow 1)",
+          "Baseline libs (xgboost etc.) likely missing in this environment"
+        ],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "Benchmark script exists but cannot run until core package and baseline libraries are installed; also TabPFN model download / license acceptance may be required before fitting."
+      },
+      {
+        "workflow_name": "Visualize predicted distributions and extract embeddings",
+        "status": "blocked",
+        "paper_reference": null,
+        "files_staged": [
+          "examples/plot_regression_distribution.py"
+        ],
+        "commands_run": [
+          "none (blocked by package import/deps)"
+        ],
+        "observed_outputs": [],
+        "missing_inputs": [
+          "tabpfn importable (typing_extensions, torch, scikit-learn, etc.)",
+          "matplotlib (for plotting) and numpy",
+          "Pretrained model weights or authenticated access to download them"
+        ],
+        "dependency_issues": [
+          "ModuleNotFoundError: No module named 'typing_extensions' prevents importing tabpfn and running visualization code"
+        ],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "Visualization relies on a fitted TabPFNRegressor and matplotlib; blocked until dependencies and model weights are available."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "Train TabPFNRegressor on California Housing",
+      "Benchmark TabPFNRegressor vs other regressors",
+      "Visualize predicted distributions and extract embeddings"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Install the project's runtime dependencies (minimum): pip install -e .[viz] from the repo root or pip install typing_extensions torch scikit-learn pydantic-settings huggingface-hub matplotlib numpy",
+      "After installing deps, retry a smoke import: python -c \"import tabpfn; print(tabpfn.__name__)\" (or run examples/tabpfn_for_regression.py)",
+      "If model weights fail to download, authenticate/accept the license: set TABPFN_TOKEN=<api-key> or run the browser-based flow (tabpfn.browser_auth.ensure_license_accepted) or use scripts/download_all_models.py after auth",
+      "For benchmarking, install baseline libs as needed (xgboost, lightgbm, catboost, autogluon) and adapt examples/benchmarking_tabpfn.py for regression (or use examples/tabpfn_for_regression.py as a minimal starting point)",
+      "Avoid running full benchmarks until dependencies and model weights are confirmed; start with a single run on California Housing to verify environment and timing"
+    ],
+    "notes": "I staged the package source and example scripts and attempted a lightweight import test. Import failed immediately due to missing typing_extensions; the runtime also lacks scikit-learn and torch. Model weight downloads may be gated and require manual license acceptance or TABPFN_TOKEN."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Blocked: core reproduction workflows cannot run due to missing runtime dependencies and absent pretrained model weights; benchmarking additionally blocked by missing baseline libraries.",
+    "identified_gaps": [
+      {
+        "title": "Missing runtime Python dependencies (torch, scikit-learn, etc.)",
+        "gap_type": "execution_gap",
+        "severity": "high",
+        "paper_reference": null,
+        "related_repo_files": [
+          "pyproject.toml",
+          "examples/tabpfn_for_regression.py",
+          "examples/benchmarking_tabpfn.py"
+        ],
+        "related_workflow": "Train TabPFNRegressor on California Housing",
+        "execution_evidence": [
+          "testing_report.workflows: ModuleNotFoundError: No module named 'typing_extensions' and environment missing scikit-learn and torch",
+          "execution_answer.venv_status(): Installed packages: pip==26.1.2, typing_extensions==4.15.0 (no torch, no scikit-learn)",
+          "testing_report.recommendations: pip install -e .[viz] suggested; workflows blocked until dependencies installed"
+        ],
+        "explanation": "The runtime environment lacks required packages declared in pyproject.toml (torch>=2.5, scikit-learn>=1.2.0, etc.), causing immediate import failures and preventing any training or benchmark execution.",
+        "likely_impact": "High — completely blocks running the TabPFN regressor, training on California Housing, and running benchmarks.",
+        "possible_remediation": "Install the package dependencies (e.g., pip install -e . or pip install -e .[viz]; or pip install torch scikit-learn pydantic-settings huggingface-hub numpy matplotlib etc.), then retry the examples."
+      },
+      {
+        "title": "Pretrained TabPFN model weights absent in repo / gated by license/token",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": null,
+        "related_repo_files": [
+          "scripts/download_all_models.py",
+          "src/tabpfn/model_loading.py",
+          "src/tabpfn/architectures/shared/tabpfn_col_embedding.pt",
+          "pyproject.toml"
+        ],
+        "related_workflow": "Train TabPFNRegressor on California Housing",
+        "execution_evidence": [
+          "execution_answer: no .pth files found in repo; only src/tabpfn/architectures/shared/tabpfn_col_embedding.pt (376.6 KB)",
+          "testing_report.missing_inputs: Pretrained TabPFN model weights (auto-download may require license acceptance / HF token)",
+          "execution_answer.final_answer and blocker_explanation: weights are not included and auto-download may require Hugging Face license acceptance / TABPFN_TOKEN"
+        ],
+        "explanation": "The repository does not contain full pretrained model weights; the workflow expects auto-download but that process is gated (may require authentication or license acceptance), so a runnable model is not available by default.",
+        "likely_impact": "High — without accessible pretrained weights (or a documented way to obtain them), reproducing reported model performance or running inference is not possible.",
+        "possible_remediation": "Provide instructions and scripts to authenticate and download weights (e.g., document TABPFN_TOKEN flow and use scripts/download_all_models.py), or include a small demo checkpoint for smoke tests."
+      },
+      {
+        "title": "Benchmarking blocked by missing baseline libraries (xgboost, lightgbm, catboost, etc.)",
+        "gap_type": "fragile_setup",
+        "severity": "medium",
+        "paper_reference": null,
+        "related_repo_files": [
+          "examples/benchmarking_tabpfn.py",
+          "pyproject.toml"
+        ],
+        "related_workflow": "Benchmark TabPFNRegressor vs other regressors",
+        "execution_evidence": [
+          "testing_report.missing_inputs: Baseline libraries (xgboost, lightgbm, catboost, autogluon optional, pandas) missing",
+          "testing_report.dependency_issues: baseline libs likely missing in this environment",
+          "execution_answer.venv_status(): only typing_extensions installed (baseline libs absent)"
+        ],
+        "explanation": "The benchmark script depends on several third-party baseline libraries which are not installed in the environment; lacking these prevents running comparative benchmarks even after installing TabPFN dependencies.",
+        "likely_impact": "Medium — prevents reproducing benchmark comparisons reported by examples, though core TabPFN training/inference could be verified separately once dependencies and weights are available.",
+        "possible_remediation": "Install required baseline libraries (e.g., pip install xgboost lightgbm catboost autogluon pandas) or document a minimal benchmark configuration that runs with fewer dependencies."
+      }
+    ],
+    "paper_repo_mismatches": [],
+    "execution_gaps": [
+      "Missing runtime Python dependencies (torch, scikit-learn, etc.)",
+      "Benchmarking blocked by missing baseline libraries (xgboost, lightgbm, catboost, etc.)"
+    ],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Pretrained TabPFN model weights absent in repo / gated by license/token"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 2,
+      "medium": 1,
+      "low": 0
+    },
+    "evidence_sources": [
+      "testing_report.workflows",
+      "execution_answer.chain",
+      "execution_answer.final_answer",
+      "execution_tool_outputs",
+      "critic_reviews",
+      "install_events"
+    ],
+    "recommended_followups": [
+      "Install runtime dependencies from pyproject.toml (e.g., pip install -e . or pip install -e .[viz]) and re-run the regression example to confirm imports succeed.",
+      "Authenticate / accept license and download pretrained TabPFN weights (TABPFN_TOKEN or scripts/download_all_models.py) or provide accessible test checkpoints, then re-run training/inference.",
+      "Install baseline libraries (xgboost, lightgbm, catboost, pandas, etc.) before running examples/benchmarking_tabpfn.py; start with a single California Housing run to validate performance."
+    ],
+    "notes": "Repository contains regression examples and a clear API (examples/tabpfn_for_regression.py) but execution was blocked by environment and missing-weight issues documented above."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "High-severity execution and missing-artifact gaps (missing runtime dependencies and absent pretrained TabPFN weights) directly prevent running the workflow and producing the requested results.",
+    "triggered_gaps": [
+      "Missing runtime Python dependencies (torch, scikit-learn, etc.)",
+      "Pretrained TabPFN model weights absent in repo / gated by license/token"
+    ]
+  },
+  "elapsed_seconds": 380.6
+}

@@ -1,0 +1,387 @@
+{
+  "id": "FADVI_003",
+  "team": "testing-worker-critic",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.03.683998v1",
+  "question": "Load the scRNA-seq data from 'fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad' (500 cells x 2000 genes) and the spatial transcriptomics data from 'fadvi/notebooks/spatial_and_single_cell/data/st_data.h5ad' (300 spots x 2000 genes). Use TACCO to annotate the ST data using the scRNA-seq reference with the cell_type annotation key, concatenate the data with 'tech' as the batch label, then train a FADVI model with batch_key='tech', labels_key='cell_type', using the counts layer, for 30 epochs. What is the dimensionality (number of features) of the latent representation?",
+  "ground_truth": "30",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "I will list all repository files to verify whether the example .h5ad input files exist at the paths referenced by the tutorial.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\21-66M-fadvi\\repo:\n.flake8\n.gitignore\n.readthedocs.yaml\nLICENSE\nMANIFEST.in\nREADME.md\npyproject.toml\nrequirements.txt\n.github/dependabot.yml\n.github/workflows/ci.yml\n.github/workflows/release.yml\ndocs/Makefile\ndocs/changelog.rst\ndocs/conf.py\ndocs/contributing.rst\ndocs/index.rst\ndocs/installation.rst\ndocs/make.bat\ndocs/requirements.txt\ndocs/api/fadvi.rst\ndocs/api/index.rst\ndocs/api/model.rst\ndocs/examples/index.rst\ndocs/tutorials/advanced_usage.rst\ndocs/tutorials/basic_usage.rst\ndocs/tutorials/index.rst\ndocs/tutorials/quickstart.rst\ndocs/tutorials/spatial_and_single_cell.rst\ndocs/_static/.gitkeep\nsrc/fadvi/__init__.py\nsrc/fadvi/_fadvae.py\nsrc/fadvi/_fadvi.py\ntest/__init__.py\ntest/test_fadvi.py\ntest/test_fadvi_predict.py\ntest/test_installation.py\ntest/test_interpretability.py",
+      "reflection": "The repo tree does not show the example .h5ad data files; next I will search specifically for .h5ad files to be sure."
+    },
+    {
+      "step": 2,
+      "thought": "Search the repository for any .h5ad files (the required input files) to confirm whether they are present anywhere in the repo.",
+      "action": "find_repo_files({\"pattern\":\".h5ad\",\"include_binary\":true})",
+      "observation": "No filenames matched '.h5ad' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\21-66M-fadvi\\repo",
+      "reflection": "The example AnnData files are not present in the repo. I should inspect the model source to confirm default latent sizes, and check the environment for required deps before attempting execution."
+    },
+    {
+      "step": 3,
+      "thought": "Read the FADVI source to confirm the default latent dimensionalities (n_latent_b, n_latent_l, n_latent_r) and the get_latent_representation behavior (label vs full).",
+      "action": "read_repo_file({\"relative_path\":\"src/fadvi/_fadvi.py\"})",
+      "observation": "Contents of C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\21-66M-fadvi\\repo\\src\\fadvi\\_fadvi.py:\nfrom __future__ import annotations\n\nimport importlib\nimport logging\nfrom typing import TYPE_CHECKING\n\nimport numpy as np\nimport pandas as pd\nimport torch\nimport torchmetrics.functional as tmf\nfrom scvi import REGISTRY_KEYS\nfrom scvi.data import AnnDataManager\nfrom scvi.data.fields import (\n    CategoricalJointObsField,\n    CategoricalObsField,\n    LabelsWithUnlabeledObsField,\n    LayerField,\n    NumericalJointObsField,\n    NumericalObsField,\n)\nfrom scvi.model._utils import _init_library_size\nfrom scvi.model.base import (\n    ArchesMixin,\n    BaseMinifiedModeModelClass,\n    RNASeqMixin,\n    SemisupervisedTrainingMixin,\n    VAEMixin,\n)\nfrom scvi.module.base import BaseModuleClass, LossOutput\nfrom scvi.train import SemiSupervisedTrainingPlan, TrainingPlan\nfrom scvi.train._constants import METRIC_KEYS\nfrom scvi.train._metrics import ElboMetric\n\nfrom ._fadvae import FADVAE\n\nif TYPE_CHECKING:\n    from typing import Literal\n\n    from anndata import AnnData\n\nlogger = logging.getLogger(__name__)\n\n\nclass SemiSupervisedTrainingPlanFixed(SemiSupervisedTrainingPlan):\n    def __init__(\n        self,\n        module: BaseModuleClass,\n        n_classes: int,\n        *,\n        lr: float = 1e-3,\n        weight_decay: float = 1e-6,\n        n_steps_kl_warmup: int | None = None,\n        n_epochs_kl_warmup: int | None = 400,\n        reduce_lr_on_plateau: bool = False,\n        lr_factor: float = 0.6,\n        lr_patience: int = 30,\n        lr_threshold: float = 0.0,\n        lr_scheduler_metric: Literal[\n            \"elbo_validation\", \"reconstruction_loss_validation\", \"kl_local_validation\"\n        ] = \"elbo_validation\",\n        compile: bool = False,\n        compile_kwargs: dict | None = None,\n        **loss_kwargs,\n    ):\n        super().__init__(\n            module=module,\n            n_classes=n_classes,\n            lr=lr,\n            weight_decay=weight_decay,\n            n_steps_kl_warmup=n_steps_kl_warmup,\n            n_epochs_kl_warmup=n_epochs_kl_warmup,\n            reduce_lr_on_plateau=reduce_lr_on_plateau,\n            lr_factor=lr_factor,\n            lr_patience=lr_patience,\n            lr_threshold=lr_threshold,\n            lr_scheduler_metric=lr_scheduler_metric,\n            compile=compile,\n            compile_kwargs=compile_kwargs,\n            **loss_kwargs,\n        )\n\n    def compute_and_log_metrics(\n        self, loss_output: LossOutput, metrics: dict[str, ElboMetric], mode: str\n    ):\n        \"\"\"Computes and logs metrics.\"\"\"\n        TrainingPlan.compute_and_log_metrics(self, loss_output, metrics, mode)\n        # no labeled observations in minibatch\n        if loss_output.classification_loss is None:\n            return\n\n        classification_loss = loss_output.classification_loss\n        true_labels = loss_output.true_labels\n        logits = loss_output.logits\n        predicted_labels = torch.argmax(logits, dim=-1)\n\n        accuracy = tmf.classification.multiclass_accuracy(\n            predicted_labels,\n            true_labels,\n            self.n_classes,\n            average=\"micro\",\n        )\n\n        f1 = tmf.classification.multiclass_f1_score(\n            predicted_labels,\n            true_labels,\n            self.n_classes,\n            average=\"micro\",\n        )\n        ce = tmf.classification.multiclass_calibration_error(\n            logits,\n            true_labels,\n            self.n_classes,\n        )\n\n        self.log_with_mode(\n            METRIC_KEYS.CLASSIFICATION_LOSS_KEY,\n            classification_loss,\n            mode,\n            on_step=False,\n            on_epoch=True,\n            batch_size=loss_output.n_obs_minibatch,\n        )\n        self.log_with_mode(\n            METRIC_KEYS.ACCURACY_KEY,\n            accuracy,\n            mode,\n            on_step=False,\n            on_epoch=True,\n            batch_size=loss_output.n_obs_minibatch,\n        )\n        self.log_with_mode(\n            METRIC_KEYS.F1_SCORE_KEY,\n            f1,\n            mode,\n            on_step=False,\n            on_epoch=True,\n            batch_size=loss_output.n_obs_minibatch,\n        )\n        self.log_with_mode(\n            METRIC_KEYS.CALIBRATION_ERROR_KEY,\n            ce,\n            mode,\n            on_step=False,\n            on_epoch=True,\n            batch_size=loss_output.n_obs_minibatch,\n        )\n\n\nclass FADVI(\n    RNASeqMixin,\n    SemisupervisedTrainingMixin,\n    VAEMixin,\n    ArchesMixin,\n    BaseMinifiedModeModelClass,\n):\n    \"\"\"Factor Disentanglement Variational Inference model.\n\n    This model disentangles batch-related variation, label-related variation,\n    and residual variation using adversarial training and cross-correlation penalties.\n\n    Parameters\n    ----------\n    adata\n        AnnData object that has been registered via :meth:`~scvi.model.FADVI.setup_anndata`.\n    registry\n        Registry of the datamodule used to train FADVI model.\n    n_hidden\n        Number of nodes per hidden layer.\n    n_latent_b\n        Dimensionality of the batch latent space.\n    n_latent_l\n        Dimensionality of the label latent space.\n    n_latent_r\n        Dimensionality of the residual latent space.\n    n_layers\n        Number of hidden layers used for encoder and decoder NNs.\n    dropout_rate\n        Dropout rate for neural networks.\n    dispersion\n        One of the following:\n\n        * ``'gene'`` - dispersion parameter of NB is constant per gene across cells\n        * ``'gene-batch'`` - dispersion can differ between different batches\n        * ``'gene-label'`` - dispersion can differ between different labels\n        * ``'gene-cell'`` - dispersion can differ for every gene in every cell\n    gene_likelihood\n        One of:\n\n        * ``'nb'`` - Negative binomial distribution\n        * ``'zinb'`` - Zero-inflated negative binomial distribution\n        * ``'poisson'`` - Poisson distribution\n    use_observed_lib_size\n        If ``True``, use the observed library size for RNA as the scaling factor in the mean of the\n        conditional distribution.\n    beta\n        Weight for KL divergence in ELBO.\n    lambda_b\n        Weight for batch classification loss.\n    lambda_l\n        Weight for label classification loss.\n    alpha_bl\n        Weight for adversarial loss (label prediction from batch latents).\n    alpha_lb\n        Weight for adversarial loss (batch prediction from label latents).\n    alpha_rb\n        Weight for adversarial loss (batch prediction from residual latents).\n    alpha_rl\n        Weight for adversarial loss (label prediction from residual latents).\n    gamma\n        Weight for cross-correlation penalty.\n    **model_kwargs\n        Keyword args for :class:`~fadvi.FADVAE`\n\n    Examples\n    --------\n    >>> adata = anndata.read_h5ad(path_to_anndata)\n    >>> fadvi.FADVI.setup_anndata(adata, batch_key=\"batch\", labels_key=\"labels\")\n    >>> model = fadvi.FADVI(adata)\n    >>> model.train()\n    >>> adata.obsm[\"X_fadvi_b\"] = model.get_latent_representation(representation=\"b\")\n    >>> adata.obsm[\"X_fadvi_l\"] = model.get_latent_representation(representation=\"l\")\n    >>> adata.obsm[\"X_fadvi_r\"] = model.get_latent_representation(representation=\"r\")\n    \"\"\"\n\n    _training_plan_cls = SemiSupervisedTrainingPlanFixed\n\n    def __init__(\n        self,\n        adata: AnnData,\n        registry: dict | None = None,\n        n_hidden: int = 128,\n        n_latent_b: int = 30,\n        n_latent_l: int = 30,\n        n_latent_r: int = 10,\n        n_layers: int = 2,\n        dropout_rate: float = 0.1,\n        dispersion: Literal[\"gene\", \"gene-batch\", \"gene-label\", \"gene-cell\"] = \"gene\",\n        gene_likelihood: Literal[\"zinb\", \"nb\", \"poisson\"] = \"zinb\",\n        use_observed_lib_size: bool = True,\n        beta: float = 1.0,\n        lambda_b: float = 50,\n        lambda_l: float = 50,\n        alpha_bl: float = 1.0,\n        alpha_lb: float = 1.0,\n        alpha_rb: float = 1.0,\n        alpha_rl: float = 1.0,\n        gamma: float = 1.0,\n        **model_kwargs,\n    ):\n        super().__init__(adata, registry)\n\n        self._set_indices_and_labels()\n        self._set_batch_mapping()\n\n        n_batch = self.summary_stats.n_batch\n\n        # Following SCANVI pattern: reduce n_labels for module if unlabeled category exists\n        n_labels = self.summary_stats.n_labels\n        unlabeled_category_id = None\n        if (\n            self.unlabeled_category_ is not None\n            and self.unlabeled_category_ in self.labels_\n        ):\n            n_labels = self.summary_stats.n_labels - 1\n            # Find the ID of the unlabeled category in the label mapping\n            unlabeled_category_id = np.where(\n                self._label_mapping == self.unlabeled_category_\n            )[0]\n            if len(unlabeled_category_id) > 0:\n                unlabeled_category_id = int(unlabeled_category_id[0])\n            else:\n                unlabeled_category_id = None\n        else:\n            if adata is not None and len(set(self.labels_)) == (\n                self.summary_stats.n_labels - 1\n            ):\n                n_labels = self.summary_stats.n_labels - 1\n            else:\n                n_labels = self.summary_stats.n_labels\n\n        # Store both original and reduced n_labels\n        self.n_labels_original = (\n            self.summary_stats.n_labels\n        )  # For training plan compatibility\n        self.n_labels = n_labels  # Reduced for module (actual prediction classes)\n        n_continuous_cov = self.summary_stats.get(\"n_extra_continuous_covs\", 0)\n        if adata is not None:\n            n_cats_per_cov = (\n                self.adata_manager.get_state_registry(\n                    REGISTRY_KEYS.CAT_COVS_KEY\n                ).n_cats_per_key\n                if REGISTRY_KEYS.CAT_COVS_KEY in self.adata_manager.data_registry\n                else None\n            )\n        else:\n            # custom datamodule\n            if (\n                len(\n                    self.registry[\"field_registries\"][f\"{REGISTRY_KEYS.CAT_COVS_KEY}\"][\n                        \"state_registry\"\n                    ]\n                )\n                > 0\n            ):\n                n_cats_per_cov = tuple(\n                    self.registry[\"field_registries\"][f\"{REGISTRY_KEYS.CAT_COVS_KEY}\"][\n                        \"state_registry\"\n                    ][\"n_cats_per_key\"]\n                )\n            else:\n                n_cats_per_cov = None\n\n        # Complain if unlabeled\n        use_size_factor_key = (\n            REGISTRY_KEYS.SIZE_FACTOR_KEY in self.adata_manager.data_registry\n        )\n        library_log_means, library_log_vars = None, None\n        if not use_size_factor_key:\n            library_log_means, library_log_vars = _init_library_size(\n                self.adata_manager, n_batch\n            )\n\n        self.module = FADVAE(\n            n_input=self.summary_stats.n_vars,\n            n_batch=n_batch,\n            n_labels=n_labels,\n            n_continuous_cov=n_continuous_cov,\n            n_cats_per_cov=n_cats_per_cov,\n            n_hidden=n_hidden,\n            n_latent_b=n_latent_b,\n            n_latent_l=n_latent_l,\n            n_latent_r=n_latent_r,\n            n_layers=n_layers,\n            dropout_rate=dropout_rate,\n            dispersion=dispersion,\n            gene_likelihood=gene_likelihood,\n            use_observed_lib_size=use_observed_lib_size,\n            library_log_means=library_log_means,\n            library_log_vars=library_log_vars,\n            beta=beta,\n            lambda_b=lambda_b,\n            lambda_l=lambda_l,\n            alpha_bl=alpha_bl,\n            alpha_lb=alpha_lb,\n            alpha_rb=alpha_rb,\n            alpha_rl=alpha_rl,\n            gamma=gamma,\n            unlabeled_category_id=unlabeled_category_id,\n            **model_kwargs,\n        )\n        self._model_summary_string = (\n            f\"FADVI Model with the following params: \\n\"\n            f\"unlabeled_category: {self.unlabeled_category_}, n_hidden: {n_hidden}, \"\n            f\"n_latent_b: {n_latent_b}, n_latent_l: {n_latent_l}, n_latent_r: {n_latent_r}, \"\n            f\"n_layers: {n_layers}, dropout_rate: {dropout_rate}, \"\n            f\"dispersion: {dispersion}, gene_likelihood: {gene_likelihood}, \"\n            f\"beta: {beta}, lambda_b: {lambda_b}, lambda_l: {lambda_l}, \"\n            f\"alpha_bl: {alpha_bl}, alpha_lb: {alpha_lb}, alpha_rb: {alpha_rb}, alpha_rl: {alpha_rl}, \"\n            f\"gamma: {gamma}\"\n        )\n        self.init_params_ = self._get_init_params(locals())\n\n    def _set_batch_mapping(self):\n        \"\"\"Set up batch mapping for converting codes to original batch labels.\"\"\"\n        if REGISTRY_KEYS.BATCH_KEY in self.adata_manager.data_registry:\n            batch_state_registry = self.adata_manager.get_state_registry(\n                REGISTRY_KEYS.BATCH_KEY\n            )\n            self._batch_mapping = batch_state_registry.categorical_mapping\n            self._code_to_batch = dict(enumerate(self._batch_mapping))\n        else:\n            self._batch_mapping = None\n            self._code_to_batch = None\n\n    def _get_label_mapping_for_predictions(self):\n        \"\"\"Get label mapping excluding unlabeled category for predictions.\"\"\"\n        if self._label_mapping is None:\n            return None\n\n        # Filter out unlabeled category if it exists\n        if (\n            self.unlabeled_category_ is not None\n            and self.unlabeled_category_ in self._label_mapping\n        ):\n            # Return all categories except the unlabeled one\n            filtered_mapping = [\n                cat for cat in self._label_mapping if cat != self.unlabeled_category_\n            ]\n            return np.array(filtered_mapping)\n        else:\n            return self._label_mapping\n\n    def _get_code_to_label_for_predictions(self):\n        \"\"\"Get code-to-label mapping excluding unlabeled category for predictions.\"\"\"\n        filtered_mapping = self._get_label_mapping_for_predictions()\n        if filtered_mapping is None:\n            return None\n        return dict(enumerate(filtered_mapping))\n\n    @classmethod\n    def setup_anndata(\n        cls,\n        adata: AnnData,\n        layer: str | None = None,\n        batch_key: str | None = None,\n        labels_key: str | None = None,\n        unlabeled_category: str = \"Unknown\",\n        size_factor_key: str | None = None,\n        categorical_covariate_keys: list[str] | None = None,\n        continuous_covariate_keys: list[str] | None = None,\n        **kwargs,\n    ) -> AnnDataManager | None:\n        \"\"\"Set up AnnData object for FADVI model.\n\n        A mapping will be created between data fields used by FADVI and AnnData objects.\n        None of the data in adata are modified. Only adds fields to uns.\n\n        Parameters\n        ----------\n        AnnData object.\n            Rows represent cells, columns represent features.\n        layer\n            If not `None`, uses this as the key in `adata.layers` for raw count data.\n        batch_key\n            key in `adata.obs` for batch information. Categories will automatically be converted into\n            integer categories and saved to `adata.obs['_scvi_batch']`. If `None`, assigns the same batch\n            to all the data.\n        labels_key\n            key in `adata.obs` for label information. Categories will automatically be converted into\n            integer categories and saved to `adata.obs['_scvi_labels']`. If `None`, assigns the same label\n            to all the data.\n        unlabeled_category\n            value in `adata.obs[labels_key]` that indicates unlabeled observations.\n        size_factor_key\n            key in `adata.obs` for size factor information. Instead of using library size as a size factor,\n            the provided size factor column will be used as offset in the mean of the likelihood. Assumed\n            to be on linear scale.\n        categorical_covariate_keys\n            keys in `adata.obs` that correspond to categorical data.\n            These covariates can be added in addition to the batch covariate and are also treated as\n            nuisance factors (i.e., the model tries to minimize their effects on the latent space). Thus,\n            these should not be used for biologically-relevant factors that you do _not_ want to correct\n            for.\n        continuous_covariate_keys\n            keys in `adata.obs` that correspond to continuous data.\n            These covariates can be added in addition to the batch covariate and are also treated as\n            nuisance factors (i.e., the model tries to minimize their effects on the latent space). Thus,\n            these should not be used for biologically-relevant factors that you do _not_ want to correct\n            for.\n\n        Returns\n        -------\n        None. Adds the following fields:\n\n            .uns['_scvi']\n                `scvi` setup dictionary\n            .obs['_scvi_labels']\n                labels encoded as integers\n            .obs['_scvi_batch']\n                batch encoded as integers\n        \"\"\"\n        setup_method_args = cls._get_setup_method_args(**locals())\n        anndata_fields = [\n            LayerField(REGISTRY_KEYS.X_KEY, layer, is_count_data=True),\n            CategoricalObsField(REGISTRY_KEYS.BATCH_KEY, batch_key),\n            LabelsWithUnlabeledObsField(\n                REGISTRY_KEYS.LABELS_KEY, labels_key, unlabeled_category\n            ),\n            NumericalObsField(\n                REGISTRY_KEYS.SIZE_FACTOR_KEY, size_factor_key, required=False\n            ),\n            CategoricalJointObsField(\n                REGISTRY_KEYS.CAT_COVS_KEY, categorical_covariate_keys\n            ),\n            NumericalJointObsField(\n                REGISTRY_KEYS.CONT_COVS_KEY, continuous_covariate_keys\n            ),\n        ]\n        adata_manager = AnnDataManager(\n            fields=anndata_fields, setup_method_args=setup_method_args\n        )\n        adata_manager.register_fields(adata, **kwargs)\n        cls.register_manager(adata_manager)\n\n    def get_latent_representation(\n        self,\n        adata: AnnData | None = None,\n        indices: list[int] | None = None,\n        give_mean: bool = True,\n        mc_samples: int = 5000,\n        batch_size: int | None = None,\n        return_dist: bool = False,\n        representation: Literal[\n            \"full\", \"b\", \"batch\", \"l\", \"label\", \"r\", \"residual\", \"lr\", \"label_residual\"\n        ] = \"label\",\n    ) -> dict[str, torch.Tensor] | torch.Tensor:\n        \"\"\"Return the latent representation for each cell.\n\n        Parameters\n        ----------\n        adata\n            AnnData object with equivalent structure to initial AnnData. If `None`, defaults to the\n            AnnData object used to initialize the model.\n        indices\n            Indices of cells in adata to use. If `None`, all cells are used.\n        give_mean\n            Give mean of distribution or sample from it.\n        mc_samples\n            For distributions that have no closed-form mean (e.g. `LogNormal`), how many Monte Carlo\n            samples to take for computing mean.\n        batch_size\n            Minibatch size for data loading into model. Defaults to `scvi.settings.batch_size`.\n        return_dist\n            If `True`, a mapping will be returned with key \"dist\" that contains distributional\n            samples of the latent variables.\n        representation\n            Which latent representation to return:\n            - \"full\": concatenated representation [z_b, z_l, z_r]\n            - \"b\" or \"batch\": batch representation only\n            - \"l\" or \"label\": label representation only\n            - \"r\" or \"residual\": residual representation only\n            - \"lr\" or \"label_residual\": concatenated label and residual representation\n\n        Returns\n        -------\n        latent_representation\n            Low-dimensional representation for each cell or dict of tensors if `return_dist` is True.\n        \"\"\"\n        if self.is_trained_ is False:\n            raise RuntimeError(\"Please train the model first.\")\n\n        adata = self._validate_anndata(adata)\n        scdl = self._make_data_loader(\n            adata=adata, indices=indices, batch_size=batch_size\n        )\n\n        latent = []\n        for tensors in scdl:\n            # Move tensors to model device\n            device = next(self.module.parameters()).device\n            tensors = {\n                k: v.to(device) if isinstance(v, torch.Tensor) else v\n                for k, v in tensors.items()\n            }\n\n            inference_inputs = self.module._get_inference_input(tensors)\n            outputs = self.module.inference(**inference_inputs)\n\n            if representation in [\"b\", \"batch\"]:\n                z = outputs[\"z_b\"]\n                qz = outputs[\"qb\"]\n            elif representation in [\"l\", \"label\"]:\n                z = outputs[\"z_l\"]\n                qz = outputs[\"ql\"]\n            elif representation in [\"r\", \"residual\"]:\n                z = outputs[\"z_r\"]\n                qz = outputs[\"qr\"]\n            elif representation in [\"lr\", \"label_residual\"]:\n                z_l = outputs[\"z_l\"]\n                z_r = outputs[\"z_r\"]\n                z = torch.cat([z_l, z_r], dim=-1)\n                qz = None\n            else:  # \"full\"\n                z_b = outputs[\"z_b\"]\n                z_l = outputs[\"z_l\"]\n                z_r = outputs[\"z_r\"]\n                z = torch.cat([z_b, z_l, z_r], dim=-1)\n                # For full representation, we don't return qz for now\n                qz = None\n\n            if not give_mean and qz is not None:\n                z = qz.sample()\n\n            latent += [z.cpu()]\n\n        if return_dist and qz is not None:\n            return {\"mean\": torch.cat(latent).detach().numpy(), \"dist\": qz}\n\n        return torch.cat(latent).detach().numpy()\n\n    def get_normalized_expression(\n        self,\n        adata: AnnData | None = None,\n        indices: list[int] | None = None,\n        transform_batch: str | int | None = None,\n        gene_list: list[str] | None = None,\n        library_size: float | Literal[\"latent\"] = 1,\n        n_samples: int = 1,\n        n_samples_overall: int | None = None,\n        batch_size: int | None = None,\n        return_mean: bool = True,\n        return_numpy: bool | None = None,\n    ):\n        \"\"\"Return the normalized (decoded) gene expression.\n\n        This is denoted as :math:`\\\\rho_n` in the scVI paper.\n\n        Parameters\n        ----------\n        adata\n            AnnData object with equivalent structure to initial AnnData. If `None`, defaults to the\n            AnnData object used to initialize the model.\n        indices\n            Indices of cells in adata to use. If `None`, all cells are used.\n        transform_batch\n            Batch to condition on.\n            If transform_batch is:\n\n            - None, then real observed batch is used.\n            - int, then batch transform_batch is used.\n        gene_list\n            Return frequencies of expression for a subset of genes.\n            This can save memory when working with large datasets and few genes are\n            of interest.\n        library_size\n            Scale the expression frequencies to a common library size.\n            This allows gene expression levels to be interpreted on a common scale of relevant\n            magnitude. If set to `\"latent\"`, use the latent library size.\n        n_samples\n            Number of posterior samples to use for estimation.\n        n_samples_overall\n            Number of posterior samples to use for estimation. Overrides `n_samples`.\n        batch_size\n            Minibatch size for data loading into model. Defaults to `scvi.settings.batch_size`.\n        return_mean\n            Whether to return the mean of the samples.\n        return_numpy\n            Return a :class:`~numpy.ndarray` instead of a :class:`~pandas.DataFrame`. DataFrame includes\n            gene names as columns. If either `n_samples=1` or `return_mean=True`, defaults to `False`.\n            Otherwise, it defaults to `True`.\n\n        Returns\n        -------\n        normalized_expression\n            If `n_samples` > 1 and `return_mean` is False, then the shape is `(samples, cells, genes)`.\n            Otherwise, shape is `(cells, genes)`. In this case, return type is\n            :class:`~pandas.DataFrame` unless `return_numpy` is True.\n        \"\"\"\n        return super().get_normalized_expression(\n            adata=adata,\n            indices=indices,\n            transform_batch=transform_batch,\n            gene_list=gene_list,\n            library_size=library_size,\n            n_samples=n_samples,\n            n_samples_overall=n_samples_overall,\n            batch_size=batch_size,\n            return_mean=return_mean,\n            return_numpy=return_numpy,\n        )\n\n    def _batch_classifier_for_interpretability(\n        self, x, batch_index=None, cat_covs=None, cont_covs=None\n    ):\n        \"\"\"Classifier function for batch prediction with interpretability methods.\"\"\"\n        inference_outputs = self.module.inference(\n            x, batch_index=batch_index, cat_covs=cat_covs, cont_covs=cont_covs\n        )\n        z_b = inference_outputs[\"z_b\"]\n        batch_logits = self.module.head_batch(z_b)\n        return torch.softmax(batch_logits, dim=1)\n\n    def _label_classifier_for_interpretability(\n        self, x, batch_index=None, cat_covs=None, cont_covs=None\n    ):\n        \"\"\"Classifier function for label prediction with interpretability methods.\"\"\"\n        inference_outputs = self.module.inference(\n            x, batch_index=batch_index, cat_covs=cat_covs, cont_covs=cont_covs\n        )\n        z_l = inference_outputs[\"z_l\"]\n        label_logits = self.module.head_label(z_l)\n        return torch.softmax(label_logits, dim=1)\n\n    def _compute_attributions(\n        self,\n        method: Literal[\"ig\", \"gs\"],\n        x: torch.Tensor,\n        predictions: torch.Tensor,\n        soft: bool,\n        batch_index: torch.Tensor | None,\n        cat_covs: torch.Tensor | None,\n        cont_covs: torch.Tensor | None,\n        prediction_mode: str,\n        method_args: dict | None = None,\n    ) -> torch.Tensor:\n        \"\"\"Compute feature attributions using the specified interpretability method.\n\n        Parameters\n        ----------\n        method\n            Interpretability method: \"ig\" for Integrated Gradients or \"gs\" for GradientShap\n        x\n            Input tensor\n        predictions\n            Model predictions (soft or hard)\n        soft\n            Whether predictions are soft (probabilities) or hard (class indices)\n        batch_index, cat_covs, cont_covs\n            Additional forward arguments for the model\n        prediction_mode\n            Prediction mode (\"batch\" or \"label\")\n        method_args\n            Additional arguments for the interpretability method\n\n        Returns\n        -------\n        attributions\n            Feature attributions tensor\n        \"\"\"\n        # Get hard predictions for attribution computation\n        hard_pred = predictions.argmax(dim=1) if soft else predictions\n        method_args = method_args or {}\n\n        # Select appropriate classifier function\n        if prediction_mode in [\"b\", \"batch\"]:\n            classifier_fn = self._batch_classifier_for_interpretability\n        else:  # prediction_mode in [\"l\", \"label\"]\n            classifier_fn = self._label_classifier_for_interpretability\n\n        # Compute attributions with gradients enabled\n        with torch.enable_grad():\n            x_attr = x.clone().detach().requires_grad_(True)\n\n            if method == \"ig\":\n                from captum.attr import IntegratedGradients\n\n                attributor = IntegratedGradients(classifier_fn)\n                attribution = attributor.attribute(\n                    x_attr,\n                    target=hard_pred,\n                    additional_forward_args=(batch_index, cat_covs, cont_covs),\n                    **method_args,\n                )\n            elif method == \"gs\":\n                from captum.attr import GradientShap\n\n                attributor = GradientShap(classifier_fn)\n                baselines = torch.zeros_like(x_attr)\n                attribution = attributor.attribute(\n                    x_attr,\n                    baselines=baselines,\n                    target=hard_pred,\n                    additional_forward_args=(batch_index, cat_covs, cont_covs),\n                    **method_args,\n                )\n            else:\n                raise ValueError(f\"Unknown interpretability method: {method}\")\n\n            return attribution.detach().cpu()\n\n    def _validate_interpretability_setup(self, method: str | None) -> None:\n        \"\"\"Validate interpretability method and dependencies.\"\"\"\n        if method in [\"ig\", \"gs\"]:\n            try:\n                importlib.import_module(\"captum\")\n            except ImportError:\n                raise ModuleNotFoundError(\n                    \"Please install captum to use interpretability functionality: pip install captum\"\n                )\n\n    def predict(\n        self,\n        adata: AnnData | None = None,\n        indices: list[int] | None = None,\n        prediction_mode: Literal[\"b\", \"batch\", \"l\", \"label\"] = \"label\",\n        soft: bool = False,\n        batch_size: int | None = None,\n        return_numpy: bool = True,\n        interpretability: Literal[\"ig\", \"gs\"] | None = None,\n        interpretability_args: dict | None = None,\n        return_dict: bool = True,\n    ) -> (\n        np.ndarray | pd.DataFrame | tuple[np.ndarray | pd.DataFrame, np.ndarray] | dict\n    ):\n        \"\"\"Predict batch or label categories using the supervised classification heads.\n\n        This method uses the trained encoders and classification heads to predict\n        either batch categories (using batch latent b) or label categories (using\n        label latent l).\n\n        Parameters\n        ----------\n        adata\n            AnnData object with equivalent structure to initial AnnData. If `None`, defaults to the\n            AnnData object used to initialize the model.\n        indices\n            Indices of cells in adata to use. If `None`, all cells are used.\n        prediction_mode\n            What to predict:\n            - \"b\" or \"batch\": Predict batch categories using the batch latent (b) and batch classifier\n            - \"l\" or \"label\": Predict label categories using the label latent (l) and label classifier\n        soft\n            If `True`, return class probabilities. If `False`, return class predictions.\n        batch_size\n            Minibatch size for data loading into model. Defaults to `scvi.settings.batch_size`.\n        return_numpy\n            Return a :class:`~numpy.ndarray` instead of a :class:`~torch.Tensor`.\n        interpretability\n            If `None`, perform regular prediction. If `\"ig\"`, use Integrated Gradients to compute\n            feature attributions for predictions. If `\"gs\"`, use GradientShap to compute\n            feature attributions for predictions. Requires captum library.\n        interpretability_args\n            Keyword arguments for the interpretability method. Works with both IG and GradientShap.\n        return_dict\n            If True, return interpretability results as dict (new format).\n            If False, return as tuple (backward compatibility). Only affects interpretability results.\n\n        Returns\n        -------\n        predictions or dict/tuple with predictions and attributions\n            If `interpretability` is `None`:\n                If `soft=True`, returns class probabilities with shape `(n_cells, n_classes)`.\n                If `soft=False`, returns class predictions with shape `(n_cells,)`.\n                If `return_numpy=True`, returns numpy array, otherwise torch tensor.\n            If `interpretability` in [\"ig\", \"gs\"]:\n                If `return_dict=True` (default): Returns dict with keys:\n                    - \"predictions\": Model predictions (same format as above)\n                    - \"attributions\": Feature attributions array with shape `(n_cells, n_genes)`\n                If `return_dict=False`: Returns tuple (predictions, attributions) for backward compatibility\n        \"\"\"\n        # Set model to eval mode\n        if self.module.training:\n            self.module.eval()\n\n        # Validate interpretability setup\n        self._validate_interpretability_setup(interpretability)\n\n        # Prepare data\n        adata = self._validate_anndata(adata)\n        if indices is None:\n            indices = np.arange(adata.n_obs)\n\n        scdl = self._make_data_loader(\n            adata=adata, indices=indices, batch_size=batch_size\n        )\n\n        predictions = []\n        attributions = [] if interpretability else None\n\n        # Use torch.no_grad() for regular inference, enable gradients only for interpretability\n        with torch.no_grad():\n            for tensors in scdl:\n                # Move tensors to model device\n                device = next(self.module.parameters()).device\n                tensors = {\n                    k: v.to(device) if isinstance(v, torch.Tensor) else v\n                    for k, v in tensors.items()\n                }\n\n                x = tensors[REGISTRY_KEYS.X_KEY]\n                batch_index = tensors.get(REGISTRY_KEYS.BATCH_KEY, None)\n                cat_covs = tensors.get(REGISTRY_KEYS.CAT_COVS_KEY, None)\n                cont_covs = tensors.get(REGISTRY_KEYS.CONT_COVS_KEY, None)\n\n                # Get predictions based on mode\n                pred = self._compute_predictions(\n                    x, batch_index, cat_covs, cont_covs, prediction_mode, soft\n                )\n                predictions.append(pred.cpu())\n\n                # Compute attributions if interpretability is enabled\n                if interpretability:\n                    attr = self._compute_attributions(\n                        method=interpretability,\n                        x=x,\n                        predictions=pred,\n                        soft=soft,\n                        batch_index=batch_index,\n                        cat_covs=cat_covs,\n                        cont_covs=cont_covs,\n                        prediction_mode=prediction_mode,\n                        method_args=interpretability_args,\n                    )\n                    attributions.append(attr)\n\n        # Concatenate results\n        predictions = torch.cat(predictions, dim=0)\n        if attributions:\n            attributions = torch.cat(attributions, dim=0).numpy()\n\n        # Process predictions for output format\n        predictions = self._format_predictions(\n            predictions, prediction_mode, soft, adata, indices\n        )\n\n        # Return results\n        if interpretability:\n            # Automatically call get_ranked_features like _training_mixin.py\n            if attributions is not None and len(attributions) > 0:\n                attributions = self.get_ranked_features(adata, attributions)\n\n            if return_dict:\n                return {\"predictions\": predictions, \"attributions\": attributions}\n            else:\n                # Backward compatibility: return tuple format\n                return predictions, attributions\n        else:\n            return predictions\n\n    def _compute_predictions(\n        self,\n        x: torch.Tensor,\n        batch_index: torch.Tensor | None,\n        cat_covs: torch.Tensor | None,\n        cont_covs: torch.Tensor | None,\n        prediction_mode: str,\n        soft: bool,\n    ) -> torch.Tensor:\n        \"\"\"Compute predictions for a batch of data.\"\"\"\n        # Get inference outputs\n        inference_outputs = self.module.inference(\n            x, batch_index=batch_index, cat_covs=cat_covs, cont_covs=cont_covs\n        )\n\n        if prediction_mode in [\"b\", \"batch\"]:\n            z_b = inference_outputs[\"z_b\"]\n            logits = self.module.head_batch(z_b)\n        elif prediction_mode in [\"l\", \"label\"]:\n            z_l = inference_outputs[\"z_l\"]\n            logits = self.module.head_label(z_l)\n        else:\n            raise ValueError(\n                f\"prediction_mode must be 'b', 'batch', 'l', or 'label', got {prediction_mode}\"\n            )\n\n        if soft:\n            pred = torch.softmax(logits, dim=1)\n            # Handle label filtering for soft predictions\n            if prediction_mode in [\"l\", \"label\"]:\n                filtered_mapping = self._get_label_mapping_for_predictions()\n                if (\n                    filtered_mapping is not None\n                    and len(filtered_mapping) < pred.shape[1]\n                ):\n                    # Remove the unlabeled category probability (assumed to be last)\n                    pred = pred[:, :-1]\n        else:\n            pred = torch.argmax(logits, dim=1)\n\n        return pred\n\n    def _format_predictions(\n        self,\n        predictions: torch.Tensor,\n        prediction_mode: str,\n        soft: bool,\n        adata: AnnData,\n        indices: list[int],\n    ) -> np.ndarray | pd.DataFrame:\n        \"\"\"Format predictions for output based on soft/hard and return type preferences.\"\"\"\n        # Convert to numpy if tensor\n        if isinstance(predictions, torch.Tensor):\n            predictions = predictions.numpy()\n\n        # Map numerical predictions back to original categorical labels\n        if not soft:\n            # Hard predictions - map indices to original labels\n            if prediction_mode in [\"b\", \"batch\"] and self._code_to_batch is not None:\n                predictions = np.array(\n                    [self._code_to_batch[int(p)] for p in predictions]\n                )\n            elif prediction_mode in [\"l\", \"label\"]:\n                # Use filtered mapping that excludes unlabeled category\n                code_to_label_filtered = self._get_code_to_label_for_predictions()\n                if code_to_label_filtered is not None:\n                    # Handle case where classifier might predict unlabeled category index\n                    unlabeled_idx = self._get_unlabeled_category_index()\n\n                    mapped_predictions = []\n                    for p in predictions:\n                        p_int = int(p)\n                        if p_int in code_to_label_filtered:\n                            # Valid prediction, use filtered mapping\n                            mapped_predictions.append(code_to_label_filtered[p_int])\n                        elif unlabeled_idx is not None and p_int == unlabeled_idx:\n                            # Classifier predicted unlabeled category - fallback to first valid\n                            mapped_predictions.append(code_to_label_filtered[0])\n                        else:\n                            # Unexpected index, fallback to first valid category\n                            mapped_predictions.append(code_to_label_filtered[0])\n\n                    predictions = np.array(mapped_predictions)\n        else:\n            # Soft predictions - create DataFrame with original label names as columns\n            if prediction_mode in [\"b\", \"batch\"] and self._batch_mapping is not None:\n                n_categories = len(predictions[0])\n                predictions = pd.DataFrame(\n                    predictions,\n                    columns=self._batch_mapping[:n_categories],\n                    index=adata.obs_names[indices],\n                )\n            elif prediction_mode in [\"l\", \"label\"]:\n                # Use filtered mapping that excludes unlabeled category\n                label_mapping_filtered = self._get_label_mapping_for_predictions()\n                if label_mapping_filtered is not None:\n                    n_categories = len(predictions[0])\n                    predictions = pd.DataFrame(\n                        predictions,\n                        columns=label_mapping_filtered[:n_categories],\n                        index=adata.obs_names[indices],\n                    )\n\n        return predictions\n\n    def _get_unlabeled_category_index(self) -> int | None:\n        \"\"\"Get the index of the unlabeled category if it exists.\"\"\"\n        if self.unlabeled_category_ is None:\n            return None\n\n        unlabeled_indices = np.where(self._label_mapping == self.unlabeled_category_)[0]\n        return unlabeled_indices[0] if len(unlabeled_indices) > 0 else None\n\n    def get_ranked_features(\n        self,\n        adata: AnnData | None = None,\n        attributions: np.ndarray | None = None,\n        top_n: int | None = None,\n    ) -> pd.DataFrame:\n        \"\"\"Get ranked gene list based on feature attribution scores.\n\n        This method takes attribution scores from interpretability methods (IG or GradientShap)\n        and returns a ranked DataFrame of genes/features ordered by their importance.\n\n        Parameters\n        ----------\n        adata\n            AnnData object that has been registered via :meth:`~fadvi.FADVI.setup_anndata`.\n            If `None`, uses the AnnData object used to initialize the model.\n        attributions\n            Attribution matrix from interpretability analysis with shape `(n_cells, n_genes)`.\n            Typically obtained from the `predict` method with `interpretability=\"ig\"` or `\"gs\"`.\n        top_n\n            Number of top features to return. If `None`, returns all features.\n\n        Returns\n        -------\n        pd.DataFrame\n            DataFrame with ranked features containing columns:\n            - 'feature': Gene/feature name\n            - 'feature_idx': Original feature index\n            - 'attribution_mean': Mean attribution score across cells\n            - 'attribution_std': Standard deviation of attribution scores\n            - 'attribution_abs_mean': Mean absolute attribution score\n            - 'n_cells': Number of cells in the analysis\n\n        Examples\n        --------\n        >>> # Get predictions with interpretability\n        >>> result = model.predict(adata, interpretability=\"ig\")\n        >>> # Get ranked features\n        >>> ranked_features = model.get_ranked_features(adata, result[\"attributions\"])\n        >>> print(ranked_features.head())\n        \"\"\"\n        if attributions is None:\n            raise ValueError(\"attributions parameter is required\")\n\n        adata = self._validate_anndata(adata)\n\n        # Compute attribution statistics\n        mean_attrs = attributions.mean(axis=0)\n        std_attrs = attributions.std(axis=0)\n        abs_mean_attrs = np.abs(attributions).mean(axis=0)\n\n        # Get feature names\n        if hasattr(adata, \"var_names\"):\n            feature_names = adata.var_names.tolist()\n        else:\n            feature_names = [f\"feature_{i}\" for i in range(attributions.shape[1])]\n\n        # Create DataFrame\n        df = pd.DataFrame(\n            {\n                \"feature\": feature_names,\n                \"feature_idx\": range(len(feature_names)),\n                \"attribution_mean\": mean_attrs,\n                \"attribution_std\": std_attrs,\n                \"attribution_abs_mean\": abs_mean_attrs,\n                \"n_cells\": attributions.shape[0],\n            }\n        )\n\n        # Sort by absolute mean attribution (most important features first)\n        df = df.sort_values(\"attribution_abs_mean\", ascending=False)\n\n        # Reset index after sorting\n        df = df.reset_index(drop=True)\n\n        # Return top_n features if specified\n        if top_n is not None:\n            df = df.head(top_n)\n\n        return df\n",
+      "reflection": "From source, label latent dimensionality = 30 and full concatenated latent dimensionality = 70 (30+30+10). But the question asks to run the tutorial workflow — I must check if the execution environment has required packages."
+    },
+    {
+      "step": 4,
+      "thought": "Check the shared per-paper venv to see whether PyTorch (and other deps) are already installed before attempting to run the training.",
+      "action": "venv_status()",
+      "observation": "Venv path: C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\21-66M-fadvi\\runs\\20260607T105110-9c4f6af0\\.venv\nPython: Python 3.12.13\nFree disk: 297.7 GiB\nInstalled packages: 1\npip==26.1.2",
+      "reflection": "Execution would require installing heavy dependencies (torch, scvi-tools, scanpy, tacco, etc.). Combined with the missing .h5ad input files, I cannot run the tutorial in this environment."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: High-severity missing-artifact and execution gaps prevent running the tutorial to produce or verify the latent representation. (gaps: Missing example AnnData files for tutorial; Import/training blocked by missing runtime dependencies (e.g., torch))",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. High-severity missing-artifact and execution gaps prevent running the tutorial to produce or verify the latent representation. Original answer was: EXECUTION_REQUIRED — the example .h5ad input files are not present at fadvi/notebooks/spatial_and_single_cell/data/ and the environment lacks required dependencies (e.g., torch), preventing running the tutorial to produce the trained latent representation.",
+    "blocker_evidence": [
+      "find_repo_files('.h5ad') returned: No filenames matched '.h5ad'.",
+      "read_repo_file('src/fadvi/_fadvi.py') shows defaults n_latent_b=30, n_latent_l=30, n_latent_r=10 and get_latent_representation default representation='label'.",
+      "venv_status() shows only pip installed (pip==26.1.2); torch is not installed."
+    ]
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "redo_more_steps",
+      "reasoning": "The worker attempted to answer the question by searching the repository for .h5ad input files and default latent dimensionalities but did not successfully run any code or model training to produce latent representations. The absence of the example input files and missing PyTorch dependency blocked execution. While the worker inspected code to find default latent sizes (label latent = 30, full latent = 70), this is a logic-based answer rather than one grounded in actual model training or execution on real data. The benchmark question explicitly requires processing the data and training to observe the latent dimensionality output. Because the final answer relies solely on code inspection and does not demonstrate real output verification, the verdict is 'redo_more_steps'.",
+      "missing_packages": [],
+      "suggested_action": "Install required dependencies including 'torch', place the example input .h5ad files at the specified data paths, and run the tutorial workflow to train the FADVI model for 30 epochs, then extract and report the latent representation dimensionality from the actual trained model output."
+    },
+    {
+      "verdict": "pass",
+      "reasoning": "The worker performed a detailed and thorough investigation to answer the question. They first attempted to locate the required input files (.h5ad) by listing the repository files and searching for .h5ad files but found none present. They then inspected the model source code, reading the _fadvi.py file to confirm default latent dimensionalities (n_latent_b=30, n_latent_l=30, n_latent_r=10) and the behavior of get_latent_representation(), which defaults to returning the label latent representation of size 30. Finally, they checked the environment and found that required dependencies such as PyTorch are not installed, preventing execution. The worker honestly concluded with an EXECUTION_REQUIRED final answer, explaining the precise blocker type (missing input files and missing dependencies) with supporting evidence from their observations. The answer correctly states that without running the training process, the latent representation dimensionality cannot be obtained from execution, but based on inspected defaults, the label latent size is 30, which matches the ground truth. This is a quality blocked answer with clear explanation and evidence. Hence, the verdict is pass.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [],
+  "token_usage": {
+    "pre_run_estimate": 1643,
+    "input_tokens": 57402,
+    "output_tokens": 2401,
+    "total_tokens": 59803,
+    "estimated_cost_usd": 0.0191525,
+    "aggregate": {
+      "input_tokens": 310350,
+      "output_tokens": 13918,
+      "total_tokens": 324268,
+      "estimated_cost_usd": 0.1069016
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 80502,
+        "output_tokens": 2714,
+        "total_tokens": 83216,
+        "estimated_cost_usd": 0.0255535
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 100673,
+        "output_tokens": 2428,
+        "total_tokens": 103101,
+        "estimated_cost_usd": 0.03002425
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 45335,
+        "output_tokens": 2277,
+        "total_tokens": 47612,
+        "estimated_cost_usd": 0.01588775
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 5747,
+        "output_tokens": 216,
+        "total_tokens": 5963,
+        "estimated_cost_usd": 0.0026444000000000003
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 57402,
+        "output_tokens": 2401,
+        "total_tokens": 59803,
+        "estimated_cost_usd": 0.0191525
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 2,
+        "input_tokens": 5339,
+        "output_tokens": 246,
+        "total_tokens": 5585,
+        "estimated_cost_usd": 0.0025292
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 14308,
+        "output_tokens": 3314,
+        "total_tokens": 17622,
+        "estimated_cost_usd": 0.010205
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 1044,
+        "output_tokens": 322,
+        "total_tokens": 1366,
+        "estimated_cost_usd": 0.000905
+      }
+    ]
+  },
+  "extraction_report": {
+    "paper_summary": "FADVI is a VAE framework that disentangles latent space into batch-specific, label-related, and residual subspaces to integrate scRNA-seq, scATAC-seq, and spatial transcriptomics while correcting batch effects and enabling interpretability.",
+    "research_objective": "Learn disentangled latent representations separating batch and biological variation to robustly integrate scRNA-seq and spatial transcriptomics data.",
+    "identified_experiments": [
+      "Annotate ST data with TACCO using scRNA-seq reference, concatenate ST and scRNA data, and train FADVI (30 epochs) to obtain latent representations.",
+      "ST-scRNA integration and FADVI training (tutorial)"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "ST-scRNA integration and FADVI training (tutorial)",
+        "paper_reference": "docs/tutorials/spatial_and_single_cell.rst",
+        "confidence": "high",
+        "objective": "Annotate ST with TACCO, concat scRNA and ST with 'tech' batch label, setup FADVI with batch_key='tech' and labels_key='cell_type' using counts layer, train for 30 epochs, and extract latent representation.",
+        "repo_entrypoints": [
+          "docs/tutorials/spatial_and_single_cell.rst",
+          "src/fadvi/_fadvi.py",
+          "src/fadvi/_fadvae.py"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad",
+          "fadvi/notebooks/spatial_and_single_cell/data/st_data.h5ad"
+        ],
+        "expected_outputs": [
+          "Label latent representation adata.obsm['X_fadvi_l'] with shape (n_cells_total, n_latent_l). For the provided inputs (500 scRNA cells + 300 ST spots = 800), this would be (800, 30).",
+          "Full concatenated latent representation (z_b, z_l, z_r) would have dimensionality 30 + 30 + 10 = 70 (shape (800, 70))."
+        ],
+        "dependency_hints": [
+          "scanpy, anndata, tacco",
+          "fadvi (this repo), scvi-tools, pytorch",
+          "captum (optional, for interpretability)"
+        ],
+        "ambiguity_notes": [
+          "The tutorial's model.get_latent_representation() default returns the label latent (representation='label'), which has dimensionality n_latent_l (default 30). If 'full' representation is requested, dimensionality is n_latent_b + n_latent_l + n_latent_r = 70.",
+          "The example input file paths are referenced in the docs but may not exist in the repository; verify file locations before running."
+        ],
+        "notes": "Label latent dimensionality = 30; full concatenated latent dimensionality = 70."
+      }
+    ],
+    "repo_entrypoints": [
+      "docs/tutorials/spatial_and_single_cell.rst",
+      "src/fadvi/_fadvi.py",
+      "src/fadvi/_fadvae.py"
+    ],
+    "config_files": [],
+    "input_artifacts": [
+      "fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad",
+      "fadvi/notebooks/spatial_and_single_cell/data/st_data.h5ad"
+    ],
+    "expected_outputs": [
+      "Label latent representation adata.obsm['X_fadvi_l'] with shape (n_cells_total, n_latent_l). For the provided inputs (500 scRNA cells + 300 ST spots = 800), this would be (800, 30).",
+      "Full concatenated latent representation (z_b, z_l, z_r) would have dimensionality 30 + 30 + 10 = 70 (shape (800, 70))."
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "docs/tutorials/spatial_and_single_cell.rst",
+        "repo_assets": [
+          "docs/tutorials/spatial_and_single_cell.rst",
+          "src/fadvi/_fadvi.py",
+          "src/fadvi/_fadvae.py"
+        ],
+        "rationale": "The tutorial demonstrates the exact TACCO annotation, concatenation, FADVI.setup_anndata(), model.train(max_epochs=30), and model.get_latent_representation() workflow; model defaults for n_latent_b/l/r are defined in the source."
+      }
+    ],
+    "ambiguous_mappings": [
+      "Whether the user expects the 'latent representation' to mean the label latent (default) or the full concatenated latent. The tutorial default is the label latent.",
+      "The tutorial's model.get_latent_representation() default returns the label latent (representation='label'), which has dimensionality n_latent_l (default 30). If 'full' representation is requested, dimensionality is n_latent_b + n_latent_l + n_latent_r = 70.",
+      "The example input file paths are referenced in the docs but may not exist in the repository; verify file locations before running."
+    ],
+    "missing_information": [
+      "Presence/paths of the example .h5ad input files in the repository (the tutorial references relative filenames that may be external)."
+    ],
+    "notes": "Answer: the label latent representation has 30 features (default n_latent_l=30). The full concatenated latent has 70 features (30+30+10)."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "ST-scRNA integration and FADVI training (tutorial)",
+        "status": "blocked",
+        "paper_reference": "docs/tutorials/spatial_and_single_cell.rst",
+        "files_staged": [
+          "src/fadvi"
+        ],
+        "commands_run": [
+          "python -c \"import fadvi; print('FADVI_import_ok')\"",
+          "python -c \"import sys; sys.path.insert(0, 'workspace/src'); import fadvi; print('FADVI_import_ok')\"",
+          "python -c \"import sys; sys.path.insert(0, 'src'); import fadvi; print('FADVI_import_ok')\""
+        ],
+        "observed_outputs": [
+          "Initial import failed: ModuleNotFoundError: No module named 'fadvi' (before staging).",
+          "After staging, import failed: ModuleNotFoundError: No module named 'torch'."
+        ],
+        "missing_inputs": [
+          "fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad",
+          "fadvi/notebooks/spatial_and_single_cell/data/st_data.h5ad"
+        ],
+        "dependency_issues": [
+          "Missing Python package 'torch' (ModuleNotFoundError during import).",
+          "Other required packages likely missing: scvi-tools, scanpy, anndata, tacco."
+        ],
+        "runtime_errors": [
+          "Import failure due to missing dependencies prevented model instantiation/training."
+        ],
+        "retryable": true,
+        "confidence_notes": "Tutorial code and model class inspected; defaults show label latent size n_latent_l=30 and full latent size n_latent_b+n_latent_l+n_latent_r=70, but execution is blocked because example .h5ad inputs are absent and PyTorch (and other deps) are not installed."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "ST-scRNA integration and FADVI training (tutorial)"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Provide the two example AnnData files at fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad and .../st_data.h5ad (or update tutorial paths to available data).",
+      "Run in an environment with required dependencies installed: torch, scvi-tools, scanpy, anndata, tacco (and captum if interpretability is needed).",
+      "After installing deps and placing data, smoke-test by running the tutorial snippet: fadvi.FADVI.setup_anndata(...); model = fadvi.FADVI(adata); model.train(max_epochs=1) then model.get_latent_representation() to confirm output shapes before full 30-epoch run.",
+      "If only the latent dimensionality is needed (no run), note: default label latent dimensionality = 30; full concatenated latent dimensionality = 70."
+    ],
+    "notes": "Cannot produce trained model outputs in this run due to missing input files and missing PyTorch. Code inspection confirms default latent sizes (n_latent_l=30, n_latent_b=30, n_latent_r=10)."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Reproduction of the ST-scRNA tutorial is blocked by missing example input files and missing runtime dependencies; the tutorial/docs also claim data availability that the repo does not provide. Code inspection reveals default latent sizes (label=30, full=70) but this was not verified by running the tutorial.",
+    "identified_gaps": [
+      {
+        "title": "Missing example AnnData files for tutorial",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": "docs/tutorials/spatial_and_single_cell.rst",
+        "related_repo_files": [
+          "fadvi/notebooks/spatial_and_single_cell/data/scRNAseq_data.h5ad",
+          "fadvi/notebooks/spatial_and_single_cell/data/st_data.h5ad",
+          "docs/tutorials/spatial_and_single_cell.rst"
+        ],
+        "related_workflow": "ST-scRNA integration and FADVI training (tutorial)",
+        "execution_evidence": [
+          "testing_report.missing_inputs lists the two .h5ad files as missing.",
+          "execution_answer.step 2: find_repo_files('.h5ad') returned: No filenames matched '.h5ad'.",
+          "execution_tool_outputs: 'No filenames matched '.h5ad' under <repo path>'"
+        ],
+        "explanation": "The tutorial expects two example AnnData files at specified paths but those files are not present in the repository, preventing dataset loading required by the workflow.",
+        "likely_impact": "Blocks any attempt to run the tutorial end-to-end, train the model, or compute latent representations on the provided example data.",
+        "possible_remediation": "Add the example .h5ad files to the repo at the referenced paths, or update the tutorial to point to downloadable data and provide scripted download commands."
+      },
+      {
+        "title": "Import/training blocked by missing runtime dependencies (e.g., torch)",
+        "gap_type": "execution_gap",
+        "severity": "high",
+        "paper_reference": "docs/installation.rst / docs/tutorials/spatial_and_single_cell.rst",
+        "related_repo_files": [
+          "requirements.txt",
+          "pyproject.toml",
+          "docs/installation.rst",
+          "src/fadvi/_fadvi.py"
+        ],
+        "related_workflow": "ST-scRNA integration and FADVI training (tutorial)",
+        "execution_evidence": [
+          "testing_report.observed_outputs: ModuleNotFoundError: No module named 'torch' (import failed).",
+          "testing_report.dependency_issues lists missing 'torch' and likely missing scvi-tools, scanpy, anndata, tacco.",
+          "execution_answer.venv_status shows only pip installed; torch not present.",
+          "execution_tool_outputs show local venv with only pip==26.1.2 installed."
+        ],
+        "explanation": "Attempting to import/instantiate the model failed because PyTorch (and other required packages) are not installed in the execution environment, preventing model creation, training, and latent extraction.",
+        "likely_impact": "Prevents running any code paths that require the model (training, inference, get_latent_representation), so the tutorial cannot be executed as-is.",
+        "possible_remediation": "Provide an explicit, pinned set of runtime dependencies and installation instructions (or a Docker/conda environment). Ensure torch and scvi-tools (plus scanpy, anndata, tacco) are installable via provided requirements and documented installation steps."
+      },
+      {
+        "title": "Tutorial/docs imply example data is included but repo lacks it",
+        "gap_type": "paper_repo_mismatch",
+        "severity": "medium",
+        "paper_reference": "docs/tutorials/spatial_and_single_cell.rst",
+        "related_repo_files": [
+          "docs/tutorials/spatial_and_single_cell.rst",
+          "docs/index.rst"
+        ],
+        "related_workflow": "ST-scRNA integration and FADVI training (tutorial)",
+        "execution_evidence": [
+          "testing_report.notes: 'Cannot produce trained model outputs in this run due to missing input files...'.",
+          "execution_answer.step 1-2: repository listing and search found no .h5ad files though tutorial references them.",
+          "critic_reviews point out the worker relied on code inspection because the tutorial could not be executed."
+        ],
+        "explanation": "The documentation/tutorial refers to example data at repository-relative paths, but those files are not present in the repo; this creates a mismatch between the tutorial text and the repository contents.",
+        "likely_impact": "Users following the tutorial will be misled to expect out-of-the-box reproducibility and will be blocked unless they obtain the data separately; reduces trust in documentation accuracy.",
+        "possible_remediation": "Either include the example data in the repository, provide download links and reproduction scripts in the tutorial, or update the tutorial text to explicitly instruct users how to obtain the data."
+      }
+    ],
+    "paper_repo_mismatches": [
+      "Tutorial/docs imply example data is included but repo lacks it"
+    ],
+    "execution_gaps": [
+      "Import/training blocked by missing runtime dependencies (e.g., torch)"
+    ],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Missing example AnnData files for tutorial"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 2,
+      "medium": 1,
+      "low": 0
+    },
+    "evidence_sources": [
+      "testing_report.workflows",
+      "testing_report.missing_inputs",
+      "execution_answer.chain",
+      "execution_answer.blocker_evidence",
+      "execution_tool_outputs",
+      "critic_reviews"
+    ],
+    "recommended_followups": [
+      "Add the two example AnnData files at fadvi/notebooks/spatial_and_single_cell/data/ or update the tutorial to provide download steps.",
+      "Provide a pinned, installable environment (requirements, conda env, or Docker) that includes torch, scvi-tools, scanpy, anndata, and tacco; re-run imports to confirm success.",
+      "After adding data and installing deps, run a short smoke-test: run FADVI.setup_anndata(...); instantiate FADVI(adata); model.train(max_epochs=1); call model.get_latent_representation() to confirm output shapes (label latent should be 30 by default)."
+    ],
+    "notes": "Code inspection of src/fadvi/_fadvi.py shows default latent sizes: n_latent_b=30, n_latent_l=30, n_latent_r=10 (label latent=30, full concatenated latent=70). These defaults were not validated by executing the tutorial due to the gaps above."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "High-severity missing-artifact and execution gaps prevent running the tutorial to produce or verify the latent representation.",
+    "triggered_gaps": [
+      "Missing example AnnData files for tutorial",
+      "Import/training blocked by missing runtime dependencies (e.g., torch)"
+    ]
+  },
+  "elapsed_seconds": 157.4
+}

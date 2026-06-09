@@ -1,0 +1,539 @@
+{
+  "id": "CROSSPPI_003",
+  "team": "testing-worker-critic",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.25.690371v1",
+  "question": "Generate per-residue protein embeddings using the ESM-2 model for the KRAS protein sequence MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLAARTVESRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQHKLRKLNPPDESGPGCMSCKCVLS with complex ID TEST003, using maximum sequence length of 1000 residues. What is the mean value of the first residue embedding vector (rounded to 4 decimal places)?",
+  "ground_truth": "9.6298",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "List repository files to locate embedding.py and overall repo layout before running anything.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\22-68Mg-CrossPPI\\repo:\n.gitattributes\nREADME.md\ncontact_map.py\nembedding.py\nmain_cv.py\nppi.yml\nt.py\ndata/__init__.py\ndata/process_ligands.py\ndata/process_receptors.py\ndata/protein_dataset.py\ndata/protein_processor.py\nmodel/__init__.py\nmodel/cross_attention.py\nmodel/gnn_model_protein.py",
+      "reflection": "Found embedding.py in the repo — will inspect it to see how embeddings are generated and what dependencies are required."
+    },
+    {
+      "step": 2,
+      "thought": "Read embedding.py to understand how to call the embedding function and what it returns (repr layer, device behavior).",
+      "action": "read_repo_file(relative_path=\"embedding.py\")",
+      "observation": "Contents of C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\22-68Mg-CrossPPI\\repo\\embedding.py:\nimport pandas as pd\nimport torch\nimport esm\nimport numpy as np\nimport os\nfrom datetime import datetime\n\n# Load the ESM-2 model\nmodel, alphabet = esm.pretrained.esm2_t33_650M_UR50D()\nmodel.eval()\ndevice = \"cuda\"\nmodel.to(device)\n\ndef generate_embeddings(sequence, max_length=1000):\n    \"\"\"Generate per-residue embeddings for a protein sequence using ESM-2.\"\"\"\n    # Check sequence length\n    if len(sequence) > max_length:\n        print(f\"Sequence too long ({len(sequence)} residues). Skipping.\")\n        return None, len(sequence)\n    \n    # Tokenize the sequence\n    batch_converter = alphabet.get_batch_converter()\n    data = [(\"\", sequence)]  # ESM expects a tuple with (name, sequence)\n    _, _, tokens = batch_converter(data)\n    tokens = tokens.to(device)\n    \n    # Generate embeddings\n    try:\n        with torch.no_grad():\n            results = model(tokens, repr_layers=[33], return_contacts=False)\n            embeddings = results[\"representations\"][33][0].cpu().numpy()  # Per-residue embeddings\n        return embeddings, len(sequence)\n    except Exception as e:\n        print(f\"Error in embedding generation: {e}\")\n        return None, len(sequence)\n    finally:\n        # Clear memory\n        torch.cuda.empty_cache() if torch.cuda.is_available() else None\n\ndef save_embeddings(embeddings, complex_id, output_dir=\"embeddings_receptor\"):\n    \"\"\"Save the embeddings to a .npy file named after the complex ID.\"\"\"\n    if not os.path.exists(output_dir):\n        os.makedirs(output_dir)\n    \n    output_file = os.path.join(output_dir, f\"{complex_id}.npy\")\n    np.save(output_file, embeddings)\n    print(f\"Saved embeddings for {complex_id} to {output_file}\")\n\ndef log_failed_sequence(complex_id, sequence_length, error, log_file=\"failed_sequences.log\"):\n    \"\"\"Log details of failed sequences to a file.\"\"\"\n    with open(log_file, \"a\") as f:\n        timestamp = datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")\n        f.write(f\"[{timestamp}] Complex ID: {complex_id}, Length: {sequence_length}, Error: {str(error)}\\n\")\n\ndef process_dataframe(df, sequence_col=\"sequence\", id_col=\"complex_id\", max_length=1000):\n    \"\"\"Iterate through DataFrame and generate embeddings for each sequence, displaying rows left.\"\"\"\n    total_rows = len(df)\n    for index, row in df.iterrows():\n        rows_left = total_rows - (index + 1)\n        print(f\"Processing row {index + 1}/{total_rows}, {rows_left} rows left\")\n        \n        complex_id = row[id_col]\n        sequence = row[sequence_col]\n        \n        # Validate sequence\n        if not isinstance(sequence, str) or not sequence:\n            print(f\"Skipping invalid sequence for {complex_id}\")\n            log_failed_sequence(complex_id, 0, \"Invalid or empty sequence\")\n            continue\n        \n        # Generate embeddings\n        try:\n            embeddings, seq_length = generate_embeddings(sequence, max_length)\n            if embeddings is not None:\n                save_embeddings(embeddings, complex_id)\n            else:\n                print(f\"Failed to process {complex_id}: Sequence too long or memory error\")\n                log_failed_sequence(complex_id, seq_length, \"Sequence too long or memory error\")\n        except Exception as e:\n            print(f\"Error processing {complex_id}: {e}\")\n            log_failed_sequence(complex_id, len(sequence), str(e))\n\n# Example usage\nif __name__ == \"__main__\":\n    # Load DataFrame from Excel file\n    excel_file = \"PPB-Affinity-Modified.xlsx\"  # Excel file path\n    try:\n        df = pd.read_excel(excel_file)\n    except FileNotFoundError:\n        print(f\"Error: Excel file '{excel_file}' not found.\")\n        exit(1)\n    except Exception as e:\n        print(f\"Error reading Excel file: {e}\")\n        exit(1)\n    \n    # Verify required columns\n    if \"Complex ID\" not in df.columns or \"Receptor Chains\" not in df.columns:\n        print(\"Error: Excel file must contain 'Complex ID' and 'Ligand Chains' columns.\")\n        exit(1)\n    \n    # Process the DataFrame\n    process_dataframe(df, sequence_col=\"Receptor Chains\", id_col=\"Complex ID\", max_length=1000)",
+      "reflection": "Importing embedding.py would attempt to load the large pretrained model and move it to CUDA; to avoid GPU requirement and import-time side effects, I'll write a small script that loads the same ESM-2 model but sends it to CPU and computes the requested mean for the given sequence."
+    },
+    {
+      "step": 3,
+      "thought": "Check the shared venv to see which packages are already installed so I know if I must install esm/fair-esm.",
+      "action": "venv_status()",
+      "observation": "Venv path: C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\22-68Mg-CrossPPI\\runs\\20260607T105208-e1c24e4d\\.venv\nPython: Python 3.12.13\nFree disk: 294.5 GiB\nInstalled packages: 16\nJinja2==3.1.6\nMarkupSafe==3.0.3\nfilelock==3.29.1\nfsspec==2026.4.0\nmpmath==1.3.0\nnetworkx==3.6.1\nnumpy==2.4.6\npandas==3.0.3\npip==26.1.2\npython-dateutil==2.9.0.post0\nsetuptools==81.0.0\nsix==1.17.0\nsympy==1.14.0\ntorch==2.12.0\ntyping_extensions==4.15.0\ntzdata==2026.2",
+      "reflection": "Need to install the esm package (fair-esm) before running code that imports esm."
+    },
+    {
+      "step": 4,
+      "thought": "Install the fair-esm package so the script can import esm and load the pretrained model.",
+      "action": "execute_command(\"pip install fair-esm --quiet\", timeout=1200)",
+      "observation": "Exit code: 0",
+      "reflection": "fair-esm installed. Now create a small script that loads the ESM-2 model on CPU and computes the mean of the first residue embedding vector for the provided KRAS sequence."
+    },
+    {
+      "step": 5,
+      "thought": "Write a helper script in the workspace to load the esm2_t33_650M_UR50D model on CPU, compute embeddings for the given KRAS sequence, and print the mean of the first residue embedding vector.",
+      "action": "write_file(relative_path=\"workspace/run_embed.py\", content=<script>)",
+      "observation": "Wrote 957 characters to run_embed.py",
+      "reflection": "Script saved under workspace/run_embed.py, but the run path may differ; I'll attempt to run it. If path errors occur, I'll write directly to workspace root and retry."
+    },
+    {
+      "step": 6,
+      "thought": "Run the script at workspace/run_embed.py to produce the embedding mean. This may fail if the working directory path differs.",
+      "action": "execute_command(\"python workspace/run_embed.py\", timeout=3600)",
+      "observation": "Exit code: 2\n\nSTDERR:\nC:\\Users\\32472\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe: can't open file 'C:\\\\Users\\\\32472\\\\Desktop\\\\MaastrichtUni\\\\MscAI\\\\ProjectSem2\\\\Phase3\\\\Group-25-Research-Project\\\\Papers\\\\22-68Mg-CrossPPI\\\\runs\\\\20260607T105208-e1c24e4d\\\\workspace\\\\workspace\\\\run_embed.py': [Errno 2] No such file or directory\n",
+      "reflection": "The script path was not found due to where files are written vs. execution cwd. I'll write the script to the repository workspace root as run_embed.py and run that instead."
+    },
+    {
+      "step": 7,
+      "thought": "Write the helper script to the repository workspace root as run_embed.py (correct path for execution).",
+      "action": "write_file(relative_path=\"run_embed.py\", content=<script>)",
+      "observation": "Wrote 957 characters to run_embed.py",
+      "reflection": "Script is now at run_embed.py in the current workspace; proceed to execute it. The script loads the ESM-2 model to CPU, tokenizes the sequence, computes representations[33], and prints the mean of embeddings[0]."
+    },
+    {
+      "step": 8,
+      "thought": "Execute the run_embed.py script to load the model, compute per-residue embeddings for the KRAS sequence, and print the mean of the first residue embedding vector.",
+      "action": "execute_command(\"python run_embed.py\", timeout=3600)",
+      "observation": "Exit code: 0\n\nSTDOUT:\n-0.0011\n",
+      "reflection": "Obtained the mean value printed by the script. This is the requested mean of the first residue embedding vector rounded to 4 decimals."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: High-severity gaps (fragile import that forces CUDA, missing pretrained weights/dependency, and an execution_gap about ambiguous extraction) directly prevent reliable reproduction and the worker did not demonstrably bypass them. (gaps: Import-time model load with hard-coded CUDA (fragile setup); Pretrained ESM-2 weights not cached / dependency 'esm' absent initially; Numeric result mismatch / ambiguous embedding-extraction details (execution gap))",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. High-severity gaps (fragile import that forces CUDA, missing pretrained weights/dependency, and an execution_gap about ambiguous extraction) directly prevent reliable reproduction and the worker did not demonstrably bypass them. Original answer was: -0.0011",
+    "blocker_evidence": []
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "incorrect",
+      "reasoning": "The worker correctly identified missing packages and installed the 'fair-esm' package, wrote and executed a script to load the ESM-2 model on CPU, computed the embeddings for the KRAS sequence, and printed the mean of the first residue's embedding vector as -0.0011. However, the given ground truth embedding mean is 9.6298, which differs substantially. Since the worker directly ran the model and obtained a significantly different value without evidence of an error or justification for the discrepancy, this indicates the final answer is incorrect. There is no evidence that the worker's result matches the expected embedding mean from the real model output, suggesting either an error in the executed code or a mismatch in interpretation. Therefore, the final answer is not grounded in the benchmark ground truth.",
+      "missing_packages": [],
+      "suggested_action": "Review the embedding computation steps and verify handling of special tokens or embeddings layer selection; re-run the embedding extraction to ensure consistency with the expected output."
+    }
+  ],
+  "install_events": [
+    {
+      "attempt": 1,
+      "modules": [
+        "pandas",
+        "torch"
+      ],
+      "packages": [
+        "pandas",
+        "torch"
+      ],
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--no-cache",
+        "--python",
+        "C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\22-68Mg-CrossPPI\\runs\\20260607T105208-e1c24e4d\\.venv\\Scripts\\python.exe",
+        "pandas",
+        "torch"
+      ],
+      "exit_code": 0,
+      "output": "Using Python 3.12.13 environment at: Papers\\22-68Mg-CrossPPI\\runs\\20260607T105208-e1c24e4d\\.venv\nResolved 15 packages in 467ms\nDownloading networkx (2.0MiB)\nDownloading setuptools (1.0MiB)\nDownloading torch (117.3MiB)\n Downloaded setuptools\n Downloaded networkx\n Downloaded torch\nPrepared 7 packages in 43.85s\nInstalled 7 packages in 10.29s\n + filelock==3.29.1\n + fsspec==2026.4.0\n + jinja2==3.1.6\n + markupsafe==3.0.3\n + networkx==3.6.1\n + setuptools==81.0.0\n + torch==2.12.0",
+      "succeeded": true
+    }
+  ],
+  "token_usage": {
+    "pre_run_estimate": 1650,
+    "input_tokens": 89697,
+    "output_tokens": 3819,
+    "total_tokens": 93516,
+    "estimated_cost_usd": 0.03006225,
+    "aggregate": {
+      "input_tokens": 328276,
+      "output_tokens": 17726,
+      "total_tokens": 346002,
+      "estimated_cost_usd": 0.11846835
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 101970,
+        "output_tokens": 3964,
+        "total_tokens": 105934,
+        "estimated_cost_usd": 0.0334205
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 25706,
+        "output_tokens": 1834,
+        "total_tokens": 27540,
+        "estimated_cost_usd": 0.0100945
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 97577,
+        "output_tokens": 4716,
+        "total_tokens": 102293,
+        "estimated_cost_usd": 0.03382625
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 89697,
+        "output_tokens": 3819,
+        "total_tokens": 93516,
+        "estimated_cost_usd": 0.03006225
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 6865,
+        "output_tokens": 206,
+        "total_tokens": 7071,
+        "estimated_cost_usd": 0.0030756000000000004
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 5382,
+        "output_tokens": 2791,
+        "total_tokens": 8173,
+        "estimated_cost_usd": 0.0069275
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 1079,
+        "output_tokens": 396,
+        "total_tokens": 1475,
+        "estimated_cost_usd": 0.00106175
+      }
+    ]
+  },
+  "extraction_report": {
+    "paper_summary": "CrossPPI: a Cross-Fusion deep learning framework that integrates sequence and structural features (ESM-2 embeddings + contact maps + GATs + CNNs + cross-attention) to predict protein–protein binding affinity (pKD).",
+    "research_objective": "Predict protein–protein binding affinity by fusing ESM-2-derived sequence embeddings and contact-map/graph structural features via a cross-fusion transformer and GATs/CNNs.",
+    "identified_experiments": [
+      "Generate per-residue embeddings using ESM-2 (650M)",
+      "Generate ESM-2 contact maps and binarize (threshold 0.5)",
+      "Train/evaluate CrossPPI model (cross-fusion + GATs/CNNs) with k-fold CV",
+      "ESM-2 per-residue embedding generation",
+      "ESM-2 contact map generation and binarization",
+      "CrossPPI model training and evaluation (k-fold CV)"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "ESM-2 per-residue embedding generation",
+        "paper_reference": "Section 2.2 (Protein sequence information) — ESM2 (650M) embeddings",
+        "confidence": "high",
+        "objective": "Produce per-residue embeddings for each protein sequence using ESM-2 (esm2_t33_650M_UR50D) and save per-complex .npy files.",
+        "repo_entrypoints": [
+          "embedding.py"
+        ],
+        "config_files": [
+          "ppi.yml"
+        ],
+        "required_inputs": [
+          "Protein sequence string (function accepts single sequence)",
+          "PPB-Affinity-Modified.xlsx (embedding.py main uses this Excel file if run as script) -- expected columns: 'Complex ID' and 'Receptor Chains'"
+        ],
+        "expected_outputs": [
+          "embeddings_receptor/<complex_id>.npy (per-complex NumPy file of embeddings)"
+        ],
+        "dependency_hints": [
+          "esm (esm.pretrained, expects esm 3.x / fair-esm integration)",
+          "torch (CUDA recommended)",
+          "numpy, pandas",
+          "GPU (code sets device='cuda' and calls model.to(device))"
+        ],
+        "ambiguity_notes": [
+          "embedding.py returns results['representations'][33][0] without explicit slicing to remove special tokens — ambiguous whether the first/last token(s) are included in the saved per-residue embeddings.",
+          "embedding.py expects Excel file 'PPB-Affinity-Modified.xlsx' with column names 'Complex ID' and 'Receptor Chains' (the README/paper may use different naming); mismatch risk if column names differ.",
+          "Pretrained weights are loaded via esm.pretrained.esm2_t33_650M_UR50D() — requires network or local cache; availability not provided in repo."
+        ],
+        "notes": "Main function generate_embeddings(sequence, max_length=1000) and save_embeddings(complex_id) implement this workflow."
+      },
+      {
+        "workflow_name": "ESM-2 contact map generation and binarization",
+        "paper_reference": "Section 2.2.1 (Protein graph findings) — contact map generated from ESM2(650M) and binarized at threshold 0.5",
+        "confidence": "high",
+        "objective": "Compute ESM-2 contact probabilities/matrix for a sequence, threshold at 0.5, and save binary contact map per complex.",
+        "repo_entrypoints": [
+          "contact_map.py"
+        ],
+        "config_files": [
+          "ppi.yml"
+        ],
+        "required_inputs": [
+          "Protein sequence string (script reads Excel 'data/PPB-Affinity-Modified(pkd).xlsx' by default)",
+          "Column names expected: 'Complex ID' and 'Receptor Chains' (script example uses Ligand Chains in call; column usage inconsistent)"
+        ],
+        "expected_outputs": [
+          "contact_maps_ligands/<complex_id>.txt (text file with binary contact map matrix)"
+        ],
+        "dependency_hints": [
+          "esm (return_contacts=True used)",
+          "torch (CUDA recommended)",
+          "numpy, pandas"
+        ],
+        "ambiguity_notes": [
+          "contact_map.py uses max_length=999 default while embedding.py uses max_length=1000 — potential off-by-one / truncation mismatch between contact maps and embeddings.",
+          "contact_map.py calls model(tokens, repr_layers=[33], return_contacts=True) — availability of contact predictor depends on the installed esm/fair-esm version.",
+          "Example call in contact_map.py's __main__ uses 'Ligand Chains' while generate_contact_map signature and logger mention 'Receptor Chains' — inconsistent column naming."
+        ],
+        "notes": "Function generate_contact_map(sequence, complex_id, threshold=0.5, max_length=999) implements this."
+      },
+      {
+        "workflow_name": "CrossPPI model training and evaluation (k-fold CV)",
+        "paper_reference": "Section 3 (Results) and Section 2 (model architecture); training described in Methods and main_cv.py",
+        "confidence": "medium",
+        "objective": "Train CrossPPI model (Protein_feature_extraction + cross_attention + GATs/CNNs) using dataset, perform cross-validation, save checkpoints and metrics.",
+        "repo_entrypoints": [
+          "main_cv.py",
+          "model/gnn_model_protein.py",
+          "model/cross_attention.py",
+          "model/__init__.py",
+          "data/protein_dataset.py",
+          "data/protein_processor.py",
+          "data/process_ligands.py",
+          "data/process_receptors.py"
+        ],
+        "config_files": [
+          "ppi.yml"
+        ],
+        "required_inputs": [
+          "Processed dataset files (expect Excel/CSV in data/ per scripts) — examples: data/PPB-Affinity-Modified(pkd).xlsx or PPB-Affinity-Modified.xlsx",
+          "Precomputed embeddings/contact-maps may be required by Protein_dataset (not fully specified in repo files read)"
+        ],
+        "expected_outputs": [
+          "save/model_cv_(updated)<...>.pth (saved model checkpoints)",
+          "metrics(updated).txt (training metrics log)"
+        ],
+        "dependency_hints": [
+          "torch, torch-geometric, torch-scatter, numpy, scipy, sklearn",
+          "GPU recommended (main_cv sets device to cuda:2 if available)"
+        ],
+        "ambiguity_notes": [
+          "Exact data preprocessing pipeline and which precomputed artifacts (embeddings/contact maps) are required by Protein_dataset are not fully clear without running data scripts; filenames and paths in scripts vary.",
+          "main_cv.py sets device = cuda:2 — assumes multi-GPU or GPU index availability (may need adjustment)."
+        ],
+        "notes": "This is the full training/evaluation pipeline described in the paper; main entrypoint is main_cv.py."
+      }
+    ],
+    "repo_entrypoints": [
+      "embedding.py",
+      "contact_map.py",
+      "main_cv.py",
+      "model/gnn_model_protein.py",
+      "model/cross_attention.py",
+      "model/__init__.py",
+      "data/protein_dataset.py",
+      "data/protein_processor.py",
+      "data/process_ligands.py",
+      "data/process_receptors.py"
+    ],
+    "config_files": [
+      "ppi.yml"
+    ],
+    "input_artifacts": [
+      "Protein sequence string (function accepts single sequence)",
+      "PPB-Affinity-Modified.xlsx (embedding.py main uses this Excel file if run as script) -- expected columns: 'Complex ID' and 'Receptor Chains'",
+      "Protein sequence string (script reads Excel 'data/PPB-Affinity-Modified(pkd).xlsx' by default)",
+      "Column names expected: 'Complex ID' and 'Receptor Chains' (script example uses Ligand Chains in call; column usage inconsistent)",
+      "Processed dataset files (expect Excel/CSV in data/ per scripts) — examples: data/PPB-Affinity-Modified(pkd).xlsx or PPB-Affinity-Modified.xlsx",
+      "Precomputed embeddings/contact-maps may be required by Protein_dataset (not fully specified in repo files read)"
+    ],
+    "expected_outputs": [
+      "embeddings_receptor/<complex_id>.npy (per-complex NumPy file of embeddings)",
+      "contact_maps_ligands/<complex_id>.txt (text file with binary contact map matrix)",
+      "save/model_cv_(updated)<...>.pth (saved model checkpoints)",
+      "metrics(updated).txt (training metrics log)"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "Section 2.2 (ESM2 embeddings) / Section 2.2.1 (contact map)",
+        "repo_assets": [
+          "embedding.py",
+          "contact_map.py"
+        ],
+        "rationale": "Paper states ESM-2 (650M) is used for per-residue embeddings and contact maps; embedding.py and contact_map.py both instantiate esm.pretrained.esm2_t33_650M_UR50D() and implement embedding/contact map generation and saving."
+      },
+      {
+        "paper_reference": "Model architecture / Cross-fusion module (Sections 2.3–2.4)",
+        "repo_assets": [
+          "main_cv.py",
+          "model/cross_attention.py",
+          "model/gnn_model_protein.py",
+          "data/protein_dataset.py",
+          "data/protein_processor.py"
+        ],
+        "rationale": "main_cv.py implements the training loop and composes Protein_feature_extraction and cross_attention modules; model files implement cross-fusion and GAT/CNN components described in paper."
+      }
+    ],
+    "ambiguous_mappings": [
+      "Inconsistent Excel filenames and expected column names across scripts (embedding.py expects 'PPB-Affinity-Modified.xlsx' with columns 'Complex ID' and 'Receptor Chains'; contact_map.py references 'data/PPB-Affinity-Modified(pkd).xlsx' and uses 'Ligand Chains' in its example call).",
+      "Whether saved embeddings include special tokens (BOS/EOS) is not explicitly handled in embedding.py — may cause off-by-one between embedding vectors and sequence residues.",
+      "Exact data preprocessing order (whether embeddings/contact maps must be precomputed before model training) is not fully specified in code comments.",
+      "embedding.py returns results['representations'][33][0] without explicit slicing to remove special tokens — ambiguous whether the first/last token(s) are included in the saved per-residue embeddings.",
+      "embedding.py expects Excel file 'PPB-Affinity-Modified.xlsx' with column names 'Complex ID' and 'Receptor Chains' (the README/paper may use different naming); mismatch risk if column names differ.",
+      "Pretrained weights are loaded via esm.pretrained.esm2_t33_650M_UR50D() — requires network or local cache; availability not provided in repo.",
+      "contact_map.py uses max_length=999 default while embedding.py uses max_length=1000 — potential off-by-one / truncation mismatch between contact maps and embeddings.",
+      "contact_map.py calls model(tokens, repr_layers=[33], return_contacts=True) — availability of contact predictor depends on the installed esm/fair-esm version.",
+      "Example call in contact_map.py's __main__ uses 'Ligand Chains' while generate_contact_map signature and logger mention 'Receptor Chains' — inconsistent column naming.",
+      "Exact data preprocessing pipeline and which precomputed artifacts (embeddings/contact maps) are required by Protein_dataset are not fully clear without running data scripts; filenames and paths in scripts vary.",
+      "main_cv.py sets device = cuda:2 — assumes multi-GPU or GPU index availability (may need adjustment)."
+    ],
+    "missing_information": [
+      "Pretrained ESM-2 model weights availability (download/caching steps) — repo relies on esm.pretrained API but does not provide local weights.",
+      "Exact column names and filepaths for dataset files expected by data/* scripts (manifest or consolidated README mapping not present).",
+      "Hardware assumptions (GPU index used in main_cv.py, required memory) and precise environment setup steps beyond ppi.yml."
+    ],
+    "notes": "The repository provides concrete scripts to generate ESM-2 embeddings and contact maps and to train CrossPPI. To reproduce the embedding for a single sequence (KRAS, max_length=1000) one would call embedding.generate_embeddings(sequence, max_length=1000) and then compute the mean over the first residue embedding vector. However, runtime execution requires the esm package, pretrained model weights, and a compatible GPU or CPU environment."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "ESM-2 embedding generation (embedding.py)",
+        "status": "blocked",
+        "paper_reference": null,
+        "files_staged": [
+          "embedding.py"
+        ],
+        "commands_run": [
+          "python -c \"import embedding\""
+        ],
+        "observed_outputs": [
+          "ModuleNotFoundError: No module named 'pandas' (importing repo/embedding.py which also requires torch and esm; model is loaded at import-time via esm.pretrained.esm2_t33_650M_UR50D())"
+        ],
+        "missing_inputs": [
+          "Python packages: pandas, torch, esm (fair-esm/ESM-2), numpy",
+          "Pretrained ESM-2 weights (esm2_t33_650M_UR50D) — not cached locally; will require network or local model file",
+          "GPU or sufficient CPU memory (embedding.py sets device = 'cuda')"
+        ],
+        "dependency_issues": [
+          "Import failure: pandas not installed (ModuleNotFoundError)",
+          "Embedding script depends on torch and esm which are not installed in the venv",
+          "embedding.py loads the pretrained model at import time, forcing network/download during import"
+        ],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "Import-time dependency errors observed; installing required packages and ensuring pretrained weights (or modifying embedding.py to defer model load and/or use CPU) should allow the workflow to run."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "ESM-2 embedding generation (embedding.py)"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Install required packages into the repo venv: pip install pandas torch numpy fair-esm (or the esm package matching the code).",
+      "Ensure pretrained ESM-2 weights are available/cached (or allow network access) so esm.pretrained.esm2_t33_650M_UR50D() can load.",
+      "Modify embedding.py to defer loading the model at import-time (move model, alphabet = esm.pretrained... into generate_embeddings) or set device='cpu' to run on CPU if GPU unavailable.",
+      "After installing deps, re-run a smoke test: python -c \"from embedding import generate_embeddings; print(type(generate_embeddings('MTEY...',1000)))\" and then run a minimal generation for the provided KRAS sequence."
+    ],
+    "notes": "Repository venv currently has no required ML packages; the embedding entrypoint attempts to load heavy pretrained weights at import which blocks basic import checks."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Reproducibility is blocked by import-time model loading and missing/captive artifacts; execution produced a numeric result but its correctness is uncertain due to ambiguous extraction details and incomplete dependency/documentation.",
+    "identified_gaps": [
+      {
+        "title": "Import-time model load with hard-coded CUDA (fragile setup)",
+        "gap_type": "fragile_setup",
+        "severity": "high",
+        "paper_reference": null,
+        "related_repo_files": [
+          "embedding.py"
+        ],
+        "related_workflow": "ESM-2 embedding generation (embedding.py)",
+        "execution_evidence": [
+          "testing_report.workflows[0].observed_outputs: \"ModuleNotFoundError: No module named 'pandas' (importing repo/embedding.py which also requires torch and esm; model is loaded at import-time via esm.pretrained.esm2_t33_650M_UR50D())\"",
+          "execution_tool_outputs: embedding.py contains: model, alphabet = esm.pretrained.esm2_t33_650M_UR50D(); device = \"cuda\"; model.to(device)",
+          "testing_report.notes: \"embedding entrypoint attempts to load heavy pretrained weights at import which blocks basic import checks.\""
+        ],
+        "explanation": "The module loads the large pretrained ESM-2 model during import and immediately moves it to CUDA. This creates brittle behavior (requires network, heavy memory, and GPU) that blocks simple import/use and automated checks.",
+        "likely_impact": "Blocks basic usage and automated testing; prevents running embedding workflows in typical CPU or restricted-network environments.",
+        "possible_remediation": "Defer model loading to generate_embeddings(), make device configurable (default to 'cpu'), and avoid import-time downloads or provide a clear cached-model path."
+      },
+      {
+        "title": "Pretrained ESM-2 weights not cached / dependency 'esm' absent initially",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": null,
+        "related_repo_files": [
+          "embedding.py"
+        ],
+        "related_workflow": "ESM-2 embedding generation (embedding.py)",
+        "execution_evidence": [
+          "testing_report.workflows[0].missing_inputs: \"Pretrained ESM-2 weights (esm2_t33_650M_UR50D) — not cached locally; will require network or local model file\"",
+          "testing_report.dependency_issues: \"embedding.py loads the pretrained model at import time, forcing network/download during import\"",
+          "execution_answer.chain: required esm/fair-esm was not in venv; fair-esm was later installed to proceed"
+        ],
+        "explanation": "The repository assumes availability of large pretrained weights or network access but does not provide cached weights or guidance. This is a missing artifact required to run the core workflow.",
+        "likely_impact": "Prevents offline reproduction and forces large downloads at runtime, which can fail in CI or air-gapped environments.",
+        "possible_remediation": "Provide instructions and a script to download/cache the specific esm2_t33_650M_UR50D weights, or include a pointer to a tested local model file path and verify load fallback behavior."
+      },
+      {
+        "title": "Numeric result mismatch / ambiguous embedding-extraction details (execution gap)",
+        "gap_type": "execution_gap",
+        "severity": "high",
+        "paper_reference": null,
+        "related_repo_files": [
+          "embedding.py",
+          "run_embed.py (ad-hoc script used in execution)"
+        ],
+        "related_workflow": "ESM-2 embedding generation (embedding.py)",
+        "execution_evidence": [
+          "execution_answer.final_answer: \"-0.0011\" (script output)",
+          "critic_reviews.verdict: expected ground-truth embedding mean is 9.6298; critic labels worker's numeric result as incorrect",
+          "execution_answer.chain: embedding extraction used results['representations'][33][0] and computed mean of first residue"
+        ],
+        "explanation": "Although a numeric result was produced by running the model, it contradicts an externally reported ground-truth value and there is no repository documentation specifying token handling, which representation layer to use, or whether special tokens are included/excluded. This creates uncertainty whether the produced value corresponds to the intended quantity.",
+        "likely_impact": "Undermines trust in any reported numeric outputs (answers/benchmarks); a consumer cannot verify which extraction choices yield the paper's claimed values.",
+        "possible_remediation": "Document exact extraction procedure (which repr layer index, how to index/remove special tokens/BOS/EOS), provide a small checked example with expected numeric output, and add deterministic seeds/version pins for model/ESM package."
+      },
+      {
+        "title": "Repository lacks explicit dependency and input-data documentation (packages and expected DataFrame columns)",
+        "gap_type": "missing_parameter",
+        "severity": "medium",
+        "paper_reference": null,
+        "related_repo_files": [
+          "embedding.py",
+          "README.md"
+        ],
+        "related_workflow": "ESM-2 embedding generation (embedding.py)",
+        "execution_evidence": [
+          "testing_report.workflows[0].missing_inputs: \"Python packages: pandas, torch, esm (fair-esm/ESM-2), numpy\"",
+          "execution_tool_outputs: embedding.py expects Excel with columns 'Complex ID' and 'Receptor Chains' (example usage)",
+          "testing_report.recommendations: pip install requirements and modify import-time behavior"
+        ],
+        "explanation": "The repo does not include a requirements file or clear instructions listing required packages and the exact DataFrame column names expected, which forces ad-hoc fixes during reproduction.",
+        "likely_impact": "Slows reproduction and increases risk of incorrect usage (wrong column names, missing packages), but is not a fundamental blocker once resolved.",
+        "possible_remediation": "Provide a requirements.txt or environment.yml listing exact package versions, and document expected input file format and column names (or make column names configurable)."
+      }
+    ],
+    "paper_repo_mismatches": [],
+    "execution_gaps": [
+      "Import-time model load with hard-coded CUDA (fragile setup)",
+      "Numeric result mismatch / ambiguous embedding-extraction details (execution gap)"
+    ],
+    "missing_parameters": [
+      "Repository lacks explicit dependency and input-data documentation (packages and expected DataFrame columns)"
+    ],
+    "missing_artifacts": [
+      "Pretrained ESM-2 weights not cached / dependency 'esm' absent initially"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 3,
+      "medium": 1,
+      "low": 0
+    },
+    "evidence_sources": [
+      "testing_report.workflows",
+      "execution_answer.chain",
+      "execution_answer.final_answer",
+      "execution_tool_outputs",
+      "critic_reviews",
+      "install_events"
+    ],
+    "recommended_followups": [
+      "Modify embedding.py to defer model loading to generate_embeddings() and make device configurable (default 'cpu'); re-run import smoke tests.",
+      "Provide or document cached esm2_t33_650M_UR50D weights (or explicit download script) and add requirements.txt pinning esm/fair-esm and torch versions.",
+      "Add a small checked example (input sequence + expected numeric outputs) that demonstrates exact extraction steps (repr layer index, token handling) to validate correctness.",
+      "Document expected input DataFrame columns and add CLI/config flags for column names and output paths."
+    ],
+    "notes": "The workspace execution succeeded after installing fair-esm and running an ad-hoc script, producing a numeric answer, but the critic flagged a substantial mismatch versus the expected benchmark value—this motivates the 'execution_gap' for extraction ambiguity rather than a pure runtime failure."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "High-severity gaps (fragile import that forces CUDA, missing pretrained weights/dependency, and an execution_gap about ambiguous extraction) directly prevent reliable reproduction and the worker did not demonstrably bypass them.",
+    "triggered_gaps": [
+      "Import-time model load with hard-coded CUDA (fragile setup)",
+      "Pretrained ESM-2 weights not cached / dependency 'esm' absent initially",
+      "Numeric result mismatch / ambiguous embedding-extraction details (execution gap)"
+    ]
+  },
+  "elapsed_seconds": 476.4
+}

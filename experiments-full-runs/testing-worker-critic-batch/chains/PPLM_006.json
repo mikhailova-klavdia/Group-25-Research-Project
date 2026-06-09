@@ -1,0 +1,396 @@
+{
+  "id": "PPLM_006",
+  "team": "testing-worker-critic",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1",
+  "question": "Using the PPLM protein-protein interaction prediction tool, predict the interaction probability between the first protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq1.fasta and the second protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq2.fasta, using GPU device 0. What is the predicted interaction score reported in the output?",
+  "ground_truth": "0.94310874",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "I will list repository files to confirm the presence of the PPLM-PPI entrypoint, example FASTAs, and weights before attempting inference.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\repo:\nREADME.md\nenvironment.yml\nrun_pplm-affinity.py\nrun_pplm-contact.py\nrun_pplm-contact2.py\nrun_pplm-ppi.py\nrun_pplm.py\ndata/readme.md\ndata/affinity/cv_folds.csv\nexample/heterodimer.af3.pdb\nexample/heterodimer.afm.pdb\nexample/homodimer.af3.pdb\nexample/homodimer.afm.pdb\nexample/ligand.fasta\nexample/protein1.pdb\nexample/protein2.pdb\nexample/receptor.fasta\nexample/seq1.fasta\nexample/seq2.fasta\nexample/seq_pairs.fasta\npplm/__init__.py\npplm/axial_attention.py\npplm/constants.py\npplm/data.py\npplm/modules.py\npplm/multihead_attention.py\npplm/pplm.py\npplm/rotary_embedding.py\npplm/models/download_model.sh\npplm_affinity/__init__.py\npplm_affinity/model.py\npplm_contact/LoadHHM.py\npplm_contact/Module.py\npplm_contact/__init__.py\npplm_contact/config.py\npplm_contact/model.py\npplm_contact/predict.py\npplm_contact/predict2.py\npplm_contact/utils.py\npplm_contact/external_tools/extract_esm_msa_features.py\npplm_contact/external_tools/esm/__init__.py\npplm_contact/external_tools/esm/axial_attention.py\npplm_contact/external_tools/esm/constants.py\npplm_contact/external_tools/esm/data.py\npplm_contact/external_tools/esm/modules.py\npplm_contact/external_tools/esm/multihead_attention.py\npplm_contact/external_tools/esm/pretrained.py\npplm_contact/external_tools/esm/rotary_embedding.py\npplm_contact/external_tools/esm/version.py\npplm_contact/external_tools/esm/esmfold/v1/__init__.py\npplm_contact/external_tools/esm/esmfold/v1/categorical_mixture.py\npplm_contact/external_tools/esm/esmfold/v1/esmfold.py\npplm_contact/external_tools/esm/esmfold/v1/misc.py\npplm_contact/external_tools/esm/esmfold/v1/pretrained.py\npplm_contact/external_tools/esm/esmfold/v1/tri_self_attn_block.py\npplm_contact/external_tools/esm/esmfold/v1/trunk.py\npplm_contact/external_tools/esm/inverse_folding/__init__.py\npplm_contact/external_tools/esm/inverse_folding/features.py\npplm_contact/external_tools/esm/inverse_folding/gvp_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_modules.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_utils.py\npplm_contact/external_tools/esm/inverse_folding/multichain_util.py\npplm_contact/external_tools/esm/inverse_folding/transformer_decoder.py\npplm_contact/external_tools/esm/inverse_folding/transformer_layer.py\npplm_contact/external_tools/esm/inverse_folding/util.py\npplm_contact/external_tools/esm/model/__init__.py\npplm_contact/external_tools/esm/model/esm1.py\npplm_contact/external_tools/esm/model/esm2.py\npplm_contact/external_tools/esm/model/msa_transformer.py\npplm_contact/external_tools/esm/models/download_model.sh\npplm_contact/models/download_model.sh\npplm_ppi/__init__.py\npplm_ppi/model.py\nweights/download_weights.sh",
+      "reflection": "The expected scripts and example FASTAs are present. Next, locate model weight files (.pkl/.pt) to ensure required artifacts exist."
+    },
+    {
+      "step": 2,
+      "thought": "Locate .pkl artifacts to find the ensemble classifier weights (ppi_models.pkl).",
+      "action": "find_repo_files({\"pattern\": \".pkl\", \"include_binary\": true})",
+      "observation": "Filename results for '.pkl' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\repo:\nweights/affinity_models.pkl [artifact, 1.0 GB]\nweights/ppi_models.pkl [artifact, 221.0 MB]",
+      "reflection": "ppi_models.pkl is present. I also need the pretrained PPLM .pt file, so search for .pt next."
+    },
+    {
+      "step": 3,
+      "thought": "Locate .pt artifacts to find the PPLM model weights used at inference time.",
+      "action": "find_repo_files({\"pattern\": \".pt\", \"include_binary\": true})",
+      "observation": "Filename results for '.pt' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\repo:\nweights/pplm_t33_650M.pt [artifact, 1.0 GB]",
+      "reflection": "Weights file exists in the repo. I'll attempt to run the inference script with GPU device 0 using the example FASTA inputs."
+    },
+    {
+      "step": 4,
+      "thought": "Run the PPLM-PPI inference script using the two example FASTA files and GPU device 0 to obtain the predicted interaction score.",
+      "action": "execute_command(\"python run_pplm-ppi.py example/seq1.fasta example/seq2.fasta --gpu_id 0\", timeout=1200)",
+      "observation": "Exit code: 1\n\nSTDERR:\nC:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\.venv\\Lib\\site-packages\\torch\\_subclasses\\functional_tensor.py:362: UserWarning: Failed to initialize NumPy: No module named 'numpy' (Triggered internally at C:\\actions-runner\\_work\\pytorch\\pytorch\\torch\\csrc\\utils\\tensor_numpy.cpp:84.)\n  cpu = _conversion_method_template(device=torch.device(\"cpu\"))\nTraceback (most recent call last):\n  File \"C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\workspace\\run_pplm-ppi.py\", line 134, in <module>\n    main()\n  File \"C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\workspace\\run_pplm-ppi.py\", line 42, in main\n    mean_inter_attn, mean_attn_AA, mean_attn_BB, mean_embed_A, mean_embed_B, max_inter_attn, max_attn_AA, max_attn_BB, max_embed_A, max_embed_B = get_pplm_features(seqA, seqB, device)\n                                                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\workspace\\run_pplm-ppi.py\", line 85, in get_pplm_features\n    model_data = torch.load(model_location, map_location=\"cpu\")\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\.venv\\Lib\\site-packages\\torch\\serialization.py\", line 1537, in load\n    with _open_zipfile_reader(opened_file) as opened_zipfile:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\.venv\\Lib\\site-packages\\torch\\serialization.py\", line 807, in __init__\n    super().__init__(torch._C.PyTorchFileReader(name_or_buffer))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: PytorchStreamReader failed reading zip archive: failed finding central directory. This is an internal miniz error. If you are seeing this error, there is a high likelihood that your checkpoint file is corrupted. This can happen if the checkpoint was not saved properly, was transferred incorrectly, or the file was modified after saving.\n",
+      "reflection": "Inference failed because torch.load could not read the PPLM .pt checkpoint (likely corrupted). This blocks producing the requested prediction."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (corrupted PPLM checkpoint) prevents loading the pretrained model and therefore blocks reliable reproduction of the reported interaction score. (gaps: Corrupted PPLM checkpoint weights/pplm_t33_650M.pt)",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. A high-severity missing_artifact (corrupted PPLM checkpoint) prevents loading the pretrained model and therefore blocks reliable reproduction of the reported interaction score. Original answer was: EXECUTION_REQUIRED — model checkpoint weights/pplm_t33_650M.pt appears corrupted (PytorchStreamReader failed reading zip archive), preventing inference.",
+    "blocker_evidence": [
+      "UserWarning: Failed to initialize NumPy: No module named 'numpy'",
+      "RuntimeError: PytorchStreamReader failed reading zip archive: failed finding central directory. ... high likelihood that your checkpoint file is corrupted."
+    ]
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker performed a comprehensive sequence of steps including confirming the presence of necessary scripts, example FASTA files, and the required pretrained weights files. They then attempted to run the inference script with the specified inputs and GPU device, capturing the error output that clearly indicated the checkpoint weights file was corrupted, preventing successful model execution. The final answer correctly reports this blocking failure and classifies the issue as missing_weights with detailed error evidence. This truthful execution-based assessment and explicit blocking explanation comply fully with the benchmark integrity requirements, thus warranting a pass verdict.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [
+    {
+      "attempt": 1,
+      "modules": [
+        "torch"
+      ],
+      "packages": [
+        "torch"
+      ],
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--no-cache",
+        "--python",
+        "C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\.venv\\Scripts\\python.exe",
+        "torch"
+      ],
+      "exit_code": 0,
+      "output": "Using Python 3.12.13 environment at: Papers\\24-73Hwgd-PPLM\\runs\\20260607T110004-19062dfc\\.venv\nResolved 10 packages in 494ms\nDownloading torch (117.3MiB)\nDownloading sympy (6.0MiB)\nDownloading networkx (2.0MiB)\nDownloading setuptools (1.0MiB)\n Downloaded setuptools\n Downloaded networkx\n Downloaded sympy\n Downloaded torch\nPrepared 10 packages in 34.46s\nInstalled 10 packages in 6.37s\n + filelock==3.29.1\n + fsspec==2026.4.0\n + jinja2==3.1.6\n + markupsafe==3.0.3\n + mpmath==1.3.0\n + networkx==3.6.1\n + setuptools==81.0.0\n + sympy==1.14.0\n + torch==2.12.0\n + typing-extensions==4.15.0",
+      "succeeded": true
+    }
+  ],
+  "token_usage": {
+    "pre_run_estimate": 1582,
+    "input_tokens": 50137,
+    "output_tokens": 2560,
+    "total_tokens": 52697,
+    "estimated_cost_usd": 0.01765425,
+    "aggregate": {
+      "input_tokens": 401244,
+      "output_tokens": 13566,
+      "total_tokens": 414810,
+      "estimated_cost_usd": 0.12821064999999998
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 186867,
+        "output_tokens": 2493,
+        "total_tokens": 189360,
+        "estimated_cost_usd": 0.05170275
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 89192,
+        "output_tokens": 2289,
+        "total_tokens": 91481,
+        "estimated_cost_usd": 0.026875999999999997
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 63571,
+        "output_tokens": 3158,
+        "total_tokens": 66729,
+        "estimated_cost_usd": 0.02220875
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 50137,
+        "output_tokens": 2560,
+        "total_tokens": 52697,
+        "estimated_cost_usd": 0.01765425
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 5459,
+        "output_tokens": 128,
+        "total_tokens": 5587,
+        "estimated_cost_usd": 0.0023884000000000006
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 5041,
+        "output_tokens": 2534,
+        "total_tokens": 7575,
+        "estimated_cost_usd": 0.00632825
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 977,
+        "output_tokens": 404,
+        "total_tokens": 1381,
+        "estimated_cost_usd": 0.00105225
+      }
+    ]
+  },
+  "extraction_report": {
+    "paper_summary": "PPLM is a paired-protein language model that produces inter- and intra-chain representations used for three downstream tasks: binary PPI prediction (PPLM-PPI), binding affinity (PPLM-Affinity), and inter-protein contact prediction (PPLM-Contact).",
+    "research_objective": "Provide sequence-only models to (1) predict whether two proteins interact, (2) estimate binding affinity, and (3) predict inter-protein contacts/interface residues.",
+    "identified_experiments": [
+      "Binary protein–protein interaction prediction (PPLM-PPI)",
+      "Binding affinity prediction (PPLM-Affinity)",
+      "Inter-protein contact prediction (PPLM-Contact / PPLM-Contact2)",
+      "PPLM-PPI interaction prediction (inference)"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "PPLM-PPI interaction prediction (inference)",
+        "paper_reference": "PPLM-PPI (Figure 1B; 'PPLM-PPI' section)",
+        "confidence": "high",
+        "objective": "Given two protein sequences, use pretrained PPLM features and an ensemble PPI classifier to output an interaction probability.",
+        "repo_entrypoints": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/model.py",
+          "pplm/pplm.py"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "example/seq1.fasta (first sequence; user path referenced: PPLM/notebooks/run_pplm-ppi/data/seq1.fasta -> maps to example/seq1.fasta)",
+          "example/seq2.fasta (second sequence; user path referenced: PPLM/notebooks/run_pplm-ppi/data/seq2.fasta -> maps to example/seq2.fasta)",
+          "weights/ppi_models.pkl (ensemble classifier weights)",
+          "weights/pplm_t33_650M.pt (PPLM model weights)"
+        ],
+        "expected_outputs": [
+          "Console output: 'Predicted interaction score: <value>' (numpy scalar printed to stdout)"
+        ],
+        "dependency_hints": [
+          "Python",
+          "PyTorch (torch)",
+          "CUDA-capable GPU (script uses cuda:<gpu_id> when torch.cuda.is_available())",
+          "Large model weight files under weights/"
+        ],
+        "ambiguity_notes": [
+          "User-specified path PPLM/notebooks/run_pplm-ppi/data/seq1.fasta and seq2.fasta do not exist in this repo; equivalent example files are at example/seq1.fasta and example/seq2.fasta.",
+          "Script prints a numpy scalar array; downstream tooling/format for capturing the printed score is not specified."
+        ],
+        "notes": "Inference script run_pplm-ppi.py accepts two fasta paths and --gpu_id (default 0). It loads weights/ppi_models.pkl and weights/pplm_t33_650M.pt and prints the predicted interaction score."
+      }
+    ],
+    "repo_entrypoints": [
+      "run_pplm-ppi.py",
+      "pplm_ppi/model.py",
+      "pplm/pplm.py",
+      "weights/ppi_models.pkl",
+      "weights/pplm_t33_650M.pt",
+      "example/seq1.fasta",
+      "example/seq2.fasta"
+    ],
+    "config_files": [],
+    "input_artifacts": [
+      "example/seq1.fasta (first sequence; user path referenced: PPLM/notebooks/run_pplm-ppi/data/seq1.fasta -> maps to example/seq1.fasta)",
+      "example/seq2.fasta (second sequence; user path referenced: PPLM/notebooks/run_pplm-ppi/data/seq2.fasta -> maps to example/seq2.fasta)",
+      "weights/ppi_models.pkl (ensemble classifier weights)",
+      "weights/pplm_t33_650M.pt (PPLM model weights)"
+    ],
+    "expected_outputs": [
+      "Console output: 'Predicted interaction score: <value>' (numpy scalar printed to stdout)"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "PPLM-PPI (Figure 1B; Results section 'PPLM-PPI')",
+        "repo_assets": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/model.py",
+          "pplm/pplm.py",
+          "weights/ppi_models.pkl",
+          "weights/pplm_t33_650M.pt",
+          "example/seq1.fasta",
+          "example/seq2.fasta"
+        ],
+        "rationale": "run_pplm-ppi.py implements the PPLM-PPI inference pipeline described in Figure 1B, using PPLM to extract embeddings/attentions (pplm/pplm.py) and an ensemble of classifiers (weights/ppi_models.pkl). Example sequences are present under example/."
+      }
+    ],
+    "ambiguous_mappings": [
+      "User path PPLM/notebooks/run_pplm-ppi/data/... is not present; the repo contains example/seq1.fasta and example/seq2.fasta which appear intended for the same usage.",
+      "No separate config or README documents specifying exact CLI invocation/output capture format beyond printing to stdout.",
+      "User-specified path PPLM/notebooks/run_pplm-ppi/data/seq1.fasta and seq2.fasta do not exist in this repo; equivalent example files are at example/seq1.fasta and example/seq2.fasta.",
+      "Script prints a numpy scalar array; downstream tooling/format for capturing the printed score is not specified."
+    ],
+    "missing_information": [
+      "The actual predicted interaction score for the two sequences (not computed here — extraction only).",
+      "Runtime environment used by the user (CUDA availability/version) and whether weights files are intact/corrupt on this system (weights are large binary artifacts)."
+    ],
+    "notes": "To reproduce the requested prediction: run `python run_pplm-ppi.py example/seq1.fasta example/seq2.fasta --gpu_id 0` in an environment with PyTorch and a CUDA GPU and with the weights files present. This extraction stage does not execute the model, so the numeric prediction is not produced here."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "PPLM-PPI inference",
+        "status": "blocked",
+        "paper_reference": "PPLM-PPI (inference via run_pplm-ppi.py)",
+        "files_staged": [
+          "run_pplm-ppi.py",
+          "pplm_ppi",
+          "pplm",
+          "example/seq1.fasta",
+          "example/seq2.fasta",
+          "weights/ppi_models.pkl",
+          "weights/pplm_t33_650M.pt"
+        ],
+        "commands_run": [
+          "python -c \"import torch; print('torch import ok', torch.__version__)\""
+        ],
+        "observed_outputs": [
+          "STDERR: ModuleNotFoundError: No module named 'torch'"
+        ],
+        "missing_inputs": [
+          "Python package 'torch' (PyTorch) is not installed in the environment",
+          "CUDA-capable PyTorch (for GPU device 0) / available CUDA GPU (requested by the user)"
+        ],
+        "dependency_issues": [
+          "Import failure: torch missing (ModuleNotFoundError)",
+          "No evidence of CUDA-capable PyTorch; venv currently lacks PyTorch"
+        ],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "Weights and example FASTAs exist and were staged; execution could not start because PyTorch is not installed (so GPU usage cannot be validated)."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "PPLM-PPI inference"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Install PyTorch with CUDA support into the environment (pip/conda).",
+      "Ensure a CUDA-capable GPU is available and visible to the environment.",
+      "Then run: python run_pplm-ppi.py example/seq1.fasta example/seq2.fasta --gpu_id 0 and confirm stdout prints 'Predicted interaction score: <value>'."
+    ],
+    "notes": "Weights (weights/ppi_models.pkl, weights/pplm_t33_650M.pt) and example seq files are present and were staged into workspace. The current environment's venv lacks torch, blocking inference."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Blocked: inference could not run to produce the requested interaction score because the pretrained PPLM checkpoint is corrupted; reproduction is further weakened by missing CUDA-capable runtime for GPU execution and a missing NumPy installation warning.",
+    "identified_gaps": [
+      {
+        "title": "Corrupted PPLM checkpoint weights/pplm_t33_650M.pt",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": "PPLM-PPI (inference via run_pplm-ppi.py)",
+        "related_repo_files": [
+          "weights/pplm_t33_650M.pt",
+          "run_pplm-ppi.py"
+        ],
+        "related_workflow": "PPLM-PPI inference",
+        "execution_evidence": [
+          "RuntimeError: PytorchStreamReader failed reading zip archive: failed finding central directory. ... high likelihood that your checkpoint file is corrupted.",
+          "torch.load(model_location, map_location=\"cpu\") raised PytorchStreamReader error (stack trace in execution_tool_outputs and execution_answer.chain.step 4)"
+        ],
+        "explanation": "The .pt checkpoint file is present in the repo but cannot be read by torch.load; the failure indicates the archive is corrupted and prevents loading the pretrained PPLM model required for feature extraction and downstream PPI prediction.",
+        "likely_impact": "Blocks any end-to-end inference and therefore prevents obtaining the requested interaction score; core claim reproduction is impossible until a valid checkpoint is provided.",
+        "possible_remediation": "Replace or re-upload a valid weights/pplm_t33_650M.pt (verify checksum or re-download from original source)."
+      },
+      {
+        "title": "No CUDA-capable PyTorch / visible GPU for requested --gpu_id 0",
+        "gap_type": "fragile_setup",
+        "severity": "medium",
+        "paper_reference": "PPLM-PPI (inference via run_pplm-ppi.py)",
+        "related_repo_files": [
+          "run_pplm-ppi.py"
+        ],
+        "related_workflow": "PPLM-PPI inference",
+        "execution_evidence": [
+          "testing_report.missing_inputs: \"CUDA-capable PyTorch (for GPU device 0) / available CUDA GPU (requested by the user)\"",
+          "testing_report.dependency_issues: \"No evidence of CUDA-capable PyTorch; venv currently lacks PyTorch\"",
+          "install_events shows torch installed but no evidence it is CUDA-enabled; inference attempted with --gpu_id 0 cannot be validated."
+        ],
+        "explanation": "The user requested GPU device 0 but the environment lacks clear evidence of a CUDA-capable PyTorch build or an available CUDA GPU; instructions implicitly assume GPU availability which is brittle if not explicitly documented or checked.",
+        "likely_impact": "Prevents reproducing the GPU-based run as requested; may force CPU fallback or different behavior and thus affect performance and exact outputs.",
+        "possible_remediation": "Document and verify CUDA capability (torch.cuda.is_available()) and provide instructions to install a CUDA-enabled PyTorch build or run on CPU explicitly when GPU is unavailable."
+      },
+      {
+        "title": "NumPy not installed / Failed to initialize NumPy (warning)",
+        "gap_type": "missing_artifact",
+        "severity": "low",
+        "paper_reference": "PPLM-PPI (inference via run_pplm-ppi.py)",
+        "related_repo_files": [
+          "run_pplm-ppi.py"
+        ],
+        "related_workflow": "PPLM-PPI inference",
+        "execution_evidence": [
+          "UserWarning: Failed to initialize NumPy: No module named 'numpy' (from torch internals) seen in execution_tool_outputs and execution_answer.blocker_evidence"
+        ],
+        "explanation": "The runtime emitted a NumPy import/initialization warning (No module named 'numpy'), indicating numpy was not available in the environment used for execution. While this manifested as a warning, missing standard numeric packages can cause instability or additional failures.",
+        "likely_impact": "May cause warnings or runtime instability; not the primary blocker for loading the checkpoint but should be fixed for stable execution.",
+        "possible_remediation": "Install numpy into the environment (e.g., pip install numpy) before running inference."
+      }
+    ],
+    "paper_repo_mismatches": [],
+    "execution_gaps": [
+      "No CUDA-capable PyTorch / visible GPU for requested --gpu_id 0"
+    ],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Corrupted PPLM checkpoint weights/pplm_t33_650M.pt",
+      "NumPy not installed / Failed to initialize NumPy (warning)"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 1,
+      "medium": 1,
+      "low": 1
+    },
+    "evidence_sources": [
+      "testing_report.workflows (PPLM-PPI inference)",
+      "execution_answer.chain",
+      "execution_answer.blocker_evidence",
+      "execution_tool_outputs",
+      "install_events",
+      "critic_reviews"
+    ],
+    "recommended_followups": [
+      "Obtain and stage a valid (non-corrupted) weights/pplm_t33_650M.pt (verify checksum or re-download) and retry inference.",
+      "Ensure a CUDA-capable PyTorch build and a visible GPU are available if GPU device 0 is required; otherwise document CPU execution mode.",
+      "Install numpy into the environment to remove initialization warnings before re-running."
+    ],
+    "notes": "Initial testing_report noted torch missing; install_events show torch was later installed but the run failed due to a corrupted .pt checkpoint. The corrupted weights are the primary blocker to producing the requested interaction score."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "A high-severity missing_artifact (corrupted PPLM checkpoint) prevents loading the pretrained model and therefore blocks reliable reproduction of the reported interaction score.",
+    "triggered_gaps": [
+      "Corrupted PPLM checkpoint weights/pplm_t33_650M.pt"
+    ]
+  },
+  "elapsed_seconds": 887.4
+}
