@@ -1,0 +1,269 @@
+{
+  "id": "V2_D1_LARIS_002",
+  "team": "testing-worker-critic",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "",
+  "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad' (human tonsil Slide-tags spatial transcriptomics data with 5695 cells x 25583 genes) and the ligand-receptor database from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv', prepare a ligand-receptor AnnData object using 20 nearest neighbors and 'X_spatial' as the spatial coordinates key. How many ligand-receptor interaction pairs are in the resulting LR AnnData object (number of variables)?",
+  "ground_truth": "1985",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "I need to map the repository to see if the required tutorial files are present (adata .h5ad and LR CSV), so start with a full readable-file tree scan.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\experiments-gap-injection-v2\\papers\\gap-v2-laris\\repo:\n.gitignore\nLICENSE\nREADME.md\npyproject.toml\n.github/workflows/publish.yml\ndocs/.nojekyll\ndocs/genindex.html\ndocs/index.html\ndocs/installation.html\ndocs/laris.html\ndocs/laris.preprocessing.html\ndocs/laris.tools.html\ndocs/modules.html\ndocs/py-modindex.html\ndocs/search.html\ndocs/searchindex.js\ndocs/setup.html\ndocs/tutorials.html\ndocs/_sources/index.rst.txt\ndocs/_sources/installation.md.txt\ndocs/_sources/laris.plotting.rst.txt\ndocs/_sources/laris.preprocessing.rst.txt\ndocs/_sources/laris.rst.txt\ndocs/_sources/laris.tools.rst.txt\ndocs/_sources/laris_1.plotting.rst.txt\ndocs/_sources/laris_1.rst.txt\ndocs/_sources/laris_1.tools.rst.txt\ndocs/_sources/modules.rst.txt\ndocs/_sources/modules_1.rst.txt\ndocs/_sources/setup.rst.txt\ndocs/_sources/tutorials.rst.txt\ndocs/_static/basic.css\ndocs/_static/custom.css\ndocs/_static/doctools.js\ndocs/_static/documentation_options.js\ndocs/_static/language_data.js\ndocs/_static/nbsphinx-code-cells.css\ndocs/_static/nbsphinx-gallery.css\ndocs/_static/pygments.css\ndocs/_static/searchtools.js\ndocs/_static/sidebar_toggle.js\ndocs/_static/sphinx_highlight.js\ndocs/_static/webpack-macros.html\ndocs/_static/scripts/bootstrap.js\ndocs/_static/scripts/bootstrap.js.LICENSE.txt\ndocs/_static/scripts/fontawesome.js.LICENSE.txt\ndocs/_static/scripts/pydata-sphinx-theme.js\ndocs/_static/scripts/pydata-sphinx-theme.js.map\ndocs/_static/styles/theme.css\nlaris/__init__.py\nlaris/datasets/__init__.py\nlaris/datasets/_data/__init__.py\nlaris/plotting/__init__.py\nlaris/preprocessing/__init__.py\nlaris/tools/__init__.py\nlaris/tools/_utils.py\ntests/__init__.py\ntests/conftest.py\ntests/test_bugfixes.py\ntests/test_datasets.py\ntests/test_spatial_offset.py\ntests/test_tutorial_pipeline.py",
+      "reflection": "The tree is present but I didn't see the tutorial .h5ad path; next search specifically for .h5ad files to confirm whether the AnnData file exists."
+    },
+    {
+      "step": 2,
+      "thought": "Search the repo for any .h5ad files (the adata_tonsil.h5ad should be a .h5ad) to see if the required AnnData is present.",
+      "action": "find_repo_files({\"pattern\":\".h5ad\",\"include_binary\":true})",
+      "observation": "No filenames matched '.h5ad' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\experiments-gap-injection-v2\\papers\\gap-v2-laris\\repo",
+      "reflection": "The required adata_tonsil.h5ad is not present. Next, check for CSV LR databases (maybe a differently named LR CSV exists in the repo)."
+    },
+    {
+      "step": 3,
+      "thought": "Search for CSV files to locate any bundled ligand-receptor databases that might substitute for the referenced CSV.",
+      "action": "find_repo_files({\"pattern\":\".csv\",\"include_binary\":true})",
+      "observation": "Filename results for '.csv' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\experiments-gap-injection-v2\\papers\\gap-v2-laris\\repo:\nlaris/datasets/_data/human_lr_CellChatDB.csv [artifact, 2.6 MB]\nlaris/datasets/_data/mouse_lr_CellChatDB.csv [artifact, 2.9 MB]",
+      "reflection": "A human LR CSV exists but not necessarily the same formatted CSV referenced by the tutorial. The adata .h5ad is still missing. I'll inspect prepareLRInteraction implementation to confirm what inputs determine the LR AnnData variable count."
+    },
+    {
+      "step": 4,
+      "thought": "Locate the prepareLRInteraction implementation to see how the LR AnnData var count is computed and whether it requires the specific input files.",
+      "action": "search_repo({\"query\":\"prepareLRInteraction\"})",
+      "observation": "Search results for 'prepareLRInteraction' under C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\experiments-gap-injection-v2\\papers\\gap-v2-laris\\repo:\ndocs/genindex.html:432: <li><a href=\"laris.tools.html#laris.tools.prepareLRInteraction\">prepareLRInteraction() (in module laris.tools)</a>, <a href=\"laris_1.tools.html#laris.tools.prepareLRInteraction\">[1]</a>\ndocs/laris.html:380: <span class=\"gp\">&gt;&gt;&gt; </span><span class=\"n\">lr_adata</span> <span class=\"o\">=</span> <span class=\"n\">la</span><span class=\"o\">.</span><span class=\"n\">tl</span><span class=\"o\">.</span><span class=\"n\">prepareLRInteraction</span><s...\ndocs/laris.html:418: <li class=\"toctree-l2\"><a class=\"reference internal\" href=\"laris.tools.html#laris.tools.prepareLRInteraction\"><code class=\"docutils literal notranslate\"><span class=\"pre\">prepareLRInteraction()</span></code></a></li>\ndocs/laris.preprocessing.html:372: - laris.tl.prepareLRInteraction()\ndocs/laris.preprocessing.html:378: <span class=\"gp\">&gt;&gt;&gt; </span><span class=\"n\">lr_adata</span> <span class=\"o\">=</span> <span class=\"n\">la</span><span class=\"o\">.</span><span class=\"n\">tl</span><span class=\"o\">.</span><span class=\"n\">prepareLRInteraction</span><s...\ndocs/laris.tools.html:374: - prepareLRInteraction: Calculate LR interaction scores using spatial neighborhoods\ndocs/laris.tools.html:377: <dt class=\"sig sig-object py\" id=\"laris.tools.prepareLRInteraction\">\ndocs/laris.tools.html:378: <span class=\"sig-prename descclassname\"><span class=\"pre\">laris.tools.</span></span><span class=\"sig-name descname\"><span class=\"pre\">prepareLRInteraction</span></span><span class=\"sig-paren\">(</span><em class=\"sig-param\"><span class=\"n\"...\ndocs/laris.tools.html:416: <span class=\"gp\">&gt;&gt;&gt; </span><span class=\"n\">lr_adata</span> <span class=\"o\">=</span> <span class=\"n\">la</span><span class=\"o\">.</span><span class=\"n\">tl</span><span class=\"o\">.</span><span class=\"n\">prepareLRInteraction</span><s...\ndocs/laris.tools.html:443: <li><p><strong>lr_adata</strong> (<em>AnnData</em>) – <p>AnnData object containing LR interaction scores from <cite>prepareLRInteraction()</cite>.</p>\ndocs/laris.tools.html:563: <span class=\"gp\">&gt;&gt;&gt; </span><span class=\"n\">lr_adata</span> <span class=\"o\">=</span> <span class=\"n\">la</span><span class=\"o\">.</span><span class=\"n\">tl</span><span class=\"o\">.</span><span class=\"n\">prepareLRInteraction</span><s...\ndocs/laris.tools.html:627: <dt><a class=\"reference internal\" href=\"laris_1.tools.html#laris.tools.prepareLRInteraction\" title=\"laris.tools.prepareLRInteraction\"><code class=\"xref py py-obj docutils literal notranslate\"><span class=\"pre\">prepareLRInteraction</span>...\ndocs/laris.tools.html:633: <p>..autofunction:: prepareLRInteraction\ndocs/laris.tools.html:675: <li class=\"toc-h2 nav-item toc-entry\"><a class=\"reference internal nav-link\" href=\"#laris.tools.prepareLRInteraction\"><code class=\"docutils literal notranslate\"><span class=\"pre\">prepareLRInteraction()</span></code></a></li>\ndocs/modules.html:382: <li class=\"toctree-l4\"><a class=\"reference internal\" href=\"laris.tools.html#laris.tools.prepareLRInteraction\"><code class=\"docutils literal notranslate\"><span class=\"pre\">prepareLRInteraction()</span></code></a></li>\ndocs/searchindex.js:1: Search.setIndex({\"alltitles\": {\"API\": [[9, \"api\"], [10, \"api\"]], \"CCC DotPlot\": [[11, \"CCC-DotPlot\"]], \"CCC DotPlot (Facet)\": [[11, \"CCC-DotPlot-(Facet)\"]], \"CCC DotPlot (Facet), facet by receiver\": [[11, \"CCC-DotPlot-(Facet),-facet-by-r...\ndocs/_sources/laris.tools.rst.txt:10: ..autofunction:: prepareLRInteraction\ndocs/_sources/laris_1.tools.rst.txt:10: ..autofunction:: prepareLRInteraction\nlaris/__init__.py:21: >>> lr_adata = la.tl.prepareLRInteraction(adata, lr_df)\nlaris/preprocessing/__init__.py:22: >>> lr_adata = la.tl.prepareLRInteraction(adata, lr_df)\nlaris/preprocessing/__init__.py:86: >>> # Now run prepareLRInteraction — kNN will stay within-sample\nlaris/preprocessing/__init__.py:87: >>> lr_adata = la.tl.prepareLRInteraction(adata, lr_df)\nlaris/tools/__init__.py:12: - prepareLRInteraction: Calculate LR interaction scores using spatial neighborhoods\nlaris/tools/__init__.py:29: def prepareLRInteraction(\nlaris/tools/__init__.py:76: >>> lr_adata = la.tl.prepareLRInteraction(adata, lr_df)\nlaris/tools/__init__.py:88: f\"prepareLRInteraction: removed {n_dropped} duplicate ligand-receptor \"\nlaris/tools/__init__.py:198: AnnData object containing LR interaction scores from `prepareLRInteraction()`.\nlaris/tools/__init__.py:378: >>> lr_adata = la.tl.prepareLRInteraction(adata, lr_df)\nlaris/tools/__init__.py:441: prepareLRInteraction : Prepare LR scores (prerequisite for this function)\nlaris/tools/__init__.py:620: 'prepareLRInteraction',\nlaris/tools/_utils.py:635: `prepareLRInteraction()`) is enriched in different cell types.\nlaris/tools/_utils.py:1162: AnnData object containing LR interaction scores from prepareLRInteraction().\nlaris/tools/_utils.py:1295: prepareLRInteraction : Computes diffused LR scores (upstream of this function)\ntests/conftest.py:72: \"\"\"Pre-computed lr_adata from prepareLRInteraction.\"\"\"\ntests/conftest.py:74: return la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:15: # Issue #2: Dense adata.X should not crash prepareLRInteraction\ntests/test_bugfixes.py:19: \"\"\"prepareLRInteraction must accept dense numpy array X.\"\"\"\ntests/test_bugfixes.py:23: lr_adata = la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:34: lr_sparse = la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:38: lr_dense = la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:49: lr_adata = la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:61: \"\"\"prepareLRInteraction must deduplicate LR pairs and emit a warning.\"\"\"\ntests/test_bugfixes.py:65: la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:75: lr_adata = la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:86: lr_adata = la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:100: la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:173: lr_adata = la.tl.prepareLRInteraction(\ntests/test_bugfixes.py:184: lr_adata = la.tl.prepareLRInteraction(\ntests/test_tutorial_pipeline.py:6: load data → prepareLRInteraction → runLARIS → plotting functions\ntests/test_tutorial_pipeline.py:80: \"\"\"Run prepareLRInteraction (k=20, tutorial parameters).\"\"\"\n... search truncated after 50 matches",
+      "reflection": "Read the implementation file to confirm how the number of LR pairs is derived from inputs."
+    },
+    {
+      "step": 5,
+      "thought": "Read laris/tools/__init__.py to confirm the algorithm and identify which files/inputs are needed to compute lr_adata.shape[1].",
+      "action": "read_repo_file({\"relative_path\":\"laris/tools/__init__.py\"})",
+      "observation": "Contents of C:\\Users\\32472\\Desktop\\MaastrichtUni\\MscAI\\ProjectSem2\\Phase3\\Group-25-Research-Project\\experiments-gap-injection-v2\\papers\\gap-v2-laris\\repo\\laris\\tools\\__init__.py:\n\"\"\"\nLARIS Tools Module (laris.tl)\n\nCore analytical tools for ligand-receptor interaction analysis in spatial transcriptomics data.\n\nThis module contains public functions for:\n- Preparing ligand-receptor integration scores with spatial diffusion\n- Running the LARIS algorithm to identify spatially-specific LR interactions\n- Computing cell type-specific interaction scores\n\nMain Functions:\n- prepareLRInteraction: Calculate LR interaction scores using spatial neighborhoods\n- runLARIS: Identify spatially-specific LR pairs and compute cell type interactions\n\"\"\"\n\nimport pandas as pd\nimport scanpy as sc\nimport numpy as np\nimport anndata as ad\nimport scipy.sparse as sp\nfrom scipy.sparse import csr_matrix, issparse\nfrom sklearn.neighbors import kneighbors_graph\nfrom sklearn.preprocessing import normalize\nfrom typing import Optional, Union, List, Tuple\n\nfrom . import _utils\n\n\ndef prepareLRInteraction(\n    adata: ad.AnnData,\n    lr_df: pd.DataFrame,\n    number_nearest_neighbors: int = 10,\n    use_rep_spatial: str = 'X_spatial'\n) -> ad.AnnData:\n    \"\"\"\n    Calculate ligand-receptor integration scores using spatial neighborhood information.\n    \n    This function computes diffused ligand-receptor interaction scores by considering\n    the spatial context of each cell. It uses k-nearest neighbors to create a spatial\n    neighborhood graph and calculates element-wise multiplication of diffused ligand\n    and receptor expression levels.\n    \n    Parameters\n    ----------\n    adata : AnnData\n        Annotated data matrix containing gene expression and spatial coordinates.\n        Must have `.obsm[use_rep_spatial]` with spatial coordinates.\n    lr_df : pd.DataFrame\n        DataFrame containing ligand-receptor pairs with columns 'ligand' and 'receptor'.\n    number_nearest_neighbors : int, default=10\n        Number of nearest neighbors to consider for spatial diffusion.\n    use_rep_spatial : str, default='X_spatial'\n        Key in adata.obsm containing spatial coordinates.\n        \n    Returns\n    -------\n    AnnData\n        New AnnData object containing ligand-receptor interaction scores.\n        - `.X`: Sparse matrix of LR interaction scores (cells × LR pairs)\n        - `.var_names`: Ligand-receptor pair names in format \"ligand::receptor\"\n        - `.obs`: Cell metadata copied from input adata\n        - `.obsm`: Spatial and other representations copied from input adata\n        \n    Examples\n    --------\n    >>> import laris as la\n    >>> import pandas as pd\n    >>> \n    >>> # Define ligand-receptor pairs\n    >>> lr_df = pd.DataFrame({\n    ...     'ligand': ['Tgfb1', 'Vegfa'],\n    ...     'receptor': ['Tgfbr1', 'Kdr']\n    ... })\n    >>> \n    >>> # Calculate LR integration scores\n    >>> lr_adata = la.tl.prepareLRInteraction(adata, lr_df)\n    >>> print(lr_adata.shape)  # (n_cells, n_lr_pairs)\n\n    \"\"\"\n    # Deduplicate lr_df to prevent duplicate var_names in lr_adata, which\n    # causes identical background sets and duplicate p-values downstream.\n    n_before = len(lr_df)\n    lr_df = lr_df.drop_duplicates(subset=['ligand', 'receptor']).reset_index(drop=True)\n    n_dropped = n_before - len(lr_df)\n    if n_dropped > 0:\n        import warnings\n        warnings.warn(\n            f\"prepareLRInteraction: removed {n_dropped} duplicate ligand-receptor \"\n            f\"pair(s) from lr_df. Duplicate pairs cause identical p-values in \"\n            f\"runLARIS. Ensure each (ligand, receptor) pair is unique.\",\n            UserWarning,\n            stacklevel=2,\n        )\n\n    X_spatial = adata.obsm[use_rep_spatial].copy()\n\n    # Ensure adata.X is sparse so downstream .multiply() / .maximum() work.\n    # If adata.X is a dense numpy array, convert to CSR sparse matrix.\n    X = adata.X\n    if not sp.issparse(X):\n        X = sp.csr_matrix(X)\n\n    # Create the diffused ligand/receptor matrix\n    cellxcell = kneighbors_graph(\n        X_spatial,\n        n_neighbors=number_nearest_neighbors,\n        mode='distance',\n        include_self=True\n    )\n    cellxcell.data = 1 / np.exp(cellxcell.data / (np.mean(cellxcell.data) / 2))\n\n    genexcell = X.copy().T\n    order1 = genexcell @ cellxcell.T\n\n    # Estimate diffused ligand-receptor activity\n    sorter = np.argsort(adata.var_names)\n    ligand_idx = sorter[np.searchsorted(adata.var_names, lr_df['ligand'], sorter=sorter)]\n    receptor_idx = sorter[np.searchsorted(adata.var_names, lr_df['receptor'], sorter=sorter)]\n    \n    # Element-wise multiplication\n    lrxcell = order1[ligand_idx, :].multiply(order1[receptor_idx, :])\n\n    # Create an AnnData object\n    lr_names = lr_df['ligand'].astype(str) + '::' + lr_df['receptor'].astype(str)\n    lr_adata = sc.AnnData(lrxcell.T)\n    lr_adata.obs = adata.obs.copy()\n    lr_adata.obsm = adata.obsm.copy()\n    lr_adata.var_names = lr_names\n\n    # Filter to only include cells where ligand or receptor is expressed\n    ligand_idx = sorter[np.searchsorted(adata.var_names, lr_df['ligand'], sorter=sorter)]\n    receptor_idx = sorter[np.searchsorted(adata.var_names, lr_df['receptor'], sorter=sorter)]\n\n    ligand_mask = X[:, ligand_idx] != 0   # True where ligand is expressed\n    receptor_mask = X[:, receptor_idx] != 0  # True where receptor is expressed\n\n    non_zero_mask = ligand_mask.maximum(receptor_mask)  # elementwise OR for sparse matrices\n    lr_adata.X = lr_adata.X.multiply(non_zero_mask)\n    \n    return lr_adata\n\ndef runLARIS(\n    lr_adata: ad.AnnData,\n    adata: Optional[ad.AnnData] = None,\n    use_rep: str = 'X_spatial',\n    n_nearest_neighbors: int = 10,\n    random_seed: int = 27,\n    n_repeats: int = 3,\n    mu: float = 1,\n    sigma: float = 100,\n    remove_lowly_expressed: bool = True,\n    expressed_pct: float = 0.1,\n    n_cells_expressed_threshold: int = 100,\n    n_top_lr: int = 4000,\n    # Cell Type & Statistical Testing Parameters\n    by_celltype: bool = True,\n    groupby: str = 'CellTypes',\n    use_rep_spatial: str = 'X_spatial',\n    number_nearest_neighbors: int = 10,\n    mu_celltype: float = 100,\n    expressed_pct_celltype: float = 0.1,\n    remove_lowly_expressed_celltype: bool = True,\n    mask_threshold: float = 1e-6,\n    calculate_pvalues: bool = True,\n    layer_celltype: Optional[str] = None,\n    n_neighbors_permutation: int = 30,\n    n_permutations: int = 1000,\n    chunk_size: int = 50000,\n    prefilter_fdr: bool = True,\n    prefilter_threshold: float = 0.0,\n    score_threshold: float = 1e-6,\n    spatial_weight: float = 1.0,\n    use_conditional_pvalue: bool = False\n) -> Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]:\n    \"\"\"\n    Identify spatially-specific ligand-receptor interactions using LARIS algorithm.\n    \n    LARIS (Ligand And Receptor Interaction in Spatial transcriptomics) identifies LR pairs\n    that show spatial specificity by comparing observed spatial correlation patterns\n    with randomized null distributions. When `by_celltype=True`, the function also\n    computes cell type-specific interaction scores with optional statistical testing.\n    \n    This is the main analytical function of the LARIS package, providing:\n    \n    1. **Spatial Specificity Analysis**: Identifies LR pairs that show non-random\n       spatial co-localization patterns (higher scores = stronger spatial organization)\n       \n    2. **Cell type-specific Scores**: Integrates spatial specificity with cell type\n       expression specificity and spatial co-localization to identify which sender-\n       receiver cell type pairs are communicating via which LR pairs\n       \n    3. **Statistical Testing**: Optional permutation-based P values with FDR correction\n       to identify statistically significant interactions\n    \n    Parameters\n    ----------\n    lr_adata : AnnData\n        AnnData object containing LR interaction scores from `prepareLRInteraction()`.\n        \n        Required contents:\n        - `.X`: Diffused LR scores (cells × LR pairs)\n        - `.var_names`: LR pair names (\"ligand::receptor\")\n        - `.obsm[use_rep]`: Spatial coordinates or other representation\n        \n    adata : AnnData, optional\n        Original annotated data matrix with gene expression and spatial information.\n        **Required when `by_celltype=True`**.\n        \n        Required contents (when by_celltype=True):\n        - `.obs[groupby]`: Cell type annotations\n        - `.obsm[use_rep_spatial]`: Spatial coordinates\n        - `.X` or `.layers[layer_celltype]`: Gene expression\n        \n    use_rep : str, default='X_spatial'\n        Key in `lr_adata.obsm` for coordinates to use in spatial specificity analysis.\n        Typically spatial coordinates, but could be other representations.\n        \n    n_nearest_neighbors : int, default=10\n        Number of spatial neighbors for building the adjacency matrix in the\n        spatial specificity analysis. Larger values capture broader spatial patterns.\n        \n    random_seed : int, default=27\n        Random seed for reproducibility of permutation tests.\n        \n    n_repeats : int, default=3\n        Number of random permutations to generate the null distribution for\n        spatial specificity scoring. More repeats give more stable estimates.\n        \n    mu : float, default=1\n        Regularization parameter for spatial specificity. Higher values penalize\n        interactions that look similar to random background more strongly.\n        \n    sigma : float, default=100\n        Bandwidth parameter for Gaussian distance kernel in adjacency matrix.\n        Controls how quickly spatial weights decay with distance.\n        \n    remove_lowly_expressed : bool, default=True\n        Whether to filter out LR pairs with low expression before ranking.\n        \n    expressed_pct : float, default=0.1\n        Minimum fraction of cells expressing an LR pair (if remove_lowly_expressed=True).\n        \n    n_cells_expressed_threshold : int, default=100\n        Minimum number of cells expressing an LR pair for it to be ranked.\n        Pairs below this threshold receive a penalty in ranking.\n        \n    n_top_lr : int, default=4000\n        Number of top-ranked spatially-specific LR pairs to return.\n        \n    by_celltype : bool, default=True\n        Whether to compute cell type-specific interaction scores. If False,\n        only returns spatial specificity results (much faster). If True,\n        `adata` must be provided.\n    \n    Cell Type Analysis Parameters (only used if by_celltype=True)\n    -------------------------------------------------------------\n    groupby : str, default='CellTypes'\n        Column in `adata.obs` defining cell type groups.\n        \n    use_rep_spatial : str, default='X_spatial'\n        Key in `adata.obsm` for spatial coordinates (for cell type analysis).\n        \n    number_nearest_neighbors : int, default=10\n        Number of spatial neighbors for cell type co-localization analysis.\n        \n    mu_celltype : float, default=100\n        Regularization parameter for COSG cell type specificity calculation.\n        Higher values more strongly penalize broadly expressed genes.\n        \n    expressed_pct_celltype : float, default=0.1\n        Minimum expression fraction for cell type analysis.\n        \n    remove_lowly_expressed_celltype : bool, default=True\n        Whether to filter lowly expressed genes in cell type analysis.\n        \n    mask_threshold : float, default=1e-6\n        Numerical threshold for masking near-zero values.\n        \n    calculate_pvalues : bool, default=True\n        Whether to perform permutation testing for statistical significance.\n        Set to False for faster exploratory analysis.\n        \n    layer_celltype : str, optional\n        Layer in `adata.layers` to use for expression data. If None, uses `adata.X`.\n        \n    n_neighbors_permutation : int, default=30\n        Number of similar interactions to use as background controls for\n        permutation testing. These are selected based on similarity of\n        diffused score profiles.\n        \n    n_permutations : int, default=1000\n        Number of permutations for statistical testing. Common values:\n        - 1000: Quick testing\n        - 5000: More precise p-values\n        - 10000: Publication-quality precision\n        \n    chunk_size : int, default=50000\n        Number of interactions to process simultaneously during permutation.\n        Larger values are faster but use more memory.\n        \n    prefilter_fdr : bool, default=True\n        If True, only test interactions with scores > prefilter_threshold for\n        significance. Others get FDR p-value = 1.0. This reduces multiple\n        testing burden and focuses power on high-scoring interactions.\n        \n    prefilter_threshold : float, default=0.0\n        Minimum interaction score for FDR testing (if prefilter_fdr=True).\n        \n    score_threshold : float, default=1e-6\n        Numerical precision threshold. Scores below this are set to exactly 0.0.\n        \n    spatial_weight : float, default=1.0\n        Exponent applied to spatial specificity scores. Controls influence on\n        final interaction scores:\n        - 0: Ignore spatial specificity\n        - 1: Linear influence (default)\n        - >1: Stronger emphasis on spatial specificity\n        - <1: Weaker emphasis on spatial specificity\n        \n    use_conditional_pvalue : bool, default=False\n        Use conditional p-value calculation for zero-inflated data. **Recommended\n        for sparse datasets**. When True:\n        - Interactions with score=0 get p-value=1.0\n        - Non-zero scores compared only to non-zero background\n        - Prevents spurious significance from sparse null distributions\n        \n    Returns\n    -------\n    pd.DataFrame or Tuple[pd.DataFrame, pd.DataFrame]\n        If `by_celltype=False`:\n            Single DataFrame with spatial specificity results:\n            \n            Columns:\n            - 'ligand': Ligand gene name\n            - 'receptor': Receptor gene name  \n            - 'score': LARIS spatial specificity score\n            - 'Rank': Rank (0 = highest scoring)\n            \n            Index: LR pair names (\"ligand::receptor\")\n            Sorted by score (descending)\n        \n        If `by_celltype=True`:\n            Tuple of (laris_lr, celltype_results) where:\n            \n            - **laris_lr**: DataFrame as described above\n            \n            - **celltype_results**: DataFrame with cell type-specific scores:\n              \n              Columns:\n              - 'sender': Cell type sending the ligand\n              - 'receiver': Cell type receiving the signal\n              - 'ligand': Ligand gene name\n              - 'receptor': Receptor gene name\n              - 'interaction_name': \"ligand::receptor\"\n              - 'interaction_score': Integrated LARIS score\n              - 'p_value': Raw permutation p-value (if calculate_pvalues=True)\n              - 'p_value_fdr': FDR-corrected p-value (if calculate_pvalues=True)\n              - 'nlog10_p_value_fdr': -log10(FDR) for visualization\n              \n              Sorted by interaction_score (descending)\n    \n    Raises\n    ------\n    ValueError\n        If by_celltype=True but adata is not provided, or if required data\n        is missing from adata or lr_adata.\n        \n    ImportError\n        If required helper functions are not available.\n    \n    Examples\n    --------\n    **Example 1: Quick spatial specificity analysis (no cell types)**\n    \n    >>> import laris as la\n    >>> \n    >>> # Prepare LR scores\n    >>> lr_adata = la.tl.prepareLRInteraction(adata, lr_df)\n    >>> \n    >>> # Identify spatially-specific LR pairs only\n    >>> laris_lr = la.tl.runLARIS(\n    ...     lr_adata,\n    ...     by_celltype=False,\n    ...     n_top_lr=1000\n    ... )\n    >>> \n    >>> print(laris_lr.head())\n    \n    **Example 2: Full analysis with cell type-specific scores**\n    \n    >>> # Full LARIS analysis with cell types\n    >>> laris_lr, celltype_results = la.tl.runLARIS(\n    ...     lr_adata,\n    ...     adata,\n    ...     by_celltype=True,\n    ...     groupby='cell_type',\n    ...     calculate_pvalues=True,\n    ...     n_permutations=5000\n    ... )\n    >>> \n    >>> # Filter for significant interactions\n    >>> sig_results = celltype_results[\n    ...     celltype_results['p_value_fdr'] < 0.05\n    ... ]\n    >>> \n    >>> print(f\"Found {len(sig_results)} significant interactions\")\n    \n    **Example 3: Fast exploratory analysis (no p-values)**\n    \n    >>> laris_lr, celltype_results = la.tl.runLARIS(\n    ...     lr_adata,\n    ...     adata,\n    ...     by_celltype=True,\n    ...     calculate_pvalues=False  # Much faster!\n    ... )\n    \n    **Example 4: Conservative testing for sparse data**\n    \n    >>> laris_lr, celltype_results = la.tl.runLARIS(\n    ...     lr_adata,\n    ...     adata,\n    ...     by_celltype=True,\n    ...     use_conditional_pvalue=True,  # Robust for sparse data\n    ...     n_permutations=5000,\n    ...     prefilter_fdr=True,\n    ...     prefilter_threshold=0.01  # Only test score > 0.01\n    ... )\n    \n    **Example 5: Emphasize spatial specificity**\n    \n    >>> laris_lr, celltype_results = la.tl.runLARIS(\n    ...     lr_adata,\n    ...     adata,\n    ...     by_celltype=True,\n    ...     spatial_weight=2.0  # Square the spatial scores\n    ... )\n    \n    \n    See Also\n    --------\n    prepareLRInteraction : Prepare LR scores (prerequisite for this function)\n    \n    \"\"\"\n    # Validate inputs\n    if by_celltype and adata is None:\n        raise ValueError(\n            \"Parameter 'adata' must be provided when by_celltype=True. \"\n            \"adata should contain gene expression and cell type annotations.\"\n        )\n    \n    if use_rep not in lr_adata.obsm:\n        raise KeyError(\n            f\"Representation '{use_rep}' not found in lr_adata.obsm. \"\n            f\"Available keys: {list(lr_adata.obsm.keys())}\"\n        )\n    \n    print(\"\\n\" + \"=\"*70)\n    print(\"LARIS ANALYSIS\")\n    print(\"=\"*70)\n    print(f\"\\nInput data: {lr_adata.shape[0]} cells × {lr_adata.shape[1]} LR pairs\")\n    print(f\"Mode: {'Cell type-specific analysis' if by_celltype else 'Spatial specificity only'}\")\n    \n    # Import helper functions\n    try:\n        from . import _utils\n    except ImportError:\n        raise ImportError(\n            \"Could not import _utils module. Please ensure all LARIS \"\n            \"dependencies are properly installed.\"\n        )\n    \n    # =========================================================================\n    # STEP 1: Calculate LARIS Spatial Specificity Scores\n    # =========================================================================\n    print(\"\\n--- Step 1: Calculating spatial specificity scores ---\")\n    print(f\"  - Using {n_nearest_neighbors} nearest neighbors\")\n    print(f\"  - Regularization parameter μ = {mu}\")\n    print(f\"  - Random repeats: {n_repeats}\")\n    \n    # Build spatial adjacency matrix\n    cellxcell = _utils._build_adjacency_matrix(\n        lr_adata,\n        use_rep=use_rep,\n        n_nearest_neighbors=n_nearest_neighbors,\n        sigma=sigma\n    )\n    \n    # Calculate observed spatial correlation\n    genexcell = lr_adata.X.T\n    order1 = genexcell @ cellxcell.T\n    gsp = _utils._rowwise_cosine_similarity(genexcell, order1)\n    \n    # Generate random background\n    print(\"  - Generating random permutations...\")\n    random_gsp_list = _utils._generate_random_background(\n        lr_adata, cellxcell, genexcell,\n        n_nearest_neighbors=n_nearest_neighbors,\n        n_repeats=n_repeats,\n        random_seed=random_seed\n    )\n    \n    random_gsp = np.mean(random_gsp_list, axis=0)\n    \n    # Calculate spatial specificity score\n    gsp_score = gsp - mu * random_gsp\n    gsp_score = np.array(gsp_score).ravel()\n    \n    # Store in lr_adata\n    lr_adata.var['LRSS_Target'] = np.array(gsp).ravel()\n    lr_adata.var['LRSS_Random'] = np.array(random_gsp).ravel()\n    lr_adata.var['LR_SpatialSpecificity'] = gsp_score\n    \n    # Calculate QC metrics\n    if lr_adata.shape[1] < 500:\n        sc.pp.calculate_qc_metrics(lr_adata, inplace=True, percent_top=[50, 100])\n    else:\n        sc.pp.calculate_qc_metrics(lr_adata, inplace=True)\n    \n    # Rank LR pairs by spatial specificity\n    lr_var = lr_adata.var.sort_values(\n        by='LR_SpatialSpecificity', \n        ascending=False\n    ).copy()\n    \n    n_cells_expressed = lr_var['n_cells_by_counts'].values.copy()\n    gsp_score_for_ranking = lr_var['LR_SpatialSpecificity'].values.copy()\n    \n    # Penalize LR pairs with low cell counts\n    min_score = np.min(gsp_score_for_ranking)\n    low_count_mask = n_cells_expressed < n_cells_expressed_threshold\n    gsp_score_for_ranking[low_count_mask] = min_score - 0.001\n    \n    # Select top N LR pairs\n    top_indices = _utils._select_top_n(gsp_score_for_ranking, n_top_lr)\n    spag_list = lr_var.index.values[top_indices]\n    spag_list_ligand = [name.split('::')[0] for name in spag_list]\n    spag_list_receptor = [name.split('::')[1] for name in spag_list]\n    spag_list_score = gsp_score_for_ranking[top_indices]\n    \n    # Create results DataFrame\n    laris_lr = pd.DataFrame({\n        'ligand': spag_list_ligand,\n        'receptor': spag_list_receptor,\n        'score': spag_list_score\n    })\n    laris_lr.index = [f\"{l}::{r}\" for l, r in zip(spag_list_ligand, spag_list_receptor)]\n    laris_lr['Rank'] = np.arange(len(laris_lr))\n    \n    print(f\"  ✓ Identified {len(laris_lr)} top spatially-specific LR pairs\")\n    print(f\"  - Score range: [{laris_lr['score'].min():.4f}, \"\n          f\"{laris_lr['score'].max():.4f}]\")\n    \n    # =========================================================================\n    # STEP 2: Calculate Cell Type-Specific Interactions (Optional)\n    # =========================================================================\n    if by_celltype:\n        print(\"\\n\" + \"=\"*70)\n        print(\"CELL TYPE-SPECIFIC ANALYSIS\")\n        print(\"=\"*70)\n        \n        if groupby not in adata.obs:\n            raise ValueError(\n                f\"Cell type column '{groupby}' not found in adata.obs. \"\n                f\"Available columns: {list(adata.obs.columns)}\"\n            )\n        \n        n_cell_types = adata.obs[groupby].nunique()\n        print(f\"\\nAnalyzing {n_cell_types} cell types from '{groupby}'\")\n        print(f\"Cell types: {sorted(adata.obs[groupby].unique())[:10]}\"\n              f\"{'...' if n_cell_types > 10 else ''}\")\n        \n        celltype_results = _utils._calculate_laris_score_by_celltype(\n            adata=adata,\n            lr_adata=lr_adata,\n            laris_lr=laris_lr,\n            groupby=groupby,\n            use_rep_spatial=use_rep_spatial,\n            number_nearest_neighbors=number_nearest_neighbors,\n            mu=mu_celltype,\n            expressed_pct=expressed_pct_celltype,\n            remove_lowly_expressed=remove_lowly_expressed_celltype,\n            mask_threshold=mask_threshold,\n            calculate_pvalues=calculate_pvalues,\n            layer=layer_celltype,\n            n_nearest_neighbors=n_neighbors_permutation,\n            n_permutations=n_permutations,\n            chunk_size=chunk_size,\n            prefilter_fdr=prefilter_fdr,\n            prefilter_threshold=prefilter_threshold,\n            score_threshold=score_threshold,\n            spatial_weight=spatial_weight,\n            use_conditional_pvalue=use_conditional_pvalue\n        )\n        \n        print(\"\\n\" + \"=\"*70)\n        print(\"ANALYSIS COMPLETE\")\n        print(\"=\"*70)\n        print(f\"\\nResults summary:\")\n        print(f\"  - Spatially-specific LR pairs: {len(laris_lr)}\")\n        print(f\"  - Cell type combinations: {len(celltype_results):,}\")\n        \n        if calculate_pvalues:\n            n_sig = (celltype_results['p_value_fdr'] < 0.05).sum()\n            print(f\"  - Significant interactions (FDR < 0.05): {n_sig:,}\")\n        \n        return laris_lr, celltype_results\n    \n    else:\n        print(\"\\n\" + \"=\"*70)\n        print(\"ANALYSIS COMPLETE\")\n        print(\"=\"*70)\n        print(f\"\\nReturning {len(laris_lr)} spatially-specific LR pairs\")\n        \n        return laris_lr\n\n\n\n# Define public API for the tools module\n__all__ = [\n    'prepareLRInteraction',\n    'runLARIS',\n]\n",
+      "reflection": "The resulting LR AnnData variable count depends on the specific adata (genes present) and the provided lr_df; since the required adata_tonsil.h5ad and tutorial LR CSV are not present here, I cannot compute the numeric result in this environment."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: A required high-severity missing_artifact (the AnnData and LR CSV) prevents running prepareLRInteraction to compute lr_adata.shape[1]. (gaps: Missing tutorial input files (adata_tonsil.h5ad and tutorial LR CSV))",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. A required high-severity missing_artifact (the AnnData and LR CSV) prevents running prepareLRInteraction to compute lr_adata.shape[1]. Original answer was: EXECUTION_REQUIRED — the tutorial AnnData file (adata_tonsil.h5ad) and the specific LR CSV are not present in the repository/workspace, so I cannot run prepareLRInteraction here to obtain lr_adata.shape[1].",
+    "blocker_evidence": [
+      "find_repo_files('.h5ad') returned: No filenames matched '.h5ad'.",
+      "find_repo_files('.csv') returned human_lr_CellChatDB.csv at laris/datasets/_data/, but not human_lr_database_CellChatDB_formatted_v2.csv in the tutorial path.",
+      "laris/tools/__init__.py implementation shows lr_adata.var_names are built from lr_df and filtered by adata.var_names, so the numeric result depends on those exact input files."
+    ]
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker carefully investigated the repository files, confirmed the absence of the required AnnData (.h5ad) file and the specific ligand-receptor CSV file needed for the computation. They inspected the implementation of the prepareLRInteraction function to understand how the number of ligand-receptor pairs is computed and concluded that without these input files, the numeric result cannot be determined in the current environment. The final answer honestly states that execution is required but blocked due to missing input files, providing clear evidence and reasoning supporting this conclusion. This is consistent with the rules for blocked answers and the worker did not fabricate any numerical results or rely solely on static code analysis. Hence, the review determines that the answer is correct and appropriately blocked.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [],
+  "token_usage": {
+    "pre_run_estimate": 1639,
+    "input_tokens": 67268,
+    "output_tokens": 3154,
+    "total_tokens": 70422,
+    "estimated_cost_usd": 0.023125,
+    "aggregate": {
+      "input_tokens": 368429,
+      "output_tokens": 11381,
+      "total_tokens": 379810,
+      "estimated_cost_usd": 0.1158954
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 157936,
+        "output_tokens": 2344,
+        "total_tokens": 160280,
+        "estimated_cost_usd": 0.044171999999999996
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 121738,
+        "output_tokens": 2566,
+        "total_tokens": 124304,
+        "estimated_cost_usd": 0.0355665
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 67268,
+        "output_tokens": 3154,
+        "total_tokens": 70422,
+        "estimated_cost_usd": 0.023125
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 7273,
+        "output_tokens": 162,
+        "total_tokens": 7435,
+        "estimated_cost_usd": 0.0031684
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 13236,
+        "output_tokens": 2743,
+        "total_tokens": 15979,
+        "estimated_cost_usd": 0.008795
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 978,
+        "output_tokens": 412,
+        "total_tokens": 1390,
+        "estimated_cost_usd": 0.0010685
+      }
+    ]
+  },
+  "extraction_report": {
+    "paper_summary": "(not requested)",
+    "research_objective": "",
+    "identified_experiments": [],
+    "workflow_definitions": [],
+    "repo_entrypoints": [],
+    "config_files": [],
+    "input_artifacts": [],
+    "expected_outputs": [],
+    "paper_repo_links": [],
+    "ambiguous_mappings": [],
+    "missing_information": [
+      "I do not have access to the local files you referenced (the adata .h5ad and the external CSV). I cannot load or run prepareLRInteraction here to compute the exact number."
+    ],
+    "notes": "To get the number locally, run the short snippet below; the number of LR pairs equals lr_adata.shape[1] (also len(lr_df_filtered))."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "prepareLRInteraction_tutorial",
+        "status": "blocked",
+        "paper_reference": "docs/notebooks/04_LARIS_tutorial.ipynb",
+        "files_staged": [
+          "workspace/workspace/laris_tools_init.py"
+        ],
+        "commands_run": [],
+        "observed_outputs": [],
+        "missing_inputs": [
+          "LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad",
+          "LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv"
+        ],
+        "dependency_issues": [],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "prepareLRInteraction implementation is present and looks runnable, but the required tutorial data files are not in the repo/workspace so the workflow cannot be executed here."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "prepareLRInteraction_tutorial"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Provide the two input files (adata_tonsil.h5ad and the human_lr_database CSV) in the repo (e.g. tests/data/) or set LARIS_TEST_DATA to their directory, then re-run prepareLRInteraction.",
+      "Run this minimal local snippet to produce the requested number (lr_adata.shape[1]):\n\npython - <<'PY'\nimport scanpy as sc\nimport pandas as pd\nimport laris as la\nadata = sc.read_h5ad(\"LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad\")\nlr_df = pd.read_csv(\"LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv\")\nmask = lr_df['ligand'].isin(adata.var_names) & lr_df['receptor'].isin(adata.var_names)\nlr_df_filtered = lr_df.loc[mask].copy()\nlr_adata = la.tl.prepareLRInteraction(adata, lr_df_filtered, number_nearest_neighbors=20, use_rep_spatial='X_spatial')\nprint(lr_adata.shape[1])\nPY"
+    ],
+    "notes": "I inspected laris.tools.prepareLRInteraction (implementation present) and the tutorial tests. Execution is blocked because the large tutorial dataset and bundled LR CSV are not available in this environment."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Reproduction is blocked by missing tutorial input artifacts and a paper↔repo mismatch on expected data files; without the exact AnnData and LR CSV the numeric answer (lr_adata.shape[1]) cannot be determined here.",
+    "identified_gaps": [
+      {
+        "title": "Missing tutorial input files (adata_tonsil.h5ad and tutorial LR CSV)",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": "docs/notebooks/04_LARIS_tutorial.ipynb",
+        "related_repo_files": [
+          "LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil.h5ad",
+          "LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/human_lr_database_CellChatDB_formatted_v2.csv"
+        ],
+        "related_workflow": "prepareLRInteraction_tutorial",
+        "execution_evidence": [
+          "testing_report.workflows[prepareLRInteraction_tutorial].missing_inputs lists the two files as missing.",
+          "execution_answer.blocker_evidence: find_repo_files('.h5ad') returned no matches.",
+          "execution_tool_outputs: 'No filenames matched \".h5ad\"' and CSV search found different filenames but not the tutorial CSV."
+        ],
+        "explanation": "The requested computation requires a pre-generated AnnData (.h5ad) and the exact tutorial LR CSV. Those files are absent from the repo/workspace, so prepareLRInteraction could not be executed and the numeric LR pair count cannot be produced.",
+        "likely_impact": "Blocks reproduction of the tutorial workflow and prevents computing the requested lr_adata.shape[1] value in this environment.",
+        "possible_remediation": "Add the two tutorial input files to the repository (or a tests/data directory) or provide instructions/environment variable (e.g. LARIS_TEST_DATA) pointing to their location; alternatively run the provided local snippet with the files present."
+      },
+      {
+        "title": "Paper/docs expect tutorial files at a notebooks path but repo contains differently named LR CSV",
+        "gap_type": "paper_repo_mismatch",
+        "severity": "medium",
+        "paper_reference": "docs/notebooks/04_LARIS_tutorial.ipynb",
+        "related_repo_files": [
+          "docs/notebooks/04_LARIS_tutorial.ipynb (referenced in testing_report)",
+          "laris/datasets/_data/human_lr_CellChatDB.csv"
+        ],
+        "related_workflow": "prepareLRInteraction_tutorial",
+        "execution_evidence": [
+          "execution_tool_outputs: CSV search found laris/datasets/_data/human_lr_CellChatDB.csv but not human_lr_database_CellChatDB_formatted_v2.csv at the tutorial path.",
+          "laris/tools/__init__.py shows prepareLRInteraction expects lr_df with 'ligand' and 'receptor' columns, so format differences matter."
+        ],
+        "explanation": "The documentation/tutorial references LR CSV at a specific notebooks path and filename that is not present. The repo does include a differently named LR CSV (human_lr_CellChatDB.csv) in laris/datasets/_data, which may or may not match the tutorial's expected formatting and thus cannot be assumed to be a drop-in replacement.",
+        "likely_impact": "Users following the tutorial as documented will be unable to run it verbatim; using the alternative CSV without verification may change which ligand-receptor pairs pass filtering and thus change lr_adata.shape[1].",
+        "possible_remediation": "Either place the tutorial-formatted CSV at the tutorial path, document how to derive/convert the packaged CSV to the tutorial format, or update the tutorial/docs to reference the packaged CSV path and confirm format compatibility."
+      }
+    ],
+    "paper_repo_mismatches": [
+      "Paper/docs expect tutorial files at a notebooks path but repo contains differently named LR CSV"
+    ],
+    "execution_gaps": [],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Missing tutorial input files (adata_tonsil.h5ad and tutorial LR CSV)"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 1,
+      "medium": 1,
+      "low": 0
+    },
+    "evidence_sources": [
+      "testing_report.workflows (prepareLRInteraction_tutorial)",
+      "execution_answer.blocker_evidence",
+      "execution_tool_outputs (repo file listings, CSV/.h5ad search results)",
+      "laris/tools/__init__.py (prepareLRInteraction implementation)",
+      "tests/conftest.py (fixtures showing expected lr_df format)",
+      "critic_reviews"
+    ],
+    "recommended_followups": [
+      "Add the tutorial .h5ad and the exact tutorial LR CSV to the repo (or provide LARIS_TEST_DATA pointing to them), then re-run prepareLRInteraction.",
+      "If adding files is not possible, update the tutorial/docs to reference the packaged CSV (laris/datasets/_data/human_lr_CellChatDB.csv) and include a conversion/validation step to ensure columns 'ligand' and 'receptor' match prepareLRInteraction expectations.",
+      "Run the provided local Python snippet (in testing_report.recommendations) with the real files to obtain lr_adata.shape[1] and report the numeric result."
+    ],
+    "notes": "prepareLRInteraction builds lr_adata.var_names from lr_df ('ligand'::'receptor') intersected with adata.var_names, so the number of LR pairs is data-dependent and cannot be inferred from code alone without the exact input files."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "A required high-severity missing_artifact (the AnnData and LR CSV) prevents running prepareLRInteraction to compute lr_adata.shape[1].",
+    "triggered_gaps": [
+      "Missing tutorial input files (adata_tonsil.h5ad and tutorial LR CSV)"
+    ]
+  },
+  "elapsed_seconds": 207.9
+}
