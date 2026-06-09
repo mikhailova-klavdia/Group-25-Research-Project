@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2026-06-04T20:49:07.963028+00:00",
+    "run_id": "20260604T204734-1c321c7d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/not",
+    "pre_estimate_tokens": 1530,
+    "input_tokens": 150826,
+    "output_tokens": 4288,
+    "total_tokens": 155114,
+    "cost_usd": 0.046282
+  },
+  {
+    "timestamp": "2026-06-04T20:53:33.891382+00:00",
+    "run_id": "20260604T203719-0058b9a5",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_tiny checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/note",
+    "pre_estimate_tokens": 1532,
+    "input_tokens": 349555,
+    "output_tokens": 9448,
+    "total_tokens": 359003,
+    "cost_usd": 0.106285
+  }
+]

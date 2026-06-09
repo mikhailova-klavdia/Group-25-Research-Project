@@ -1,0 +1,68 @@
+[
+  {
+    "timestamp": "2026-06-04T18:59:27.291823+00:00",
+    "run_id": "20260604T185552-d99bea78",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_tiny checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/note",
+    "pre_estimate_tokens": 1532,
+    "input_tokens": 119821,
+    "output_tokens": 4507,
+    "total_tokens": 124328,
+    "cost_usd": 0.038969
+  },
+  {
+    "timestamp": "2026-06-04T19:03:41.500540+00:00",
+    "run_id": "20260604T185930-68fded18",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/not",
+    "pre_estimate_tokens": 1530,
+    "input_tokens": 107420,
+    "output_tokens": 5211,
+    "total_tokens": 112631,
+    "cost_usd": 0.037277
+  },
+  {
+    "timestamp": "2026-06-04T21:55:37.259515+00:00",
+    "run_id": "20260604T213933-f331d553",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_tiny checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/note",
+    "pre_estimate_tokens": 1532,
+    "input_tokens": 1141612,
+    "output_tokens": 8471,
+    "total_tokens": 1150083,
+    "cost_usd": 0.302345
+  },
+  {
+    "timestamp": "2026-06-04T21:55:59.392732+00:00",
+    "run_id": "20260604T215540-011a6246",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/not",
+    "pre_estimate_tokens": 1530,
+    "input_tokens": 100806,
+    "output_tokens": 1137,
+    "total_tokens": 101943,
+    "cost_usd": 0.027475
+  },
+  {
+    "timestamp": "2026-06-05T08:16:21.542748+00:00",
+    "run_id": "20260605T081450-6de319c0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_tiny checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/note",
+    "pre_estimate_tokens": 1532,
+    "input_tokens": 666024,
+    "output_tokens": 5028,
+    "total_tokens": 671052,
+    "cost_usd": 0.176562
+  },
+  {
+    "timestamp": "2026-06-05T08:20:35.795734+00:00",
+    "run_id": "20260605T081622-d8ccb5e9",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/not",
+    "pre_estimate_tokens": 1530,
+    "input_tokens": 1457812,
+    "output_tokens": 8463,
+    "total_tokens": 1466275,
+    "cost_usd": 0.381379
+  }
+]

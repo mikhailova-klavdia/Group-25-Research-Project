@@ -1,0 +1,68 @@
+[
+  {
+    "timestamp": "2026-06-04T20:18:43.925096+00:00",
+    "run_id": "20260604T201344-412c9812",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the PPLM binding affinity prediction tool, predict the binding affinity between the receptor protein sequence in t",
+    "pre_estimate_tokens": 1577,
+    "input_tokens": 163949,
+    "output_tokens": 5784,
+    "total_tokens": 169733,
+    "cost_usd": 0.052555
+  },
+  {
+    "timestamp": "2026-06-04T20:19:28.532078+00:00",
+    "run_id": "20260604T201858-1f32ab9a",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the PPLM binding affinity prediction tool with the receptor FASTA file at PPLM/notebooks/run_pplm-affinity/data/re",
+    "pre_estimate_tokens": 1572,
+    "input_tokens": 28082,
+    "output_tokens": 1373,
+    "total_tokens": 29455,
+    "cost_usd": 0.009767
+  },
+  {
+    "timestamp": "2026-06-04T20:28:23.362001+00:00",
+    "run_id": "20260604T201936-4a9cbc74",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the f",
+    "pre_estimate_tokens": 1611,
+    "input_tokens": 807652,
+    "output_tokens": 7194,
+    "total_tokens": 814846,
+    "cost_usd": 0.216301
+  },
+  {
+    "timestamp": "2026-06-04T20:29:29.640243+00:00",
+    "run_id": "20260604T202841-d04cdfef",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the f",
+    "pre_estimate_tokens": 1615,
+    "input_tokens": 122458,
+    "output_tokens": 2390,
+    "total_tokens": 124848,
+    "cost_usd": 0.035395
+  },
+  {
+    "timestamp": "2026-06-04T20:30:44.378560+00:00",
+    "run_id": "20260604T202937-b3b3222b",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the f",
+    "pre_estimate_tokens": 1618,
+    "input_tokens": 52833,
+    "output_tokens": 4387,
+    "total_tokens": 57220,
+    "cost_usd": 0.021982
+  },
+  {
+    "timestamp": "2026-06-04T20:37:04.193807+00:00",
+    "run_id": "20260604T203052-904bee2a",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the PPLM protein-protein interaction prediction tool, predict the interaction probability between the first protei",
+    "pre_estimate_tokens": 1582,
+    "input_tokens": 142055,
+    "output_tokens": 4553,
+    "total_tokens": 146608,
+    "cost_usd": 0.04462
+  }
+]

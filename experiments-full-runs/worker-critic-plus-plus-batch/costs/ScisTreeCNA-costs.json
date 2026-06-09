@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2026-06-04T17:59:45.784388+00:00",
+    "run_id": "20260604T175225-ba8d5937",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the single-cell copy number data from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv' (100 SNP ",
+    "pre_estimate_tokens": 1606,
+    "input_tokens": 847708,
+    "output_tokens": 14049,
+    "total_tokens": 861757,
+    "cost_usd": 0.240025
+  },
+  {
+    "timestamp": "2026-06-04T18:00:49.118933+00:00",
+    "run_id": "20260604T180000-bb2a71c4",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the single-cell copy number data from 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv' (100 SNP ",
+    "pre_estimate_tokens": 1653,
+    "input_tokens": 61177,
+    "output_tokens": 3066,
+    "total_tokens": 64243,
+    "cost_usd": 0.021426
+  }
+]
