@@ -1,0 +1,13 @@
+[
+  {
+    "timestamp": "2026-06-04T20:49:29.533877+00:00",
+    "run_id": "20260604T204854-0f2658da",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the SEGMA process_sequences tool, process the FASTA file located at SEGMA/notebooks/get_seqs/input/test.fasta. Wha",
+    "pre_estimate_tokens": 1539,
+    "input_tokens": 96147,
+    "output_tokens": 2659,
+    "total_tokens": 98806,
+    "cost_usd": 0.029355
+  }
+]
