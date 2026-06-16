@@ -1,0 +1,47 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,elapsed_s
+2026-06-05T07:47:05+00:00,CYTEONTO_001,papers/CyteOnto,ok,False,Required file 'CyteOnto/notebooks/adv_tutorial/data/author_labels.csv' not found,128635,0.0377,55.7
+2026-06-05T07:47:56+00:00,CYTEONTO_002,papers/CyteOnto,ok,True,stem cell,106566,0.0324,50.4
+2026-06-05T07:48:39+00:00,CYTEONTO_003,papers/CyteOnto,ok,True,ovum,116326,0.0331,43.3
+2026-06-05T07:57:30+00:00,GWAS_EPISTASIS_BIAS_002,papers/GWAS-Epistasis-Bias,ok,False,EXECUTION_REQUIRED — I could not install required Python packages (numpy/scipy) ,218670,0.0641,80.5
+2026-06-05T07:58:39+00:00,GWAS_EPISTASIS_BIAS_001,papers/GWAS-Epistasis-Bias,ok,False,EXECUTION_REQUIRED — I must run the repository script to generate the output and,20324,0.0058,8.3
+2026-06-05T07:59:47+00:00,USHER_002,papers/USHER,ok,False,Required file 'USHER/repo/USHER/datasets/xenium_scGPT.h5ad' not found in repo af,254778,0.0718,76.3
+2026-06-05T08:00:44+00:00,GWPROT_001,papers/GWProt,ok,True,54 protein structures,137488,0.0417,56.6
+2026-06-05T08:00:48+00:00,SENTIEON_CLI_001,papers/sentieon-cli,ok,True,CONSERVATIVE,857881,0.2285,137.6
+2026-06-05T08:01:30+00:00,GWPROT_002,papers/GWProt,ok,True,4,173585,0.0489,46.0
+2026-06-05T08:02:22+00:00,LARIS_001,papers/LARIS,ok,False,EXECUTION_REQUIRED — The required AnnData file 'LARIS/notebooks/04_laris_tutoria,315247,0.0887,94.0
+2026-06-05T08:02:39+00:00,SC_FRAMEWORK_001,papers/SC-Framework,ok,True,5000 cells,184347,0.0509,69.8
+2026-06-05T08:02:54+00:00,LARIS_002,papers/LARIS,ok,False,EXECUTION_REQUIRED — must run the repository code to build the LR AnnData and re,33681,0.0102,31.7
+2026-06-05T08:04:01+00:00,LARIS_003,papers/LARIS,ok,False,EXECUTION_REQUIRED — required AnnData file 'LARIS/notebooks/04_laris_tutorial/da,429313,0.1144,67.1
+2026-06-05T08:04:21+00:00,SEGMA_001,papers/segma,ok,False,EXECUTION_REQUIRED — Running the SEGMA process (get_seqs.py) requires installing,263277,0.0749,101.7
+2026-06-05T08:05:07+00:00,SCISTREECNA_001,papers/ScisTreeCNA,ok,False,Required file 'ScisTreeCNA/notebooks/scistreecna_basic/data/test_data_reads.csv',320301,0.0873,66.4
+2026-06-05T08:05:30+00:00,DISTORTIONS_001,papers/distortions,ok,False,Required file 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv' not ,353780,0.0947,68.9
+2026-06-05T08:06:01+00:00,SCISTREECNA_003,papers/ScisTreeCNA,ok,False,EXECUTION_REQUIRED — Required data files 'ScisTreeCNA/notebooks/scistreecna_basi,231062,0.0639,53.3
+2026-06-05T08:06:33+00:00,DISTORTIONS_005,papers/distortions,ok,False,Required file 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' not f,298394,0.0806,62.6
+2026-06-05T08:07:22+00:00,ARCADIA_PUBLIC_002,papers/ARCADIA_public,ok,True,300 epochs,481908,0.127,80.8
+2026-06-05T08:07:51+00:00,DISTORTIONS_006,papers/distortions,ok,True,800,475008,0.1267,78.4
+2026-06-05T08:08:06+00:00,ARCADIA_PUBLIC_003,papers/ARCADIA_public,ok,True,162,104630,0.0307,44.7
+2026-06-05T08:08:40+00:00,GWAS_EPISTASIS_BIAS_003,papers/GWAS-Epistasis-Bias,timeout,,,,,600.0
+2026-06-05T08:08:54+00:00,REGFORMER_002,papers/RegFormer,ok,True,0.8841,268483,0.0735,62.7
+2026-06-05T08:08:57+00:00,FADVI_001,papers/fadvi,ok,False,Required file 'fadvi/notebooks/basic_usage/fadvi_save/' not found in repo after ,117893,0.0347,50.8
+2026-06-05T08:10:32+00:00,REGFORMER_003,papers/RegFormer,ok,False,Required file 'RegFormer/notebooks/cell_emb/data/embeddings.npy' not found in re,373549,0.1045,98.4
+2026-06-05T08:10:36+00:00,FADVI_003,papers/fadvi,ok,False,Required file 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv' not fo,166035,0.0509,99.1
+2026-06-05T08:11:24+00:00,FADVI_007,papers/fadvi,ok,False,EXECUTION_REQUIRED — the specified .h5ad data files are not present in the repos,88509,0.0272,47.8
+2026-06-05T08:11:36+00:00,METAPOINT_001,papers/metapointfinder,ok,True,1182 sequences,190870,0.054,63.8
+2026-06-05T08:11:38+00:00,CROSSPPI_001,papers/CrossPPI,ok,False,EXECUTION_REQUIRED — I must run the CrossPPI code with the repository’s pretrain,16911,0.0056,14.1
+2026-06-05T08:11:39+00:00,PPLM_001,papers/PPLM,ok,True,-8.2265625 kcal/mol,614501,0.1646,178.9
+2026-06-05T08:11:52+00:00,CROSSPPI_003,papers/CrossPPI,ok,False,EXECUTION_REQUIRED — I must run the repository code with the provided pre-traine,16779,0.005,14.0
+2026-06-05T08:13:17+00:00,CROSSPPI_004,papers/CrossPPI,ok,False,-0.0011,191889,0.0563,84.9
+2026-06-05T08:13:25+00:00,METAPOINT_002,papers/metapointfinder,ok,True,37,336944,0.0942,108.5
+2026-06-05T08:14:13+00:00,METAPOINT_003,papers/metapointfinder,ok,False,Required file 'metapointfinder/notebooks/make_dna_mutants/output/sample_input.ts,168918,0.0471,48.6
+2026-06-05T08:14:37+00:00,PPLM_002,papers/PPLM,ok,True,Favorable,627589,0.1661,178.4
+2026-06-05T08:14:49+00:00,CROSSPPI_006,papers/CrossPPI,ok,False,218,319059,0.0867,92.4
+2026-06-05T08:16:21+00:00,SAM2_001,papers/sam2,ok,False,EXECUTION_REQUIRED — the workspace venv lacks required dependencies (PyTorch >=2,671052,0.1766,92.0
+2026-06-05T08:17:12+00:00,PPLM_003,papers/PPLM,ok,True,"(122, 1280)",688022,0.1855,155.2
+2026-06-05T08:20:20+00:00,PPLM_004,papers/PPLM,ok,True,-0.000396,1041539,0.2735,188.0
+2026-06-05T08:20:37+00:00,SAM2_002,papers/sam2,ok,False,Generated 322 masks saved to workspace/masks.npz,1466275,0.3814,255.5
+2026-06-05T08:22:36+00:00,PPLM_005,papers/PPLM,ok,True,"(660, 122, 70)",622541,0.1664,135.8
+2026-06-05T08:23:58+00:00,TABPFN_001,papers/tabpfn,ok,False,EXECUTION_REQUIRED — TabPFN requires a one-time license acceptance and an API to,549145,0.1525,201.2
+2026-06-05T08:24:13+00:00,METAPOINT_004,papers/metapointfinder,timeout,,,,,600.0
+2026-06-05T08:24:45+00:00,PPLM_006,papers/PPLM,ok,True,0.9431081,641260,0.1704,128.8
+2026-06-05T08:25:06+00:00,METAPOINT_005,papers/metapointfinder,ok,False,Required file 'metapointfinder/notebooks/pad_to_10kb/data/input_sequences.fasta',202006,0.0563,53.1
+2026-06-05T08:26:46+00:00,TABPFN_002,papers/tabpfn,ok,False,EXECUTION_REQUIRED — TabPFN requires one-time license acceptance / an API key to,632310,0.1683,167.5

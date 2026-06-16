@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2026-05-28T14:17:34.052632+00:00",
+    "run_id": "20260528T141604-c8b3b58b",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the protein mutant generator tool, generate wildtype and mutant protein sequences from the AMR protein mutation da",
+    "pre_estimate_tokens": 1630,
+    "input_tokens": 437295,
+    "output_tokens": 4886,
+    "total_tokens": 442181,
+    "cost_usd": 0.119096
+  },
+  {
+    "timestamp": "2026-05-28T14:19:28.128672+00:00",
+    "run_id": "20260528T141734-1969461d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate protein mutants using the TSV file at metapointfinder/notebooks/mutation_r_wt_generator/input/AMRProt-mutation_",
+    "pre_estimate_tokens": 1600,
+    "input_tokens": 513754,
+    "output_tokens": 4701,
+    "total_tokens": 518455,
+    "cost_usd": 0.137841
+  },
+  {
+    "timestamp": "2026-05-28T14:21:13.492006+00:00",
+    "run_id": "20260528T141928-aa4e2356",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the generate_dna_mutants tool, process the sample input TSV file at metapointfinder/notebooks/make_dna_mutants/out",
+    "pre_estimate_tokens": 1589,
+    "input_tokens": 392443,
+    "output_tokens": 4529,
+    "total_tokens": 396972,
+    "cost_usd": 0.107169
+  },
+  {
+    "timestamp": "2026-05-28T14:23:18.473715+00:00",
+    "run_id": "20260528T142113-dc116bea",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pad_sequences tool, pad or truncate the FASTA sequences in the input file at metapointfinder/notebooks/pad_to_",
+    "pre_estimate_tokens": 1600,
+    "input_tokens": 400807,
+    "output_tokens": 6327,
+    "total_tokens": 407134,
+    "cost_usd": 0.112856
+  },
+  {
+    "timestamp": "2026-05-28T14:25:36.141277+00:00",
+    "run_id": "20260528T142318-86e3364d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pad_sequences tool, pad or truncate the FASTA sequences in the input file at metapointfinder/notebooks/pad_to_",
+    "pre_estimate_tokens": 1599,
+    "input_tokens": 333237,
+    "output_tokens": 5950,
+    "total_tokens": 339187,
+    "cost_usd": 0.095209
+  },
+  {
+    "timestamp": "2026-06-04T18:30:00.621716+00:00",
+    "run_id": "20260604T182758-4fcd9687",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate protein mutants using the TSV file at metapointfinder/notebooks/mutation_r_wt_generator/input/AMRProt-mutation_",
+    "pre_estimate_tokens": 1600,
+    "input_tokens": 309948,
+    "output_tokens": 4363,
+    "total_tokens": 314311,
+    "cost_usd": 0.086213
+  },
+  {
+    "timestamp": "2026-06-04T18:31:34.450199+00:00",
+    "run_id": "20260604T183002-f4e51e28",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the generate_dna_mutants tool, process the sample input TSV file at metapointfinder/notebooks/make_dna_mutants/out",
+    "pre_estimate_tokens": 1589,
+    "input_tokens": 39989,
+    "output_tokens": 2680,
+    "total_tokens": 42669,
+    "cost_usd": 0.015357
+  },
+  {
+    "timestamp": "2026-06-04T18:33:38.119297+00:00",
+    "run_id": "20260604T183136-4e8b87d1",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pad_sequences tool, pad or truncate the FASTA sequences in the input file at metapointfinder/notebooks/pad_to_",
+    "pre_estimate_tokens": 1600,
+    "input_tokens": 49429,
+    "output_tokens": 2869,
+    "total_tokens": 52298,
+    "cost_usd": 0.018095
+  },
+  {
+    "timestamp": "2026-06-04T18:36:13.347052+00:00",
+    "run_id": "20260604T183339-a1718bd0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pad_sequences tool, pad or truncate the FASTA sequences in the input file at metapointfinder/notebooks/pad_to_",
+    "pre_estimate_tokens": 1599,
+    "input_tokens": 69369,
+    "output_tokens": 3324,
+    "total_tokens": 72693,
+    "cost_usd": 0.02399
+  }
+]

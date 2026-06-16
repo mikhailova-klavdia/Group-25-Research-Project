@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2026-06-04T17:36:10.401014+00:00",
+    "run_id": "20260604T173533-e6d0240e",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the run_pipeline tool, run the complete ARCADIA pipeline for the cite_seq dataset. According to the configuration ",
+    "pre_estimate_tokens": 1547,
+    "input_tokens": 9362,
+    "output_tokens": 1575,
+    "total_tokens": 10937,
+    "cost_usd": 0.005491
+  },
+  {
+    "timestamp": "2026-06-04T17:37:12.249403+00:00",
+    "run_id": "20260604T173612-7e9da634",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the ARCADIA hyperparameter search tool, run a hyperparameter search with the dataset name 'cite_seq', maximum epoc",
+    "pre_estimate_tokens": 1621,
+    "input_tokens": 43336,
+    "output_tokens": 3165,
+    "total_tokens": 46501,
+    "cost_usd": 0.017164
+  }
+]
