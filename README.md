@@ -268,7 +268,7 @@ Each question generates one JSON file under `papers/<slug>/runs/<run-id>/<ID>.js
 
 ## Batch Evaluation with run_eval.py
 
-Instead of calling `react_main` once per repo manually, use `run_eval.py` to run any range of ranked repos automatically. It resolves each rank to the right `Papers/` folder, matches questions from `300_questions.csv` via the `biorxiv_link.txt`, wires up the `papers/<slug>/` workspace, and calls `react_main` sequentially.
+Instead of calling `react_main` once per repo manually, use `run_eval.py` to run any range of ranked repos automatically. It resolves each rank to the right `Papers/` folder, matches questions from `benchmark_42.csv` via the `biorxiv_link.txt`, wires up the `papers/<slug>/` workspace, and calls `react_main` sequentially.
 
 ### Usage
 
@@ -332,7 +332,7 @@ can be compared directly for Cohen's kappa.
 
 ## Agent Teams
 
-All teams are selectable via `--team` on `react_main`. Six teams ship:
+All teams are selectable via `--team` on `react_main`. Nine teams ship:
 
 | Team | Description |
 |------|-------------|
@@ -340,6 +340,9 @@ All teams are selectable via `--team` on `react_main`. Six teams ship:
 | `worker-critic` | Worker + LLM critic with deterministic missing-module install retry. |
 | `worker-critic-plus` | Same as worker-critic but with the improved-variant prompt and up-front venv setup scripts (model-weight downloads). |
 | `worker-critic-plus-plus` | Same shape as worker-critic-plus with the plus-plus prompt: repo-first search, static-file gate before execution, mandatory second-strategy rule before giving up. |
+| `worker-verifier-critic` | Three agents: worker → code verifier → critic. The verifier re-checks the answer (plausibility + a known-bug checklist + an independent re-computation) and, on a fixable bug, rewrites and re-runs the script so the corrected answer reaches the critic. |
+| `testing-worker-critic` | Five stages: an extraction agent inventories paper/repo workflows → a workflow-testing agent smoke-validates them → an execution worker answers from both reports → the critic audits → a gap-detection agent summarizes paper/repo/execution discrepancies. |
+| `worker-env-critic` | Three agents: a dedicated Environment agent (discovers dependency files, installs packages, verifies imports → `EnvironmentReport`) → plus-plus worker (receives the report as a preamble) → critic. |
 | `human-in-the-loop` | Three-stage pipeline (triage → setup → execution). A setup engineer prepares the venv interactively and calls `ask_human` when blocked. YOU answer at the terminal. Use via `hitl_main`. |
 | `worker-critic-plus-plus-hitl` | Plus-plus team with a Claude operator channel: `ask_human` calls are answered by Claude autonomously in batch. Also works interactively via `hitl_main`. Requires `ANTHROPIC_API_KEY`. |
 
@@ -401,7 +404,7 @@ The memory file lives inside `papers/` which is gitignored, so it stays local to
 
 ## Benchmark
 
-The evaluated benchmark is in `benchmark_42.csv` at the repo root — 42 questions across 16 repos in the Paper2AgentBench compbio format (`biorxiv_link`, `question`, `ground_truth`, `repo`). These are the questions confirmed to be answerable by the current pipeline (27 from the broader compbio set, 6 PPLM, 5 MetaPoint, 4 CrossPPI).
+The evaluated benchmark is in `benchmark_42.csv` at the repo root — 46 questions across 18 repos in the Paper2AgentBench compbio format (`biorxiv_link`, `question`, `ground_truth`, `repo`). These are the questions confirmed to be answerable by the current pipeline (31 from the broader compbio set, 6 PPLM, 5 MetaPoint, 4 CrossPPI).
 
 ## Project Structure
 
