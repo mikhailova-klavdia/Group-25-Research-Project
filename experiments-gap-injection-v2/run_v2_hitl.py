@@ -1,19 +1,18 @@
 """
-run_v2_wc_plus_plus.py — gap-injection v2 experiment runner (worker-critic-plus-plus).
+run_v2_hitl.py — gap-injection v2 experiment runner (human-in-the-loop).
 
-Runs 16 questions across 7 gap-injected repos under the 2x2 operator taxonomy:
-  Op-E1 (Break Script):      GWAS x2, MetaPointFinder x4
-  Op-E2 (Break URL):         Distortions x2
-  Op-D1 (Delete Artifact):   LARIS x3, SC-Framework x1
-  Op-D2 (Poison Value):      CyteOnto x3, RegFormer x1
+Same 16 questions / 7 repos as run_v2_solo.py and run_v2_wc_plus_plus.py, run
+with the human-in-the-loop team (triage -> setup -> execution crew) for
+architecture comparison.
 
-Repos live in experiments-gap-injection-v2/papers/gap-v2-*/
-Never touches the Papers/ directory.
+This is a headless/batch invocation (react_main, not hitl_main), so any
+ask_human calls the setup/execution agents make degrade to autonomous
+answers instead of blocking on stdin — see research_agents/teams/__init__.py.
 
 Usage:
-    uv run python experiments-gap-injection-v2/run_v2_wc_plus_plus.py
-    uv run python experiments-gap-injection-v2/run_v2_wc_plus_plus.py --dry-run
-    uv run python experiments-gap-injection-v2/run_v2_wc_plus_plus.py --category e1_gwas
+    uv run python experiments-gap-injection-v2/run_v2_hitl.py
+    uv run python experiments-gap-injection-v2/run_v2_hitl.py --dry-run
+    uv run python experiments-gap-injection-v2/run_v2_hitl.py --category e1_gwas
 
 Each question's chain of thought (thought/action/observation/reflection per step) is copied after every category into a flat, browsable location:
     experiments-gap-injection-v2/chains/<TEAM>/<question-id>.json
@@ -33,9 +32,8 @@ ROOT = Path(__file__).parent.parent
 GAP_DIR = Path(__file__).parent
 
 MODEL = "gpt-5-mini-2025-08-07"
-TEAM = "worker-critic-plus-plus"
+TEAM = "human-in-the-loop"
 
-# (project_relative, questions_file_relative, label)
 RUNS = [
     (
         "experiments-gap-injection-v2/papers/gap-v2-gwas",
@@ -146,13 +144,13 @@ def main() -> None:
     args = parser.parse_args()
 
     label_map = {
-        "e1_gwas":       "Op-E1-GWAS",
-        "e1_meta":       "Op-E1-META",
+        "e1_gwas":        "Op-E1-GWAS",
+        "e1_meta":        "Op-E1-META",
         "e2_distortions": "Op-E2-DISTORTIONS",
-        "d1_laris":      "Op-D1-LARIS",
-        "d1_sc":         "Op-D1-SC-FRAMEWORK",
-        "d2_cyteonto":   "Op-D2-CYTEONTO",
-        "d2_regformer":  "Op-D2-REGFORMER",
+        "d1_laris":       "Op-D1-LARIS",
+        "d1_sc":          "Op-D1-SC-FRAMEWORK",
+        "d2_cyteonto":    "Op-D2-CYTEONTO",
+        "d2_regformer":   "Op-D2-REGFORMER",
     }
 
     targets = RUNS
@@ -163,7 +161,7 @@ def main() -> None:
     for project, questions_file, label in targets:
         run_category(project, questions_file, label, args.dry_run)
 
-    print("\nAll gap-v2 WC++ runs complete.")
+    print("\nAll gap-v2 human-in-the-loop runs complete.")
 
 
 if __name__ == "__main__":

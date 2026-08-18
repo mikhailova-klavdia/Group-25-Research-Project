@@ -8,9 +8,16 @@ Usage:
     uv run python experiments-gap-injection-v2/run_v2_solo.py
     uv run python experiments-gap-injection-v2/run_v2_solo.py --dry-run
     uv run python experiments-gap-injection-v2/run_v2_solo.py --category e1_gwas
+
+Each question's chain of thought (thought/action/observation/reflection per step) is copied after every category into a flat, browsable location:
+    experiments-gap-injection-v2/chains/<TEAM>/<question-id>.json
+(react_main still also writes the original to papers/<slug>/runs/<run-id>/ —
+this is a convenience copy, not a replacement.)
 """
 
 import argparse
+import json
+import shutil
 import subprocess
 import sys
 import time
@@ -61,6 +68,36 @@ RUNS = [
 ]
 
 
+def _newest_since(runs_dir: Path, pattern: str, t0: float):
+    """Newest file under runs_dir matching pattern, written at/after t0 (wall-clock)."""
+    if not runs_dir.exists():
+        return None
+    cands = [c for c in runs_dir.glob(pattern) if c.stat().st_mtime >= t0]
+    return max(cands, key=lambda p: p.stat().st_mtime) if cands else None
+
+
+def save_chains(project: str, questions_file: str, label: str, t0: float) -> None:
+    """Copy each question's chain JSON out of the scattered per-question
+    runs/<run-id>/<id>.json (react_main's default location, one fresh run-id
+    per question even in batch mode) into a single flat, easy-to-browse
+    experiments-gap-injection-v2/chains/<TEAM>/<id>.json — mirroring the
+    <run>/<team>/chains/*.json layout already used under eval_runs/.
+    """
+    entries = json.loads((ROOT / questions_file).read_text(encoding="utf-8"))
+    runs_dir = ROOT / project / "runs"
+    out_dir = GAP_DIR / "chains" / TEAM
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for entry in entries:
+        qid = entry["id"]
+        src = _newest_since(runs_dir, f"*/{qid}.json", t0)
+        if src is None:
+            print(f"  [chains] WARNING: no chain file found for {qid} ({label}) — check the log above")
+            continue
+        dest = out_dir / f"{qid}.json"
+        shutil.copy(src, dest)
+        print(f"  [chains] saved {dest.relative_to(ROOT)}")
+
+
 def run_category(project: str, questions_file: str, label: str, dry_run: bool) -> None:
     cmd = [
         sys.executable, "-m", "research_agents.react_main",
@@ -81,11 +118,14 @@ def run_category(project: str, questions_file: str, label: str, dry_run: bool) -
         print(f"  [dry-run] would run: {' '.join(cmd)}")
         return
 
+    t0_wall = time.time()
     t0 = time.monotonic()
     result = subprocess.run(cmd, cwd=ROOT)
     elapsed = time.monotonic() - t0
     status = "OK" if result.returncode == 0 else f"EXIT {result.returncode}"
     print(f"\n  [{label}] finished in {elapsed:.0f}s — {status}")
+
+    save_chains(project, questions_file, label, t0_wall)
 
 
 def main() -> None:
