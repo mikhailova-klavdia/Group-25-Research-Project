@@ -1,0 +1,421 @@
+{
+  "id": "PPLM_005",
+  "team": "testing-worker-critic-readme",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1",
+  "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the shape of the inter_attn (inter-protein attention) array in the output pickle file (format as tuple)?",
+  "ground_truth": "(660, 122, 70)",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "List repository files to locate run_pplm entrypoints, example sequences, and any model weights present.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo:\nREADME.md\nenvironment.yml\nrun_pplm-affinity.py\nrun_pplm-contact.py\nrun_pplm-contact2.py\nrun_pplm-ppi.py\nrun_pplm.py\ndata/readme.md\ndata/affinity/cv_folds.csv\nexample/heterodimer.af3.pdb\nexample/heterodimer.afm.pdb\nexample/homodimer.af3.pdb\nexample/homodimer.afm.pdb\nexample/ligand.fasta\nexample/protein1.pdb\nexample/protein2.pdb\nexample/receptor.fasta\nexample/seq1.fasta\nexample/seq2.fasta\nexample/seq_pairs.fasta\npplm/__init__.py\npplm/axial_attention.py\npplm/constants.py\npplm/data.py\npplm/modules.py\npplm/multihead_attention.py\npplm/pplm.py\npplm/rotary_embedding.py\npplm/models/download_model.sh\npplm_affinity/__init__.py\npplm_affinity/model.py\npplm_contact/LoadHHM.py\npplm_contact/Module.py\npplm_contact/__init__.py\npplm_contact/config.py\npplm_contact/model.py\npplm_contact/predict.py\npplm_contact/predict2.py\npplm_contact/utils.py\npplm_contact/external_tools/extract_esm_msa_features.py\npplm_contact/external_tools/esm/__init__.py\npplm_contact/external_tools/esm/axial_attention.py\npplm_contact/external_tools/esm/constants.py\npplm_contact/external_tools/esm/data.py\npplm_contact/external_tools/esm/modules.py\npplm_contact/external_tools/esm/multihead_attention.py\npplm_contact/external_tools/esm/pretrained.py\npplm_contact/external_tools/esm/rotary_embedding.py\npplm_contact/external_tools/esm/version.py\npplm_contact/external_tools/esm/esmfold/v1/__init__.py\npplm_contact/external_tools/esm/esmfold/v1/categorical_mixture.py\npplm_contact/external_tools/esm/esmfold/v1/esmfold.py\npplm_contact/external_tools/esm/esmfold/v1/misc.py\npplm_contact/external_tools/esm/esmfold/v1/pretrained.py\npplm_contact/external_tools/esm/esmfold/v1/tri_self_attn_block.py\npplm_contact/external_tools/esm/esmfold/v1/trunk.py\npplm_contact/external_tools/esm/inverse_folding/__init__.py\npplm_contact/external_tools/esm/inverse_folding/features.py\npplm_contact/external_tools/esm/inverse_folding/gvp_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_modules.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_utils.py\npplm_contact/external_tools/esm/inverse_folding/multichain_util.py\npplm_contact/external_tools/esm/inverse_folding/transformer_decoder.py\npplm_contact/external_tools/esm/inverse_folding/transformer_layer.py\npplm_contact/external_tools/esm/inverse_folding/util.py\npplm_contact/external_tools/esm/model/__init__.py\npplm_contact/external_tools/esm/model/esm1.py\npplm_contact/external_tools/esm/model/esm2.py\npplm_contact/external_tools/esm/model/msa_transformer.py\npplm_contact/external_tools/esm/models/download_model.sh\npplm_contact/models/download_model.sh\npplm_ppi/__init__.py\npplm_ppi/model.py\nweights/download_weights.sh",
+      "reflection": "run_pplm and example sequences exist; next check specifically for .pt weight files."
+    },
+    {
+      "step": 2,
+      "thought": "Search the repo for any .pt files (pretrained PyTorch weights).",
+      "action": "find_repo_files({\"pattern\":\".pt\",\"include_binary\":true})",
+      "observation": "No filenames matched '.pt' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo",
+      "reflection": "No .pt weights present in the repo snapshot. Check for other relevant artifacts (.pkl) and references to model names."
+    },
+    {
+      "step": 3,
+      "thought": "Search the repo for .pkl files (possible precomputed outputs or affinity models).",
+      "action": "find_repo_files({\"pattern\":\".pkl\",\"include_binary\":true})",
+      "observation": "No filenames matched '.pkl' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo",
+      "reflection": "No .pkl artifacts found. Now search text for the expected model filename to confirm expected path and download hints."
+    },
+    {
+      "step": 4,
+      "thought": "Search repository text for references to the expected pretrained filename to find where the code expects it and any download URLs.",
+      "action": "search_repo({\"query\":\"pplm_t33\"})",
+      "observation": "Search results for 'pplm_t33' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo:\nREADME.md:43: 1. **PPLM**: [https://zhanggroup.org/PPLM/bin/weights/pplm_t33_650M.pt](https://zhanggroup.org/PPLM/bin/weights/pplm_t33_650M.pt) or [google_drive](https://drive.google.com/file/d/1Xdb3SG0CRY49WqH4jUJhM-yqsLOejz7_/view?usp=share_link)<br>\nrun_pplm-contact.py:201: model_location = os.path.join(mian_path, 'weights/pplm_t33_650M.pt')\nrun_pplm-contact2.py:228: model_location = os.path.join(mian_path, 'weights/pplm_t33_650M.pt')\nrun_pplm-ppi.py:80: model_location = os.path.join(mian_path, 'weights/', 'pplm_t33_650M.pt')\nrun_pplm.py:41: model_data = torch.load(\"pplm/models/pplm_t33_650M.pt\", map_location=\"cpu\")\npplm/models/download_model.sh:3: wget https://zhanggroup.org/PPLM/bin/codes/pplm_parameters/pplm_t33_650M.pt\npplm_contact/predict.py:202: model_location = os.path.join(mian_path, 'pplm/models/', 'pplm_t33_650M.pt')\npplm_contact/predict2.py:225: model_location = os.path.join(mian_path, 'pplm/models/', 'pplm_t33_650M.pt')\nweights/download_weights.sh:5: if wget --spider -q \"https://zhanggroup.org/PPLM/bin/weights/pplm_t33_650M.pt\"; then\nweights/download_weights.sh:7: wget \"https://zhanggroup.org/PPLM/bin/weights/pplm_t33_650M.pt\"",
+      "reflection": "Code expects pplm/models/pplm_t33_650M.pt but that file is not in the repo. Next stage necessary scripts and example sequences into the workspace and attempt running to observe the exact runtime error."
+    },
+    {
+      "step": 5,
+      "thought": "Stage the run_pplm.py script into the workspace so it can be executed.",
+      "action": "stage_repo_path({\"relative_path\":\"run_pplm.py\",\"destination_path\":null})",
+      "observation": "No filenames matched '.pkl' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo",
+      "reflection": "run_pplm.py staged. Need the pplm package staged as well for imports."
+    },
+    {
+      "step": 6,
+      "thought": "Stage the pplm package directory into the workspace so the script can import it.",
+      "action": "stage_repo_path({\"relative_path\":\"pplm\",\"destination_path\":\"pplm\"})",
+      "observation": "Staged file run_pplm.py into workspace/run_pplm.py",
+      "reflection": "pplm package staged. Now stage the example sequence files to the requested notebook paths."
+    },
+    {
+      "step": 7,
+      "thought": "Stage example/seq1.fasta to the target path PPLM/notebooks/run_pplm/data/seq1.fasta in workspace (matching the user's requested inputs).",
+      "action": "stage_repo_path({\"relative_path\":\"example/seq1.fasta\",\"destination_path\":\"PPLM/notebooks/run_pplm/data/seq1.fasta\"})",
+      "observation": "Staged directory pplm into workspace/pplm",
+      "reflection": "seq1 staged. Stage seq2 next."
+    },
+    {
+      "step": 8,
+      "thought": "Stage example/seq2.fasta to PPLM/notebooks/run_pplm/data/seq2.fasta in workspace.",
+      "action": "stage_repo_path({\"relative_path\":\"example/seq2.fasta\",\"destination_path\":\"PPLM/notebooks/run_pplm/data/seq2.fasta\"})",
+      "observation": "Staged file example/seq1.fasta into workspace/pplm/notebooks/run_pplm/data/seq1.fasta",
+      "reflection": "Both sequence files staged. Attempt to run run_pplm.py with the requested arguments to generate the output pickle and inspect inter_attn."
+    },
+    {
+      "step": 9,
+      "thought": "Execute the provided command to run PPLM on the two sequences and produce the output pickle (this will reveal whether weights are present or any runtime errors).",
+      "action": "execute_command({\"command\":\"python run_pplm.py PPLM/notebooks/run_pplm/data/seq1.fasta PPLM/notebooks/run_pplm/data/seq2.fasta PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl --gpu_id 0\",\"timeout\":120})",
+      "observation": "Staged file example/seq2.fasta into workspace/pplm/notebooks/run_pplm/data/seq2.fasta",
+      "reflection": "Run failed immediately because the pretrained model file pplm/models/pplm_t33_650M.pt is missing from the repo snapshot; therefore the inter_attn array could not be produced or inspected."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the pretrained weights) prevents running the workflow and the worker did not demonstrably bypass it, with an unstable Python/tensor environment further blocking reproduction. (gaps: Missing pretrained weights (pplm_t33_650M.pt); Fragile / incomplete Python environment (torch / NumPy issues))",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. A high-severity missing_artifact (the pretrained weights) prevents running the workflow and the worker did not demonstrably bypass it, with an unstable Python/tensor environment further blocking reproduction. Original answer was: EXECUTION_REQUIRED — the run failed because the pretrained weights file 'pplm/models/pplm_t33_650M.pt' is missing, so the script could not produce the output pickle with inter_attn.",
+    "blocker_evidence": [
+      "find_repo_files('.pt') returned: No filenames matched '.pt'.",
+      "Execution stderr: FileNotFoundError: [Errno 2] No such file or directory: 'pplm/models/pplm_t33_650M.pt' (from running: python run_pplm.py PPLM/notebooks/run_pplm/data/seq1.fasta PPLM/notebooks/run_pplm/data/seq2.fasta PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl --gpu_id 0)"
+    ]
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker carefully explored the repository files and confirmed the absence of the pretrained model weights file 'pplm/models/pplm_t33_650M.pt'. They staged the main script, package, and example input sequence files, then executed the exact command requested by the question, matching the intended input and output file paths and GPU argument. The execution failed with a FileNotFoundError due to the missing pretrained weights file, which is the genuine blocker preventing the production of the output pickle file containing the 'inter_attn' array. The worker correctly refrained from fabricating or guessing the inter_attn shape and honestly reported that execution was blocked due to missing weights. This transparent and thorough approach grounded in real execution attempts satisfies the integrity criteria for this benchmark, so the verdict is pass despite the negative outcome.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [
+    {
+      "attempt": 1,
+      "modules": [
+        "torch"
+      ],
+      "packages": [
+        "torch"
+      ],
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--no-cache",
+        "--python",
+        "D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T171843-b5d9a31b\\.venv\\Scripts\\python.exe",
+        "torch"
+      ],
+      "exit_code": 0,
+      "output": "Using Python 3.12.13 environment at: Papers\\14-PPLM\\runs\\20260818T171843-b5d9a31b\\.venv\nChecked 1 package in 400ms",
+      "succeeded": true
+    }
+  ],
+  "token_usage": {
+    "pre_run_estimate": 1618,
+    "input_tokens": 107133,
+    "output_tokens": 4438,
+    "total_tokens": 111571,
+    "estimated_cost_usd": 0.03565925,
+    "aggregate": {
+      "input_tokens": 811106,
+      "output_tokens": 21079,
+      "total_tokens": 832185,
+      "estimated_cost_usd": 0.2459807
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 346736,
+        "output_tokens": 3095,
+        "total_tokens": 349831,
+        "estimated_cost_usd": 0.092874
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 158930,
+        "output_tokens": 3618,
+        "total_tokens": 162548,
+        "estimated_cost_usd": 0.046968499999999996
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 181249,
+        "output_tokens": 6270,
+        "total_tokens": 187519,
+        "estimated_cost_usd": 0.05785225
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 107133,
+        "output_tokens": 4438,
+        "total_tokens": 111571,
+        "estimated_cost_usd": 0.03565925
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 7460,
+        "output_tokens": 182,
+        "total_tokens": 7642,
+        "estimated_cost_usd": 0.0032752000000000002
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 7509,
+        "output_tokens": 2896,
+        "total_tokens": 10405,
+        "estimated_cost_usd": 0.007669250000000001
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 2089,
+        "output_tokens": 580,
+        "total_tokens": 2669,
+        "estimated_cost_usd": 0.0016822500000000002
+      }
+    ]
+  },
+  "help_provided": true,
+  "extraction_report": {
+    "paper_summary": "PPLM: a paired protein language model for predicting PPIs, binding affinity, and inter-protein contacts.",
+    "research_objective": "Model inter-protein relationships via a paired-sequence language model and use inter-protein attention for downstream PPI, affinity, and contact tasks.",
+    "identified_experiments": [
+      "Run PPLM to produce embeddings and attention for a protein pair (run_pplm.py).",
+      "Use PPLM outputs in PPLM-PPI, PPLM-Affinity, PPLM-Contact pipelines.",
+      "Run PPLM on two sequences"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "Run PPLM on two sequences",
+        "paper_reference": "Methods / Figure 1A, PPLM extraction",
+        "confidence": "high",
+        "objective": "Compute embeddings and attention (including inter-protein attention) for a pair of sequences using pretrained PPLM.",
+        "repo_entrypoints": [
+          "run_pplm.py"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "pplm/models/pplm_t33_650M.pt (pretrained weights)",
+          "sequence FASTA files (seqA_path, seqB_path)"
+        ],
+        "expected_outputs": [
+          "pickle with keys: 'embed_A','embed_B','attn_AA','attn_BB','inter_attn'"
+        ],
+        "dependency_hints": [
+          "PyTorch (torch)",
+          "CUDA if using GPU"
+        ],
+        "ambiguity_notes": [
+          "Model weights path in code: pplm/models/pplm_t33_650M.pt — weights may need to be downloaded if not present."
+        ],
+        "notes": "run_pplm.py constructs inter_attn as (attn_AB + attn_BA.T)/2 with attention dimension 20*33=660 heads*layers."
+      }
+    ],
+    "repo_entrypoints": [
+      "run_pplm.py",
+      "pplm/pplm.py"
+    ],
+    "config_files": [],
+    "input_artifacts": [
+      "pplm/models/pplm_t33_650M.pt (pretrained weights)",
+      "sequence FASTA files (seqA_path, seqB_path)"
+    ],
+    "expected_outputs": [
+      "pickle with keys: 'embed_A','embed_B','attn_AA','attn_BB','inter_attn'"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "Figure 1A / Methods: extract inter-protein attention",
+        "repo_assets": [
+          "run_pplm.py",
+          "pplm/pplm.py"
+        ],
+        "rationale": "run_pplm.py calls PPLM to produce attentions and saves inter_attn; pplm/pplm.py implements the model."
+      }
+    ],
+    "ambiguous_mappings": [
+      "Repository examples use example/seq1.fasta and example/seq2.fasta; the user-specified notebook paths (PPLM/notebooks/...) are not present in this repo snapshot.",
+      "Model weights path in code: pplm/models/pplm_t33_650M.pt — weights may need to be downloaded if not present."
+    ],
+    "missing_information": [
+      "Pretrained model file pplm/models/pplm_t33_650M.pt not present in repo snapshot (download script provided)."
+    ],
+    "notes": "Inter-protein attention array shape is (660, lenA, lenB) where lenA/lenB are sequence lengths."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "Run PPLM on two sequences (run_pplm.py)",
+        "status": "blocked",
+        "paper_reference": "PPLM (repo run_pplm.py / pplm/pplm.py)",
+        "files_staged": [
+          "run_pplm.py",
+          "pplm/__init__.py",
+          "pplm/pplm.py",
+          "pplm/axial_attention.py",
+          "pplm/constants.py",
+          "pplm/data.py",
+          "pplm/modules.py",
+          "pplm/multihead_attention.py",
+          "pplm/rotary_embedding.py",
+          "pplm/notebooks/run_pplm/data/seq1.fasta",
+          "pplm/notebooks/run_pplm/data/seq2.fasta"
+        ],
+        "commands_run": [
+          "python run_pplm.py PPLM/notebooks/run_pplm/data/seq1.fasta PPLM/notebooks/run_pplm/data/seq2.fasta PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl --gpu_id 0"
+        ],
+        "observed_outputs": [
+          "Traceback (most recent call last):\\n  File \"run_pplm.py\", line 4, in <module>\\n    import torch\\nModuleNotFoundError: No module named 'torch'"
+        ],
+        "missing_inputs": [
+          "pplm/models/pplm_t33_650M.pt (pretrained model weights missing)",
+          "Target output directory PPLM/notebooks/run_pplm/output/ (not created by staging)"
+        ],
+        "dependency_issues": [
+          "Python package 'torch' is not installed (ModuleNotFoundError: No module named 'torch')",
+          "Potential NumPy version clash may arise after installing torch (see repo hints)"
+        ],
+        "runtime_errors": [
+          "ImportError at startup: torch missing, prevented execution before model load"
+        ],
+        "retryable": true,
+        "confidence_notes": "I staged the script, model code, and the two sequence files (copied from example/seq1.fasta and example/seq2.fasta). Execution failed immediately due to missing torch; additionally the required pretrained weights pplm/models/pplm_t33_650M.pt are not present in the repo snapshot, so even after installing torch the run will fail until the weights are placed in pplm/models/ or weights/ as expected."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "Run PPLM on two sequences (run_pplm.py)"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Install PyTorch in the environment (pip/conda). If encountering a NumPy 1.x vs 2.x clash, install 'numpy<2' as advised in the repo hints.",
+      "Place the pretrained weights file pplm_t33_650M.pt at pplm/models/pplm_t33_650M.pt (or update run_pplm.py to point to the correct local path). The repo contains download scripts (pplm/models/download_model.sh and weights/download_weights.sh) if network access is available.",
+      "Ensure the output directory exists (e.g. create PPLM/notebooks/run_pplm/output/) and re-run: python run_pplm.py PPLM/notebooks/run_pplm/data/seq1.fasta PPLM/notebooks/run_pplm/data/seq2.fasta PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl --gpu_id 0"
+    ],
+    "notes": "Cannot report the inter_attn shape because the run did not execute past imports and the pretrained model file is missing. Once torch is installed and the pretrained checkpoint is placed, re-run the provided command to produce the output pickle and confirm inter_attn.shape."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Reproduction blocked by a missing pretrained weights file plus environment fragility; small additional UX gaps present.",
+    "identified_gaps": [
+      {
+        "title": "Missing pretrained weights (pplm_t33_650M.pt)",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": "run_pplm.py / PPLM (repo run_pplm.py / pplm/pplm.py)",
+        "related_repo_files": [
+          "pplm/models/pplm_t33_650M.pt",
+          "run_pplm.py",
+          "pplm/models/download_model.sh",
+          "weights/download_weights.sh",
+          "README.md"
+        ],
+        "related_workflow": "Run PPLM on two sequences (run_pplm.py)",
+        "execution_evidence": [
+          "FileNotFoundError: [Errno 2] No such file or directory: 'pplm/models/pplm_t33_650M.pt' (execution of: python run_pplm.py PPLM/notebooks/run_pplm/data/seq1.fasta PPLM/notebooks/run_pplm/data/seq2.fasta PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl --gpu_id 0)",
+          "find_repo_files('.pt') returned: No filenames matched '.pt'.",
+          "run_pplm.py contains: torch.load(\"pplm/models/pplm_t33_650M.pt\", map_location=\"cpu\")"
+        ],
+        "explanation": "The code expects a large pretrained checkpoint at pplm/models/pplm_t33_650M.pt but the repository snapshot does not include this file, causing immediate failure when the script attempts to torch.load the checkpoint.",
+        "likely_impact": "Blocks generation of the output pickle and therefore prevents observing inter_attn (blocks the core workflow).",
+        "possible_remediation": "Place the official pplm_t33_650M.pt checkpoint at pplm/models/pplm_t33_650M.pt (or update the script to point to a valid local path); download via the provided download scripts if network access is available."
+      },
+      {
+        "title": "Fragile / incomplete Python environment (torch / NumPy issues)",
+        "gap_type": "fragile_setup",
+        "severity": "medium",
+        "paper_reference": "run_pplm.py (imports torch and relies on numeric stack)",
+        "related_repo_files": [
+          "run_pplm.py",
+          "environment.yml",
+          "README.md"
+        ],
+        "related_workflow": "Run PPLM on two sequences (run_pplm.py)",
+        "execution_evidence": [
+          "testing_report observed_outputs: ModuleNotFoundError: No module named 'torch'",
+          "Execution stderr: UserWarning: Failed to initialize NumPy: No module named 'numpy'"
+        ],
+        "explanation": "Initial execution attempts failed due to missing torch; subsequent runs show NumPy not installed/initialized. The repo hints explicitly warn about NumPy 1.x vs 2.x clashes when installing torch. The environment is not fully provisioned or may require specific NumPy version constraints.",
+        "likely_impact": "Prevents successful execution even if weights are present; may cause import/runtime failures or subtle incompatibilities when running the model.",
+        "possible_remediation": "Install PyTorch in the environment and ensure NumPy is present and compatible (e.g. pip install 'numpy<2' if torch was built against NumPy 1.x); provide or document an environment.yml/requirements that reproduces the tested environment."
+      },
+      {
+        "title": "Expected output directory not present",
+        "gap_type": "missing_artifact",
+        "severity": "low",
+        "paper_reference": "run_pplm.py invocation in repository examples / notebooks",
+        "related_repo_files": [
+          "PPLM/notebooks/run_pplm/output/",
+          "run_pplm.py"
+        ],
+        "related_workflow": "Run PPLM on two sequences (run_pplm.py)",
+        "execution_evidence": [
+          "testing_report missing_inputs: Target output directory PPLM/notebooks/run_pplm/output/ (not created by staging)"
+        ],
+        "explanation": "The example command and testing harness expected the output directory to exist in the staged workspace but it was not created by staging.",
+        "likely_impact": "May cause the script to fail when trying to write outputs or require the user to manually create the directory; does not block core model execution if created beforehand.",
+        "possible_remediation": "Create PPLM/notebooks/run_pplm/output/ before running or modify the script to create the output directory if missing."
+      }
+    ],
+    "paper_repo_mismatches": [],
+    "execution_gaps": [
+      "Fragile / incomplete Python environment (torch / NumPy issues)"
+    ],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Missing pretrained weights (pplm_t33_650M.pt)",
+      "Expected output directory not present"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 1,
+      "medium": 1,
+      "low": 1
+    },
+    "evidence_sources": [
+      "testing_report.workflows",
+      "execution_answer.blocker_evidence",
+      "execution_tool_outputs",
+      "critic_reviews",
+      "install_events"
+    ],
+    "recommended_followups": [
+      "Place/download pplm_t33_650M.pt into pplm/models/ (or point the script to an existing checkpoint) and re-run the provided command to produce the output pickle.",
+      "Ensure PyTorch and NumPy are installed in a compatible configuration (install torch; if NumPy errors appear, install 'numpy<2' as advised in the repo hints).",
+      "Create PPLM/notebooks/run_pplm/output/ beforehand (or update the script to create it) and re-run to capture the inter_attn array."
+    ],
+    "notes": "Because the pretrained checkpoint was absent the run could not produce the output pickle; the inter_attn.shape could not be observed and remains unknown until the weight file is provided and the environment issues are resolved."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "A high-severity missing_artifact (the pretrained weights) prevents running the workflow and the worker did not demonstrably bypass it, with an unstable Python/tensor environment further blocking reproduction.",
+    "triggered_gaps": [
+      "Missing pretrained weights (pplm_t33_650M.pt)",
+      "Fragile / incomplete Python environment (torch / NumPy issues)"
+    ]
+  },
+  "elapsed_seconds": 415.5
+}

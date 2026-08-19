@@ -1,0 +1,46 @@
+[
+  {
+    "timestamp": "2026-08-18T15:44:38.560211+00:00",
+    "run_id": "20260818T153320-86841be9",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use the CrossPPI binding affinity predictor to analyze a RAS-RAF protein interaction. The ligand sequence is MTEYKLVVVGA",
+    "pre_estimate_tokens": 1737,
+    "input_tokens": 134903,
+    "output_tokens": 5446,
+    "total_tokens": 140349,
+    "cost_usd": 0.044618
+  },
+  {
+    "timestamp": "2026-08-18T15:53:38.552595+00:00",
+    "run_id": "20260818T154444-1b78994f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Use the CrossPPI binding affinity predictor to predict the pKD value for a protein-protein interaction. The ligand prote",
+    "pre_estimate_tokens": 1764,
+    "input_tokens": 186197,
+    "output_tokens": 3728,
+    "total_tokens": 189925,
+    "cost_usd": 0.054005
+  },
+  {
+    "timestamp": "2026-08-18T16:03:23.646051+00:00",
+    "run_id": "20260818T155343-36ce329e",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the KRAS protein sequence MTEYKLVVVGAGGVGKSALTIQLIQNHF",
+    "pre_estimate_tokens": 1650,
+    "input_tokens": 147902,
+    "output_tokens": 5181,
+    "total_tokens": 153083,
+    "cost_usd": 0.047338
+  },
+  {
+    "timestamp": "2026-08-18T16:11:20.659601+00:00",
+    "run_id": "20260818T160327-a25f3cea",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Generate per-residue protein embeddings using the ESM-2 model for the RAC1 receptor protein sequence MAAQGEPQVQFKLVLVGDG",
+    "pre_estimate_tokens": 1693,
+    "input_tokens": 124230,
+    "output_tokens": 4899,
+    "total_tokens": 129129,
+    "cost_usd": 0.040855
+  }
+]

@@ -1,0 +1,47 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,used_help,elapsed_s
+2026-08-18T12:10:43+00:00,SC_FRAMEWORK_001,Papers\07-SC-Framework,exit_1,True,5000 cells,290664,0.0948,yes,288.6
+2026-08-19T06:45:08+00:00,USHER_001,Papers\03-USHER,exit_1,False,EXECUTION_REQUIRED — gate blocked: High-severity missing artifacts and an exec,548147,0.1604,yes,244.6
+2026-08-18T12:14:26+00:00,SEGMA_001,Papers\08-SEGMA,exit_1,True,187 amino acids,313331,0.1006,yes,216.4
+2026-08-18T12:21:50+00:00,SENTIEON_CLI_001,Papers\04-sentieon-cli,exit_1,True,[UNCERTAIN — High-severity missing artifacts and an environment/runtime failur,1751843,0.4892,yes,444.6
+2026-08-18T12:24:04+00:00,ARCADIA_PUBLIC_001,Papers\11-ARCADIA_public,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (raw cite_,283848,0.0875,yes,133.6
+2026-08-18T12:26:30+00:00,ARCADIA_PUBLIC_002,Papers\11-ARCADIA_public,exit_1,True,6,89263,0.0398,yes,145.8
+2026-08-18T12:35:42+00:00,GWPROT_001,Papers\05-GWProt,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (the native ',996351,0.2855,yes,552.1
+2026-08-18T12:37:54+00:00,GWPROT_002,Papers\05-GWProt,exit_1,True,4,170842,0.0556,yes,132.4
+2026-08-18T12:40:50+00:00,REGFORMER_001,Papers\12-RegFormer,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (pretraine,579696,0.163,yes,175.3
+2026-08-18T12:44:40+00:00,REGFORMER_002,Papers\12-RegFormer,exit_1,False,EXECUTION_REQUIRED — gate blocked: High-severity missing_artifact gaps (pre-ge,401929,0.1247,yes,230.3
+2026-08-19T06:50:00+00:00,SCISTREECNA_001,Papers\09-ScisTreeCNA,exit_1,False,EXECUTION_REQUIRED — gate blocked: High-severity fragile_setup and execution_g,1464609,0.3944,yes,292.1
+2026-08-18T13:17:59+00:00,SCISTREECNA_002,Papers\09-ScisTreeCNA,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (missing CuPy,1623907,0.4327,yes,389.2
+2026-08-18T13:43:52+00:00,SAM2_001,Papers\17-sam2,timeout,False,[UNCERTAIN — The worker produced a concrete result but multiple unresolved gap,1076619,0.3127,yes,1553.6
+2026-08-18T14:03:32+00:00,SAM2_002,Papers\17-sam2,timeout,False,[UNCERTAIN — High-severity environment and artifact gaps (missing local SAM2 c,1183720,0.3419,yes,1179.5
+2026-08-18T14:11:12+00:00,TABPFN_001,Papers\18-tabpfn,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (missing 'tor,1048944,0.3015,yes,459.8
+2026-08-18T14:16:13+00:00,TABPFN_002,Papers\18-tabpfn,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (missing PyTo,929815,0.2599,yes,301.8
+2026-08-18T14:18:23+00:00,CYTEONTO_001,Papers\01-CyteOnto,exit_1,True,4,175289,0.0595,yes,129.9
+2026-08-18T14:20:32+00:00,CYTEONTO_002,Papers\01-CyteOnto,exit_1,True,stem cell,183012,0.0607,yes,128.9
+2026-08-18T14:21:59+00:00,CYTEONTO_003,Papers\01-CyteOnto,exit_1,True,ovum,106862,0.0396,yes,86.5
+2026-08-18T14:24:53+00:00,GWAS_EPISTASIS_BIAS_001,Papers\02-GWAS-Epistasis-Bias,exit_1,True,5.03698201089221e-08,273934,0.0864,yes,174.3
+2026-08-18T14:31:34+00:00,GWAS_EPISTASIS_BIAS_002,Papers\02-GWAS-Epistasis-Bias,exit_1,True,[UNCERTAIN — The worker reports a successful run yielding 0 significant result,506457,0.1715,yes,400.6
+2026-08-18T14:37:21+00:00,GWAS_EPISTASIS_BIAS_003,Papers\02-GWAS-Epistasis-Bias,exit_1,True,0.79,480072,0.1583,yes,347.7
+2026-08-19T09:00:00+00:00,LARIS_001,Papers\06-LARIS,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (pandas StringArray incompatibility) prevented completing the permutation p-value,1576335,0.4312,yes,509.1
+2026-08-18T14:51:51+00:00,LARIS_002,Papers\06-LARIS,exit_1,False,"[UNCERTAIN — The worker produced 2951 LR pairs by execution, but a high-severi",910696,0.2597,yes,360.0
+2026-08-19T09:00:00+00:00,LARIS_003,Papers\06-LARIS,exit_1,True,[UNCERTAIN — A high-severity mismatch between the LR DB and adata.var_names] SEMA4A,3166765,0.8665,yes,850.8
+2026-08-18T15:11:10+00:00,DISTORTIONS_001,Papers\10-distortions,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (local CSV,386626,0.1279,yes,308.8
+2026-08-18T15:17:06+00:00,DISTORTIONS_002,Papers\10-distortions,exit_1,True,6,622671,0.1843,yes,355.4
+2026-08-18T15:21:53+00:00,DISTORTIONS_003,Papers\10-distortions,exit_1,True,800,267893,0.0906,yes,287.1
+2026-08-18T15:26:23+00:00,FADVI_001,Papers\13-fadvi,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the pretr,555852,0.1623,yes,270.1
+2026-08-18T15:29:41+00:00,FADVI_002,Papers\13-fadvi,exit_1,False,"EXECUTION_REQUIRED — gate blocked: High-severity missing artifacts, missing ru",308286,0.0977,yes,197.9
+2026-08-18T15:33:17+00:00,FADVI_003,Papers\13-fadvi,exit_1,False,EXECUTION_REQUIRED — gate blocked: High-severity missing runtime dependencies ,391955,0.1187,yes,216.4
+2026-08-18T15:44:40+00:00,CROSSPPI_001,Papers\16-CrossPPI,timeout,False,EXECUTION_REQUIRED — gate blocked: A high-severity fragile_setup (PyTorch inst,921271,0.2744,yes,682.7
+2026-08-18T15:53:39+00:00,CROSSPPI_002,Papers\16-CrossPPI,exit_1,False,EXECUTION_REQUIRED — gate blocked: The worker gave a numeric pKD without cited,663118,0.2,yes,539.3
+2026-08-18T16:03:24+00:00,CROSSPPI_003,Papers\16-CrossPPI,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (broken/incom,661252,0.2059,yes,584.9
+2026-08-18T16:11:22+00:00,CROSSPPI_004,Papers\16-CrossPPI,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (the broken/p,553101,0.1758,yes,477.5
+2026-08-18T16:16:37+00:00,METAPOINTFINDER_001,Papers\15-metapointfinder,exit_1,True,1182 sequences,869734,0.24,yes,315.4
+2026-08-18T16:21:28+00:00,METAPOINTFINDER_002,Papers\15-metapointfinder,exit_1,True,37,880888,0.2469,yes,291.0
+2026-08-18T16:24:42+00:00,METAPOINTFINDER_003,Papers\15-metapointfinder,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the reque,287923,0.0917,yes,193.7
+2026-08-18T16:30:24+00:00,METAPOINTFINDER_004,Papers\15-metapointfinder,exit_1,True,[UNCERTAIN — A medium-severity missing_artifact gap (the input FASTA was not p,269365,0.0908,yes,342.2
+2026-08-18T16:34:33+00:00,METAPOINTFINDER_005,Papers\15-metapointfinder,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact gap shows ,316145,0.1019,yes,248.3
+2026-08-19T06:59:48+00:00,PPLM_001,Papers\14-PPLM,ok,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing/wrong-format affini,1649526,0.4576,yes,588.0
+2026-08-18T16:58:14+00:00,PPLM_002,Papers\14-PPLM,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (weights/a,337300,0.1086,yes,280.5
+2026-08-18T17:11:40+00:00,PPLM_003,Papers\14-PPLM,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing artifact (the pretr,470433,0.1551,yes,805.6
+2026-08-18T17:18:39+00:00,PPLM_004,Papers\14-PPLM,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the pretr,607714,0.1863,yes,419.3
+2026-08-18T17:25:41+00:00,PPLM_005,Papers\14-PPLM,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the pretr,832185,0.246,yes,422.1
+2026-08-18T17:32:31+00:00,PPLM_006,Papers\14-PPLM,exit_1,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (core PPI ,668780,0.1963,yes,409.3

@@ -1,0 +1,741 @@
+{
+  "id": "SAM2_002",
+  "team": "testing-worker-critic-readme",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://arxiv.org/abs/2408.00714",
+  "question": "Use sam2.1_hiera_large checkpoint to generate masks on the image 'https://github.com/facebookresearch/sam2/blob/main/notebooks/images/cars.jpg'",
+  "ground_truth": "~54 masks",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "I need to inspect the repository layout to find model code and checkpoints before running anything.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\17-sam2\\repo:\n.clang-format\n.gitignore\n.watchmanconfig\nCODE_OF_CONDUCT.md\nCONTRIBUTING.md\nINSTALL.md\nLICENSE\nLICENSE_cctorch\nMANIFEST.in\nREADME.md\nRELEASE_NOTES.md\nbackend.Dockerfile\ndocker-compose.yaml\npyproject.toml\nsetup.py\n.github/workflows/check_fmt.yml\ncheckpoints/download_ckpts.sh\ndemo/.gitignore\ndemo/README.md\ndemo/backend/server/app.py\ndemo/backend/server/app_conf.py\ndemo/backend/server/data/data_types.py\ndemo/backend/server/data/loader.py\ndemo/backend/server/data/resolver.py\ndemo/backend/server/data/schema.py\ndemo/backend/server/data/store.py\ndemo/backend/server/data/transcoder.py\ndemo/backend/server/inference/data_types.py\ndemo/backend/server/inference/multipart.py\ndemo/backend/server/inference/predictor.py\ndemo/frontend/.babelrc\ndemo/frontend/.dockerignore\ndemo/frontend/.eslintignore\ndemo/frontend/.eslintrc.cjs\ndemo/frontend/.gitignore\ndemo/frontend/.prettierignore\ndemo/frontend/.prettierrc.json\ndemo/frontend/.watchmanconfig\ndemo/frontend/frontend.Dockerfile\ndemo/frontend/index.html\ndemo/frontend/package.json\ndemo/frontend/postcss.config.js\ndemo/frontend/schema.graphql\ndemo/frontend/tailwind.config.js\ndemo/frontend/tsconfig.json\ndemo/frontend/tsconfig.node.json\ndemo/frontend/vite.config.ts\ndemo/frontend/schemas/inference-api-schema.graphql\ndemo/frontend/schemas/merge-schemas.ts\ndemo/frontend/schemas/video-api-schema.graphql\ndemo/frontend/src/App.tsx\ndemo/frontend/src/main.tsx\ndemo/frontend/src/vite-env.d.ts\ndemo/frontend/src/assets/scss/App.scss\ndemo/frontend/src/common/codecs/VideoDecoder.ts\ndemo/frontend/src/common/codecs/VideoEncoder.ts\ndemo/frontend/src/common/codecs/WebCodecUtils.ts\ndemo/frontend/src/common/components/MobileFirstClickBanner.tsx\ndemo/frontend/src/common/components/Tooltip.tsx\ndemo/frontend/src/common/components/useFunctionThrottle.tsx\ndemo/frontend/src/common/components/annotations/AddObjectButton.tsx\ndemo/frontend/src/common/components/annotations/ClearAllPointsInVideoButton.tsx\ndemo/frontend/src/common/components/annotations/CloseSessionButton.tsx\ndemo/frontend/src/common/components/annotations/FirstClickView.tsx\ndemo/frontend/src/common/components/annotations/LimitNotice.tsx\ndemo/frontend/src/common/components/annotations/MobileObjectsList.tsx\ndemo/frontend/src/common/components/annotations/MobileObjectsToolbar.tsx\ndemo/frontend/src/common/components/annotations/MobileObjectsToolbarHeader.tsx\ndemo/frontend/src/common/components/annotations/ObjectActions.tsx\ndemo/frontend/src/common/components/annotations/ObjectPlaceholder.tsx\ndemo/frontend/src/common/components/annotations/ObjectThumbnail.tsx\ndemo/frontend/src/common/components/annotations/ObjectUtils.ts\ndemo/frontend/src/common/components/annotations/ObjectsToolbar.tsx\ndemo/frontend/src/common/components/annotations/ObjectsToolbarBottomActions.tsx\ndemo/frontend/src/common/components/annotations/ObjectsToolbarHeader.tsx\ndemo/frontend/src/common/components/annotations/PointsToggle.tsx\ndemo/frontend/src/common/components/annotations/PrimaryCTAButton.tsx\ndemo/frontend/src/common/components/annotations/ToolbarObject.tsx\ndemo/frontend/src/common/components/annotations/ToolbarObjectContainer.tsx\ndemo/frontend/src/common/components/annotations/TrackletSwimlane.tsx\ndemo/frontend/src/common/components/annotations/TrackletsAnnotation.tsx\ndemo/frontend/src/common/components/annotations/useTracklets.ts\ndemo/frontend/src/common/components/button/GradientBorder.tsx\ndemo/frontend/src/common/components/button/PlaybackButton.tsx\ndemo/frontend/src/common/components/button/PrimaryCTAButton.tsx\ndemo/frontend/src/common/components/button/ResponsiveButton.tsx\ndemo/frontend/src/common/components/button/TrackAndPlayButton.tsx\ndemo/frontend/src/common/components/code/InitializeLocalMonaco.ts\ndemo/frontend/src/common/components/effects/BackgroundEffects.tsx\ndemo/frontend/src/common/components/effects/EffectVariantBadge.tsx\ndemo/frontend/src/common/components/effects/EffectsCarousel.tsx\ndemo/frontend/src/common/components/effects/EffectsCarouselShadow.tsx\ndemo/frontend/src/common/components/effects/EffectsToolbar.tsx\ndemo/frontend/src/common/components/effects/EffectsToolbarBottomActions.tsx\ndemo/frontend/src/common/components/effects/EffectsToolbarHeader.tsx\ndemo/frontend/src/common/components/effects/EffectsUtils.ts\ndemo/frontend/src/common/components/effects/HighlightEffects.tsx\ndemo/frontend/src/common/components/effects/MobileEffectsToolbar.tsx\ndemo/frontend/src/common/components/effects/MoreFunEffects.tsx\ndemo/frontend/src/common/components/gallery/ChangeVideoModal.tsx\ndemo/frontend/src/common/components/gallery/DefaultVideoGalleryModalTrigger.tsx\ndemo/frontend/src/common/components/gallery/DemoVideoGallery.tsx\ndemo/frontend/src/common/components/gallery/DemoVideoGalleryModal.tsx\ndemo/frontend/src/common/components/gallery/VideoGalleryUploadPhoto.tsx\ndemo/frontend/src/common/components/gallery/VideoPhoto.tsx\ndemo/frontend/src/common/components/gallery/useUploadVideo.ts\ndemo/frontend/src/common/components/gallery/__generated__/DemoVideoGalleryModalQuery.graphql.ts\ndemo/frontend/src/common/components/gallery/__generated__/DemoVideoGalleryQuery.graphql.ts\ndemo/frontend/src/common/components/gallery/__generated__/useUploadVideoMutation.graphql.ts\ndemo/frontend/src/common/components/icons/GitHubIcon.tsx\ndemo/frontend/src/common/components/options/DownloadOption.tsx\ndemo/frontend/src/common/components/options/GalleryOption.tsx\ndemo/frontend/src/common/components/options/MoreOptionsToolbar.tsx\ndemo/frontend/src/common/components/options/MoreOptionsToolbarBottomActions.tsx\ndemo/frontend/src/common/components/options/OptionButton.tsx\ndemo/frontend/src/common/components/options/ShareSection.tsx\ndemo/frontend/src/common/components/options/ShareUtils.ts\ndemo/frontend/src/common/components/options/TryAnotherVideoSection.tsx\ndemo/frontend/src/common/components/options/UploadOption.tsx\ndemo/frontend/src/common/components/options/useDownloadVideo.ts\ndemo/frontend/src/common/components/options/__generated__/GetLinkOptionShareVideoMutation.graphql.ts\ndemo/frontend/src/common/components/session/RestartSessionButton.tsx\ndemo/frontend/src/common/components/session/useCloseSessionBeforeUnload.ts\ndemo/frontend/src/common/components/session/useRestartSession.ts\ndemo/frontend/src/common/components/session/__generated__/useCloseSessionBeforeUnloadMutation.graphql.ts\ndemo/frontend/src/common/components/snackbar/DemoMessagesSnackbarUtils.ts\ndemo/frontend/src/common/components/snackbar/MessagesSnackbar.tsx\ndemo/frontend/src/common/components/snackbar/snackbarAtoms.ts\ndemo/frontend/src/common/components/snackbar/useDemoMessagesSnackbar.ts\ndemo/frontend/src/common/components/snackbar/useExpireMessage.ts\ndemo/frontend/src/common/components/snackbar/useMessagesSnackbar.ts\ndemo/frontend/src/common/components/toolbar/DesktopToolbar.tsx\ndemo/frontend/src/common/components/toolbar/MobileToolbar.tsx\ndemo/frontend/src/common/components/toolbar/Toolbar.tsx\ndemo/frontend/src/common/components/toolbar/ToolbarActionIcon.tsx\ndemo/frontend/src/common/components/toolbar/ToolbarBottomActionsWrapper.tsx\ndemo/frontend/src/common/components/toolbar/ToolbarConfig.tsx\ndemo/frontend/src/common/components/toolbar/ToolbarHeaderWrapper.tsx\ndemo/frontend/src/common/components/toolbar/ToolbarProgressChip.tsx\ndemo/frontend/src/common/components/toolbar/ToolbarSection.tsx\ndemo/frontend/src/common/components/toolbar/useListenToStreamingState.ts\ndemo/frontend/src/common/components/toolbar/useToolbarTabs.ts\ndemo/frontend/src/common/components/video/ChangeVideoModal.tsx\ndemo/frontend/src/common/components/video/EventEmitter.ts\ndemo/frontend/src/common/components/video/Video.tsx\ndemo/frontend/src/common/components/video/VideoFilmstripWithPlayback.tsx\ndemo/frontend/src/common/components/video/VideoLoadingOverlay.tsx\ndemo/frontend/src/common/components/video/VideoWorker.ts\ndemo/frontend/src/common/components/video/VideoWorkerBridge.ts\ndemo/frontend/src/common/components/video/VideoWorkerContext.ts\ndemo/frontend/src/common/components/video/VideoWorkerTypes.ts\ndemo/frontend/src/common/components/video/useInputVideo.ts\ndemo/frontend/src/common/components/video/useVideoWorker.ts\ndemo/frontend/src/common/components/video/editor/DemoVideoEditor.tsx\ndemo/frontend/src/common/components/video/editor/ImageUtils.ts\ndemo/frontend/src/common/components/video/editor/VideoEditor.tsx\ndemo/frontend/src/common/components/video/editor/VideoEditorUtils.ts\ndemo/frontend/src/common/components/video/editor/atoms.ts\ndemo/frontend/src/common/components/video/editor/useResetEditor.ts\ndemo/frontend/src/common/components/video/editor/useVideo.ts\ndemo/frontend/src/common/components/video/editor/useVideoEffect.ts\ndemo/frontend/src/common/components/video/effects/ArrowGLEffect.ts\ndemo/frontend/src/common/components/video/effects/BackgroundBlurEffect.ts\ndemo/frontend/src/common/components/video/effects/BackgroundTextEffect.ts\ndemo/frontend/src/common/components/video/effects/BaseGLEffect.ts\ndemo/frontend/src/common/components/video/effects/BurstGLEffect.ts\ndemo/frontend/src/common/components/video/effects/CutoutGLEffect.ts\ndemo/frontend/src/common/components/video/effects/DesaturateEffect.ts\ndemo/frontend/src/common/components/video/effects/Effect.ts\ndemo/frontend/src/common/components/video/effects/EffectUtils.ts\ndemo/frontend/src/common/components/video/effects/Effects.ts\ndemo/frontend/src/common/components/video/effects/EraseBackgroundEffect.ts\ndemo/frontend/src/common/components/video/effects/EraseForegroundEffect.ts\ndemo/frontend/src/common/components/video/effects/EraseForegroundGLEffect.ts\ndemo/frontend/src/common/components/video/effects/GradientEffect.ts\ndemo/frontend/src/common/components/video/effects/NoisyMaskEffect.ts\ndemo/frontend/src/common/components/video/effects/OriginalEffect.ts\ndemo/frontend/src/common/components/video/effects/OverlayEffect.ts\ndemo/frontend/src/common/components/video/effects/PixelateEffect.ts\ndemo/frontend/src/common/components/video/effects/PixelateMaskGLEffect.ts\ndemo/frontend/src/common/components/video/effects/ReplaceGLEffect.ts\ndemo/frontend/src/common/components/video/effects/ScopeGLEffect.ts\ndemo/frontend/src/common/components/video/effects/SobelEffect.ts\ndemo/frontend/src/common/components/video/effects/VibrantMaskEffect.ts\ndemo/frontend/src/common/components/video/effects/shaders/Arrow.frag\ndemo/frontend/src/common/components/video/effects/shaders/BackgroundBlur.frag\ndemo/frontend/src/common/components/video/effects/shaders/Burst.frag\ndemo/frontend/src/common/components/video/effects/shaders/Cutout.frag\ndemo/frontend/src/common/components/video/effects/shaders/DefaultVert.vert\ndemo/frontend/src/common/components/video/effects/shaders/EraseForeground.frag\ndemo/frontend/src/common/components/video/effects/shaders/Gradient.frag\ndemo/frontend/src/common/components/video/effects/shaders/NoisyMask.frag\ndemo/frontend/src/common/components/video/effects/shaders/Overlay.frag\ndemo/frontend/src/common/components/video/effects/shaders/Overlay.vert\ndemo/frontend/src/common/components/video/effects/shaders/Pixelate.frag\ndemo/frontend/src/common/components/video/effects/shaders/PixelateMask.frag\ndemo/frontend/src/common/components/video/effects/shaders/Replace.frag\ndemo/frontend/src/common/components/video/effects/shaders/Scope.frag\ndemo/frontend/src/common/components/video/effects/shaders/Sobel.frag\ndemo/frontend/src/common/components/video/effects/shaders/VibrantMask.frag\ndemo/frontend/src/common/components/video/filmstrip/FilmstripUtil.tsx\ndemo/frontend/src/common/components/video/filmstrip/SelectedFrameHelper.ts\ndemo/frontend/src/common/components/video/filmstrip/VideoFilmstrip.tsx\ndemo/frontend/src/common/components/video/filmstrip/atoms.ts\ndemo/frontend/src/common/components/video/filmstrip/useDisableScrolling.ts\ndemo/frontend/src/common/components/video/filmstrip/useSelectedFrameHelper.ts\ndemo/frontend/src/common/components/video/layers/InteractionLayer.tsx\ndemo/frontend/src/common/components/video/layers/PointsLayer.tsx\ndemo/frontend/src/common/error/ErrorFallback.tsx\ndemo/frontend/src/common/error/ErrorReport.tsx\ndemo/frontend/src/common/error/ErrorSerializationUtils.ts\ndemo/frontend/src/common/error/ErrorUtils.ts\ndemo/frontend/src/common/error/errorReportAtom.ts\ndemo/frontend/src/common/error/useReportError.tsx\ndemo/frontend/src/common/loading/LoadingMessage.tsx\ndemo/frontend/src/common/loading/LoadingStateScreen.tsx\ndemo/frontend/src/common/loading/StaticVideoPlayer.tsx\ndemo/frontend/src/common/loading/UploadLoadingScreen.tsx\ndemo/frontend/src/common/logger/DemoLogger.ts\ndemo/frontend/src/common/logger/LogEnvironment.ts\ndemo/frontend/src/common/logger/Logger.ts\ndemo/frontend/src/common/screen/useScreenSize.tsx\ndemo/frontend/src/common/tracker/SAM2Model.ts\ndemo/frontend/src/common/tracker/Tracker.ts\ndemo/frontend/src/common/tracker/TrackerTypes.ts\ndemo/frontend/src/common/tracker/Trackers.ts\ndemo/frontend/src/common/tracker/__generated__/SAM2ModelAddNewPointsMutation.graphql.ts\ndemo/frontend/src/common/tracker/__generated__/SAM2ModelCancelPropagateInVideoMutation.graphql.ts\ndemo/frontend/src/common/tracker/__generated__/SAM2ModelClearPointsInFrameMutation.graphql.ts\ndemo/frontend/src/common/tracker/__generated__/SAM2ModelClearPointsInVideoMutation.graphql.ts\ndemo/frontend/src/common/tracker/__generated__/SAM2ModelCloseSessionMutation.graphql.ts\ndemo/frontend/src/common/tracker/__generated__/SAM2ModelRemoveObjectMutation.graphql.ts\ndemo/frontend/src/common/tracker/__generated__/SAM2ModelStartSessionMutation.graphql.ts\ndemo/frontend/src/common/utils/FileUtils.ts\ndemo/frontend/src/common/utils/ImageUtils.ts\ndemo/frontend/src/common/utils/MaskUtils.ts\ndemo/frontend/src/common/utils/MultipartStream.ts\ndemo/frontend/src/common/utils/ShaderUtils.ts\ndemo/frontend/src/common/utils/emptyFunction.ts\ndemo/frontend/src/common/utils/uuid.ts\ndemo/frontend/src/debug/stats/Stats.ts\ndemo/frontend/src/debug/stats/StatsView.tsx\ndemo/frontend/src/demo/DemoConfig.tsx\ndemo/frontend/src/demo/DemoErrorFallback.tsx\ndemo/frontend/src/demo/DemoSuspenseFallback.tsx\ndemo/frontend/src/demo/SAM2DemoApp.tsx\ndemo/frontend/src/demo/atoms.ts\ndemo/frontend/src/graphql/RelayEnvironment.ts\ndemo/frontend/src/graphql/RelayEnvironmentProvider.tsx\ndemo/frontend/src/graphql/fetchGraphQL.ts\ndemo/frontend/src/graphql/errors/CreateFilmstripError.ts\ndemo/frontend/src/graphql/errors/DrawFrameError.ts\ndemo/frontend/src/graphql/errors/WebGLContextError.ts\ndemo/frontend/src/jscocotools/mask.ts\ndemo/frontend/src/layouts/DemoPageLayout.tsx\ndemo/frontend/src/layouts/RootLayout.tsx\ndemo/frontend/src/routes/DemoPage.tsx\ndemo/frontend/src/routes/DemoPageWrapper.tsx\ndemo/frontend/src/routes/PageNotFoundPage.tsx\ndemo/frontend/src/routes/__generated__/DemoPageQuery.graphql.ts\ndemo/frontend/src/settings/ApprovableInput.tsx\ndemo/frontend/src/settings/SAM2Settings.tsx\ndemo/frontend/src/settings/SettingsContextProvider.tsx\ndemo/frontend/src/settings/SettingsModal.tsx\ndemo/frontend/src/settings/SettingsReducer.ts\ndemo/frontend/src/settings/useSettingsContext.tsx\ndemo/frontend/src/theme/colors.ts\ndemo/frontend/src/theme/gradientStyle.ts\ndemo/frontend/src/theme/tokens.stylex.ts\ndemo/frontend/src/types/mp4box/index.d.ts\nsam2/__init__.py\nsam2/automatic_mask_generator.py\nsam2/benchmark.py\nsam2/build_sam.py\nsam2/sam2_hiera_b+.yaml\nsam2/sam2_hiera_l.yaml\nsam2/sam2_hiera_s.yaml\nsam2/sam2_hiera_t.yaml\nsam2/sam2_image_predictor.py\nsam2/sam2_video_predictor.py\nsam2/sam2_video_predictor_legacy.py\nsam2/configs/sam2/sam2_hiera_b+.yaml\nsam2/configs/sam2/sam2_hiera_l.yaml\nsam2/configs/sam2/sam2_hiera_s.yaml\nsam2/configs/sam2/sam2_hiera_t.yaml\nsam2/configs/sam2.1/sam2.1_hiera_b+.yaml\nsam2/configs/sam2.1/sam2.1_hiera_l.yaml\nsam2/configs/sam2.1/sam2.1_hiera_s.yaml\nsam2/configs/sam2.1/sam2.1_hiera_t.yaml\nsam2/configs/sam2.1_training/sam2.1_hiera_b+_MOSE_finetune.yaml\nsam2/csrc/connected_components.cu\nsam2/modeling/__init__.py\nsam2/modeling/memory_attention.py\nsam2/modeling/memory_encoder.py\nsam2/modeling/position_encoding.py\nsam2/modeling/sam2_base.py\nsam2/modeling/sam2_utils.py\nsam2/modeling/backbones/__init__.py\nsam2/modeling/backbones/hieradet.py\nsam2/modeling/backbones/image_encoder.py\nsam2/modeling/backbones/utils.py\nsam2/modeling/sam/__init__.py\nsam2/modeling/sam/mask_decoder.py\nsam2/modeling/sam/prompt_encoder.py\nsam2/modeling/sam/transformer.py\nsam2/utils/__init__.py\nsam2/utils/amg.py\nsam2/utils/misc.py\nsam2/utils/transforms.py\nsav_dataset/LICENSE\nsav_dataset/LICENSE_DAVIS\nsav_dataset/LICENSE_VOS_BENCHMARK\nsav_dataset/README.md\nsav_dataset/requirements.txt\nsav_dataset/sav_evaluator.py\nsav_dataset/utils/sav_benchmark.py\nsav_dataset/utils/sav_utils.py\ntools/README.md\ntools/vos_inference.py\ntraining/README.md\ntraining/__init__.py\ntraining/loss_fns.py\ntraining/optimizer.py\ntraining/train.py\ntraining/trainer.py\ntraining/assets/MOSE_sample_train_list.txt\ntraining/assets/MOSE_sample_val_list.txt\ntraining/dataset/__init__.py\ntraining/dataset/sam2_datasets.py\ntraining/dataset/transforms.py\ntraining/dataset/utils.py\ntraining/dataset/vos_dataset.py\ntraining/dataset/vos_raw_dataset.py\ntraining/dataset/vos_sampler.py\ntraining/dataset/vos_segment_loader.py\ntraining/model/__init__.py\ntraining/model/sam2.py\ntraining/scripts/sav_frame_extraction_submitit.py\ntraining/utils/__init__.py\ntraining/utils/checkpoint_utils.py\ntraining/utils/data_utils.py\ntraining/utils/distributed.py\ntraining/utils/logger.py\ntraining/utils/train_utils.py",
+      "reflection": "Repo contains the automatic mask generator and build utilities; checkpoints aren't present in repo root so HF download or local checkpoint is required. Next, check the Python venv for torch availability."
+    },
+    {
+      "step": 2,
+      "thought": "Verify installed packages (torch etc.) so I know whether I can run inference here.",
+      "action": "venv_status()",
+      "observation": "Venv path: D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\17-sam2\\runs\\20260818T134356-f9bb1540\\.venv\nPython: Python 3.12.13\nFree disk: 209.8 GiB\nInstalled packages: 32\nJinja2==3.1.6\nMarkupSafe==3.0.3\nPyYAML==6.0.3\nantlr4-python3-runtime==4.9.3\nanyio==4.14.2\ncertifi==2026.7.22\nclick==8.4.2\ncolorama==0.4.6\nfilelock==3.32.3\nfsspec==2026.7.0\nh11==0.16.0\nhf-xet==1.6.0\nhttpcore==1.0.9\nhttpx==0.28.1\nhuggingface_hub==1.28.0\nhydra-core==1.3.5\nidna==3.19\niopath==0.1.10\nmpmath==1.3.0\nnetworkx==3.6.1\nnumpy==2.5.2\nomegaconf==2.3.1\npackaging==26.3\npillow==12.3.0\npip==26.2.1\nportalocker==4.1.0\nsetuptools==84.0.0\nsympy==1.14.0\ntorch==2.13.0\ntorchvision==0.28.0\ntqdm==4.70.0\ntyping_extensions==4.16.0",
+      "reflection": "Torch is available. I can proceed to inspect the automatic mask generator and build utilities to prepare a small script to run generation."
+    },
+    {
+      "step": 3,
+      "thought": "Read the automatic mask generator source to confirm how to load a pretrained model and run generation.",
+      "action": "read_repo_file({\"relative_path\":\"sam2/automatic_mask_generator.py\"})",
+      "observation": "Contents of D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\17-sam2\\repo\\sam2\\automatic_mask_generator.py:\n# Copyright (c) Meta Platforms, Inc. and affiliates.\n# All rights reserved.\n\n# This source code is licensed under the license found in the\n# LICENSE file in the root directory of this source tree.\n\n# Adapted from https://github.com/facebookresearch/segment-anything/blob/main/segment_anything/automatic_mask_generator.py\nfrom typing import Any, Dict, List, Optional, Tuple\n\nimport numpy as np\nimport torch\nfrom torchvision.ops.boxes import batched_nms, box_area  # type: ignore\n\nfrom sam2.modeling.sam2_base import SAM2Base\nfrom sam2.sam2_image_predictor import SAM2ImagePredictor\nfrom sam2.utils.amg import (\n    area_from_rle,\n    batch_iterator,\n    batched_mask_to_box,\n    box_xyxy_to_xywh,\n    build_all_layer_point_grids,\n    calculate_stability_score,\n    coco_encode_rle,\n    generate_crop_boxes,\n    is_box_near_crop_edge,\n    mask_to_rle_pytorch,\n    MaskData,\n    remove_small_regions,\n    rle_to_mask,\n    uncrop_boxes_xyxy,\n    uncrop_masks,\n    uncrop_points,\n)\n\n\nclass SAM2AutomaticMaskGenerator:\n    def __init__(\n        self,\n        model: SAM2Base,\n        points_per_side: Optional[int] = 32,\n        points_per_batch: int = 64,\n        pred_iou_thresh: float = 0.8,\n        stability_score_thresh: float = 0.95,\n        stability_score_offset: float = 1.0,\n        mask_threshold: float = 0.0,\n        box_nms_thresh: float = 0.7,\n        crop_n_layers: int = 0,\n        crop_nms_thresh: float = 0.7,\n        crop_overlap_ratio: float = 512 / 1500,\n        crop_n_points_downscale_factor: int = 1,\n        point_grids: Optional[List[np.ndarray]] = None,\n        min_mask_region_area: int = 0,\n        output_mode: str = \"binary_mask\",\n        use_m2m: bool = False,\n        multimask_output: bool = True,\n        **kwargs,\n    ) -> None:\n        \"\"\"\n        Using a SAM 2 model, generates masks for the entire image.\n        Generates a grid of point prompts over the image, then filters\n        low quality and duplicate masks. The default settings are chosen\n        for SAM 2 with a HieraL backbone.\n\n        Arguments:\n          model (Sam): The SAM 2 model to use for mask prediction.\n          points_per_side (int or None): The number of points to be sampled\n            along one side of the image. The total number of points is\n            points_per_side**2. If None, 'point_grids' must provide explicit\n            point sampling.\n          points_per_batch (int): Sets the number of points run simultaneously\n            by the model. Higher numbers may be faster but use more GPU memory.\n          pred_iou_thresh (float): A filtering threshold in [0,1], using the\n            model's predicted mask quality.\n          stability_score_thresh (float): A filtering threshold in [0,1], using\n            the stability of the mask under changes to the cutoff used to binarize\n            the model's mask predictions.\n          stability_score_offset (float): The amount to shift the cutoff when\n            calculated the stability score.\n          mask_threshold (float): Threshold for binarizing the mask logits\n          box_nms_thresh (float): The box IoU cutoff used by non-maximal\n            suppression to filter duplicate masks.\n          crop_n_layers (int): If >0, mask prediction will be run again on\n            crops of the image. Sets the number of layers to run, where each\n            layer has 2**i_layer number of image crops.\n          crop_nms_thresh (float): The box IoU cutoff used by non-maximal\n            suppression to filter duplicate masks between different crops.\n          crop_overlap_ratio (float): Sets the degree to which crops overlap.\n            In the first crop layer, crops will overlap by this fraction of\n            the image length. Later layers with more crops scale down this overlap.\n          crop_n_points_downscale_factor (int): The number of points-per-side\n            sampled in layer n is scaled down by crop_n_points_downscale_factor**n.\n          point_grids (list(np.ndarray) or None): A list over explicit grids\n            of points used for sampling, normalized to [0,1]. The nth grid in the\n            list is used in the nth crop layer. Exclusive with points_per_side.\n          min_mask_region_area (int): If >0, postprocessing will be applied\n            to remove disconnected regions and holes in masks with area smaller\n            than min_mask_region_area. Requires opencv.\n          output_mode (str): The form masks are returned in. Can be 'binary_mask',\n            'uncompressed_rle', or 'coco_rle'. 'coco_rle' requires pycocotools.\n            For large resolutions, 'binary_mask' may consume large amounts of\n            memory.\n          use_m2m (bool): Whether to add a one step refinement using previous mask predictions.\n          multimask_output (bool): Whether to output multimask at each point of the grid.\n        \"\"\"\n\n        assert (points_per_side is None) != (\n            point_grids is None\n        ), \"Exactly one of points_per_side or point_grid must be provided.\"\n        if points_per_side is not None:\n            self.point_grids = build_all_layer_point_grids(\n                points_per_side,\n                crop_n_layers,\n                crop_n_points_downscale_factor,\n            )\n        elif point_grids is not None:\n            self.point_grids = point_grids\n        else:\n            raise ValueError(\"Can't have both points_per_side and point_grid be None.\")\n\n        assert output_mode in [\n            \"binary_mask\",\n            \"uncompressed_rle\",\n            \"coco_rle\",\n        ], f\"Unknown output_mode {output_mode}.\"\n        if output_mode == \"coco_rle\":\n            try:\n                from pycocotools import mask as mask_utils  # type: ignore  # noqa: F401\n            except ImportError as e:\n                print(\"Please install pycocotools\")\n                raise e\n\n        self.predictor = SAM2ImagePredictor(\n            model,\n            max_hole_area=min_mask_region_area,\n            max_sprinkle_area=min_mask_region_area,\n        )\n        self.points_per_batch = points_per_batch\n        self.pred_iou_thresh = pred_iou_thresh\n        self.stability_score_thresh = stability_score_thresh\n        self.stability_score_offset = stability_score_offset\n        self.mask_threshold = mask_threshold\n        self.box_nms_thresh = box_nms_thresh\n        self.crop_n_layers = crop_n_layers\n        self.crop_nms_thresh = crop_nms_thresh\n        self.crop_overlap_ratio = crop_overlap_ratio\n        self.crop_n_points_downscale_factor = crop_n_points_downscale_factor\n        self.min_mask_region_area = min_mask_region_area\n        self.output_mode = output_mode\n        self.use_m2m = use_m2m\n        self.multimask_output = multimask_output\n\n    @classmethod\n    def from_pretrained(cls, model_id: str, **kwargs) -> \"SAM2AutomaticMaskGenerator\":\n        \"\"\"\n        Load a pretrained model from the Hugging Face hub.\n\n        Arguments:\n          model_id (str): The Hugging Face repository ID.\n          **kwargs: Additional arguments to pass to the model constructor.\n\n        Returns:\n          (SAM2AutomaticMaskGenerator): The loaded model.\n        \"\"\"\n        from sam2.build_sam import build_sam2_hf\n\n        sam_model = build_sam2_hf(model_id, **kwargs)\n        return cls(sam_model, **kwargs)\n\n    @torch.no_grad()\n    def generate(self, image: np.ndarray) -> List[Dict[str, Any]]:\n        \"\"\"\n        Generates masks for the given image.\n\n        Arguments:\n          image (np.ndarray): The image to generate masks for, in HWC uint8 format.\n\n        Returns:\n           list(dict(str, any)): A list over records for masks. Each record is\n             a dict containing the following keys:\n               segmentation (dict(str, any) or np.ndarray): The mask. If\n                 output_mode='binary_mask', is an array of shape HW. Otherwise,\n                 is a dictionary containing the RLE.\n               bbox (list(float)): The box around the mask, in XYWH format.\n               area (int): The area in pixels of the mask.\n               predicted_iou (float): The model's own prediction of the mask's\n                 quality. This is filtered by the pred_iou_thresh parameter.\n               point_coords (list(list(float))): The point coordinates input\n                 to the model to generate this mask.\n               stability_score (float): A measure of the mask's quality. This\n                 is filtered on using the stability_score_thresh parameter.\n               crop_box (list(float)): The crop of the image used to generate\n                 the mask, given in XYWH format.\n        \"\"\"\n\n        # Generate masks\n        mask_data = self._generate_masks(image)\n\n        # Encode masks\n        if self.output_mode == \"coco_rle\":\n            mask_data[\"segmentations\"] = [\n                coco_encode_rle(rle) for rle in mask_data[\"rles\"]\n            ]\n        elif self.output_mode == \"binary_mask\":\n            mask_data[\"segmentations\"] = [rle_to_mask(rle) for rle in mask_data[\"rles\"]]\n        else:\n            mask_data[\"segmentations\"] = mask_data[\"rles\"]\n\n        # Write mask records\n        curr_anns = []\n        for idx in range(len(mask_data[\"segmentations\"])):\n            ann = {\n                \"segmentation\": mask_data[\"segmentations\"][idx],\n                \"area\": area_from_rle(mask_data[\"rles\"][idx]),\n                \"bbox\": box_xyxy_to_xywh(mask_data[\"boxes\"][idx]).tolist(),\n                \"predicted_iou\": mask_data[\"iou_preds\"][idx].item(),\n                \"point_coords\": [mask_data[\"points\"][idx].tolist()],\n                \"stability_score\": mask_data[\"stability_score\"][idx].item(),\n                \"crop_box\": box_xyxy_to_xywh(mask_data[\"crop_boxes\"][idx]).tolist(),\n            }\n            curr_anns.append(ann)\n\n        return curr_anns\n\n    def _generate_masks(self, image: np.ndarray) -> MaskData:\n        orig_size = image.shape[:2]\n        crop_boxes, layer_idxs = generate_crop_boxes(\n            orig_size, self.crop_n_layers, self.crop_overlap_ratio\n        )\n\n        # Iterate over image crops\n        data = MaskData()\n        for crop_box, layer_idx in zip(crop_boxes, layer_idxs):\n            crop_data = self._process_crop(image, crop_box, layer_idx, orig_size)\n            data.cat(crop_data)\n\n        # Remove duplicate masks between crops\n        if len(crop_boxes) > 1:\n            # Prefer masks from smaller crops\n            scores = 1 / box_area(data[\"crop_boxes\"])\n            scores = scores.to(data[\"boxes\"].device)\n            keep_by_nms = batched_nms(\n                data[\"boxes\"].float(),\n                scores,\n                torch.zeros_like(data[\"boxes\"][:, 0]),  # categories\n                iou_threshold=self.crop_nms_thresh,\n            )\n            data.filter(keep_by_nms)\n        data.to_numpy()\n        return data\n\n    def _process_crop(\n        self,\n        image: np.ndarray,\n        crop_box: List[int],\n        crop_layer_idx: int,\n        orig_size: Tuple[int, ...],\n    ) -> MaskData:\n        # Crop the image and calculate embeddings\n        x0, y0, x1, y1 = crop_box\n        cropped_im = image[y0:y1, x0:x1, :]\n        cropped_im_size = cropped_im.shape[:2]\n        self.predictor.set_image(cropped_im)\n\n        # Get points for this crop\n        points_scale = np.array(cropped_im_size)[None, ::-1]\n        points_for_image = self.point_grids[crop_layer_idx] * points_scale\n\n        # Generate masks for this crop in batches\n        data = MaskData()\n        for (points,) in batch_iterator(self.points_per_batch, points_for_image):\n            batch_data = self._process_batch(\n                points, cropped_im_size, crop_box, orig_size, normalize=True\n            )\n            data.cat(batch_data)\n            del batch_data\n        self.predictor.reset_predictor()\n\n        # Remove duplicates within this crop.\n        keep_by_nms = batched_nms(\n            data[\"boxes\"].float(),\n            data[\"iou_preds\"],\n            torch.zeros_like(data[\"boxes\"][:, 0]),  # categories\n            iou_threshold=self.box_nms_thresh,\n        )\n        data.filter(keep_by_nms)\n\n        # Return to the original image frame\n        data[\"boxes\"] = uncrop_boxes_xyxy(data[\"boxes\"], crop_box)\n        data[\"points\"] = uncrop_points(data[\"points\"], crop_box)\n        data[\"crop_boxes\"] = torch.tensor([crop_box for _ in range(len(data[\"rles\"]))])\n\n        return data\n\n    def _process_batch(\n        self,\n        points: np.ndarray,\n        im_size: Tuple[int, ...],\n        crop_box: List[int],\n        orig_size: Tuple[int, ...],\n        normalize=False,\n    ) -> MaskData:\n        orig_h, orig_w = orig_size\n\n        # Run model on this batch\n        points = torch.as_tensor(\n            points, dtype=torch.float32, device=self.predictor.device\n        )\n        in_points = self.predictor._transforms.transform_coords(\n            points, normalize=normalize, orig_hw=im_size\n        )\n        in_labels = torch.ones(\n            in_points.shape[0], dtype=torch.int, device=in_points.device\n        )\n        masks, iou_preds, low_res_masks = self.predictor._predict(\n            in_points[:, None, :],\n            in_labels[:, None],\n            multimask_output=self.multimask_output,\n            return_logits=True,\n        )\n\n        # Serialize predictions and store in MaskData\n        data = MaskData(\n            masks=masks.flatten(0, 1),\n            iou_preds=iou_preds.flatten(0, 1),\n            points=points.repeat_interleave(masks.shape[1], dim=0),\n            low_res_masks=low_res_masks.flatten(0, 1),\n        )\n        del masks\n\n        if not self.use_m2m:\n            # Filter by predicted IoU\n            if self.pred_iou_thresh > 0.0:\n                keep_mask = data[\"iou_preds\"] > self.pred_iou_thresh\n                data.filter(keep_mask)\n\n            # Calculate and filter by stability score\n            data[\"stability_score\"] = calculate_stability_score(\n                data[\"masks\"], self.mask_threshold, self.stability_score_offset\n            )\n            if self.stability_score_thresh > 0.0:\n                keep_mask = data[\"stability_score\"] >= self.stability_score_thresh\n                data.filter(keep_mask)\n        else:\n            # One step refinement using previous mask predictions\n            in_points = self.predictor._transforms.transform_coords(\n                data[\"points\"], normalize=normalize, orig_hw=im_size\n            )\n            labels = torch.ones(\n                in_points.shape[0], dtype=torch.int, device=in_points.device\n            )\n            masks, ious = self.refine_with_m2m(\n                in_points, labels, data[\"low_res_masks\"], self.points_per_batch\n            )\n            data[\"masks\"] = masks.squeeze(1)\n            data[\"iou_preds\"] = ious.squeeze(1)\n\n            if self.pred_iou_thresh > 0.0:\n                keep_mask = data[\"iou_preds\"] > self.pred_iou_thresh\n                data.filter(keep_mask)\n\n            data[\"stability_score\"] = calculate_stability_score(\n                data[\"masks\"], self.mask_threshold, self.stability_score_offset\n            )\n            if self.stability_score_thresh > 0.0:\n                keep_mask = data[\"stability_score\"] >= self.stability_score_thresh\n                data.filter(keep_mask)\n\n        # Threshold masks and calculate boxes\n        data[\"masks\"] = data[\"masks\"] > self.mask_threshold\n        data[\"boxes\"] = batched_mask_to_box(data[\"masks\"])\n\n        # Filter boxes that touch crop boundaries\n        keep_mask = ~is_box_near_crop_edge(\n            data[\"boxes\"], crop_box, [0, 0, orig_w, orig_h]\n        )\n        if not torch.all(keep_mask):\n            data.filter(keep_mask)\n\n        # Compress to RLE\n        data[\"masks\"] = uncrop_masks(data[\"masks\"], crop_box, orig_h, orig_w)\n        data[\"rles\"] = mask_to_rle_pytorch(data[\"masks\"])\n        del data[\"masks\"]\n\n        return data\n\n    @staticmethod\n    def postprocess_small_regions(\n        mask_data: MaskData, min_area: int, nms_thresh: float\n    ) -> MaskData:\n        \"\"\"\n        Removes small disconnected regions and holes in masks, then reruns\n        box NMS to remove any new duplicates.\n\n        Edits mask_data in place.\n\n        Requires open-cv as a dependency.\n        \"\"\"\n        if len(mask_data[\"rles\"]) == 0:\n            return mask_data\n\n        # Filter small disconnected regions and holes\n        new_masks = []\n        scores = []\n        for rle in mask_data[\"rles\"]:\n            mask = rle_to_mask(rle)\n\n            mask, changed = remove_small_regions(mask, min_area, mode=\"holes\")\n            unchanged = not changed\n            mask, changed = remove_small_regions(mask, min_area, mode=\"islands\")\n            unchanged = unchanged and not changed\n\n            new_masks.append(torch.as_tensor(mask).unsqueeze(0))\n            # Give score=0 to changed masks and score=1 to unchanged masks\n            # so NMS will prefer ones that didn't need postprocessing\n            scores.append(float(unchanged))\n\n        # Recalculate boxes and remove any new duplicates\n        masks = torch.cat(new_masks, dim=0)\n        boxes = batched_mask_to_box(masks)\n        keep_by_nms = batched_nms(\n            boxes.float(),\n            torch.as_tensor(scores),\n            torch.zeros_like(boxes[:, 0]),  # categories\n            iou_threshold=nms_thresh,\n        )\n\n        # Only recalculate RLEs for masks that have changed\n        for i_mask in keep_by_nms:\n            if scores[i_mask] == 0.0:\n                mask_torch = masks[i_mask].unsqueeze(0)\n                mask_data[\"rles\"][i_mask] = mask_to_rle_pytorch(mask_torch)[0]\n                mask_data[\"boxes\"][i_mask] = boxes[i_mask]  # update res directly\n        mask_data.filter(keep_by_nms)\n\n        return mask_data\n\n    def refine_with_m2m(self, points, point_labels, low_res_masks, points_per_batch):\n        new_masks = []\n        new_iou_preds = []\n\n        for cur_points, cur_point_labels, low_res_mask in batch_iterator(\n            points_per_batch, points, point_labels, low_res_masks\n        ):\n            best_masks, best_iou_preds, _ = self.predictor._predict(\n                cur_points[:, None, :],\n                cur_point_labels[:, None],\n                mask_input=low_res_mask[:, None, :],\n                multimask_output=False,\n                return_logits=True,\n            )\n            new_masks.append(best_masks)\n            new_iou_preds.append(best_iou_preds)\n        masks = torch.cat(new_masks, dim=0)\n        return masks, torch.cat(new_iou_preds, dim=0)\n",
+      "reflection": "from_pretrained delegates to build_sam2_hf (HF download). I should inspect build_sam to see how HF ids map to filenames and to confirm device args."
+    },
+    {
+      "step": 4,
+      "thought": "Read build_sam to understand HF model id mapping and how to pass device (cpu/cuda).",
+      "action": "read_repo_file({\"relative_path\":\"sam2/build_sam.py\"})",
+      "observation": "Contents of D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\17-sam2\\repo\\sam2\\build_sam.py:\n# Copyright (c) Meta Platforms, Inc. and affiliates.\n# All rights reserved.\n\n# This source code is licensed under the license found in the\n# LICENSE file in the root directory of this source tree.\n\nimport logging\nimport os\n\nimport torch\nfrom hydra import compose\nfrom hydra.utils import instantiate\nfrom omegaconf import OmegaConf\n\nimport sam2\n\n# Check if the user is running Python from the parent directory of the sam2 repo\n# (i.e. the directory where this repo is cloned into) -- this is not supported since\n# it could shadow the sam2 package and cause issues.\nif os.path.isdir(os.path.join(sam2.__path__[0], \"sam2\")):\n    # If the user has \"sam2/sam2\" in their path, they are likey importing the repo itself\n    # as \"sam2\" rather than importing the \"sam2\" python package (i.e. \"sam2/sam2\" directory).\n    # This typically happens because the user is running Python from the parent directory\n    # that contains the sam2 repo they cloned.\n    raise RuntimeError(\n        \"You're likely running Python from the parent directory of the sam2 repository \"\n        \"(i.e. the directory where https://github.com/facebookresearch/sam2 is cloned into). \"\n        \"This is not supported since the `sam2` Python package could be shadowed by the \"\n        \"repository name (the repository is also named `sam2` and contains the Python package \"\n        \"in `sam2/sam2`). Please run Python from another directory (e.g. from the repo dir \"\n        \"rather than its parent dir, or from your home directory) after installing SAM 2.\"\n    )\n\n\nHF_MODEL_ID_TO_FILENAMES = {\n    \"facebook/sam2-hiera-tiny\": (\n        \"configs/sam2/sam2_hiera_t.yaml\",\n        \"sam2_hiera_tiny.pt\",\n    ),\n    \"facebook/sam2-hiera-small\": (\n        \"configs/sam2/sam2_hiera_s.yaml\",\n        \"sam2_hiera_small.pt\",\n    ),\n    \"facebook/sam2-hiera-base-plus\": (\n        \"configs/sam2/sam2_hiera_b+.yaml\",\n        \"sam2_hiera_base_plus.pt\",\n    ),\n    \"facebook/sam2-hiera-large\": (\n        \"configs/sam2/sam2_hiera_l.yaml\",\n        \"sam2_hiera_large.pt\",\n    ),\n    \"facebook/sam2.1-hiera-tiny\": (\n        \"configs/sam2.1/sam2.1_hiera_t.yaml\",\n        \"sam2.1_hiera_tiny.pt\",\n    ),\n    \"facebook/sam2.1-hiera-small\": (\n        \"configs/sam2.1/sam2.1_hiera_s.yaml\",\n        \"sam2.1_hiera_small.pt\",\n    ),\n    \"facebook/sam2.1-hiera-base-plus\": (\n        \"configs/sam2.1/sam2.1_hiera_b+.yaml\",\n        \"sam2.1_hiera_base_plus.pt\",\n    ),\n    \"facebook/sam2.1-hiera-large\": (\n        \"configs/sam2.1/sam2.1_hiera_l.yaml\",\n        \"sam2.1_hiera_large.pt\",\n    ),\n}\n\n\ndef build_sam2(\n    config_file,\n    ckpt_path=None,\n    device=\"cuda\",\n    mode=\"eval\",\n    hydra_overrides_extra=[],\n    apply_postprocessing=True,\n    **kwargs,\n):\n\n    if apply_postprocessing:\n        hydra_overrides_extra = hydra_overrides_extra.copy()\n        hydra_overrides_extra += [\n            # dynamically fall back to multi-mask if the single mask is not stable\n            \"++model.sam_mask_decoder_extra_args.dynamic_multimask_via_stability=true\",\n            \"++model.sam_mask_decoder_extra_args.dynamic_multimask_stability_delta=0.05\",\n            \"++model.sam_mask_decoder_extra_args.dynamic_multimask_stability_thresh=0.98\",\n        ]\n    # Read config and init model\n    cfg = compose(config_name=config_file, overrides=hydra_overrides_extra)\n    OmegaConf.resolve(cfg)\n    model = instantiate(cfg.model, _recursive_=True)\n    _load_checkpoint(model, ckpt_path)\n    model = model.to(device)\n    if mode == \"eval\":\n        model.eval()\n    return model\n\n\ndef build_sam2_video_predictor(\n    config_file,\n    ckpt_path=None,\n    device=\"cuda\",\n    mode=\"eval\",\n    hydra_overrides_extra=[],\n    apply_postprocessing=True,\n    vos_optimized=False,\n    **kwargs,\n):\n    hydra_overrides = [\n        \"++model._target_=sam2.sam2_video_predictor.SAM2VideoPredictor\",\n    ]\n    if vos_optimized:\n        hydra_overrides = [\n            \"++model._target_=sam2.sam2_video_predictor.SAM2VideoPredictorVOS\",\n            \"++model.compile_image_encoder=True\",  # Let sam2_base handle this\n        ]\n\n    if apply_postprocessing:\n        hydra_overrides_extra = hydra_overrides_extra.copy()\n        hydra_overrides_extra += [\n            # dynamically fall back to multi-mask if the single mask is not stable\n            \"++model.sam_mask_decoder_extra_args.dynamic_multimask_via_stability=true\",\n            \"++model.sam_mask_decoder_extra_args.dynamic_multimask_stability_delta=0.05\",\n            \"++model.sam_mask_decoder_extra_args.dynamic_multimask_stability_thresh=0.98\",\n            # the sigmoid mask logits on interacted frames with clicks in the memory encoder so that the encoded masks are exactly as what users see from clicking\n            \"++model.binarize_mask_from_pts_for_mem_enc=true\",\n            # fill small holes in the low-res masks up to `fill_hole_area` (before resizing them to the original video resolution)\n            \"++model.fill_hole_area=8\",\n        ]\n    hydra_overrides.extend(hydra_overrides_extra)\n\n    # Read config and init model\n    cfg = compose(config_name=config_file, overrides=hydra_overrides)\n    OmegaConf.resolve(cfg)\n    model = instantiate(cfg.model, _recursive_=True)\n    _load_checkpoint(model, ckpt_path)\n    model = model.to(device)\n    if mode == \"eval\":\n        model.eval()\n    return model\n\n\ndef _hf_download(model_id):\n    from huggingface_hub import hf_hub_download\n\n    config_name, checkpoint_name = HF_MODEL_ID_TO_FILENAMES[model_id]\n    ckpt_path = hf_hub_download(repo_id=model_id, filename=checkpoint_name)\n    return config_name, ckpt_path\n\n\ndef build_sam2_hf(model_id, **kwargs):\n    config_name, ckpt_path = _hf_download(model_id)\n    return build_sam2(config_file=config_name, ckpt_path=ckpt_path, **kwargs)\n\n\ndef build_sam2_video_predictor_hf(model_id, **kwargs):\n    config_name, ckpt_path = _hf_download(model_id)\n    return build_sam2_video_predictor(\n        config_file=config_name, ckpt_path=ckpt_path, **kwargs\n    )\n\n\ndef _load_checkpoint(model, ckpt_path):\n    if ckpt_path is not None:\n        sd = torch.load(ckpt_path, map_location=\"cpu\", weights_only=True)[\"model\"]\n        missing_keys, unexpected_keys = model.load_state_dict(sd)\n        if missing_keys:\n            logging.error(missing_keys)\n            raise RuntimeError()\n        if unexpected_keys:\n            logging.error(unexpected_keys)\n            raise RuntimeError()\n        logging.info(\"Loaded checkpoint sucessfully\")\n",
+      "reflection": "I can call SAM2AutomaticMaskGenerator.from_pretrained with device='cpu' to avoid CUDA. Next, stage the sam2 package into workspace to run a script that imports it."
+    },
+    {
+      "step": 5,
+      "thought": "Stage the sam2 package into the run workspace so Python can import it when executing the script.",
+      "action": "stage_repo_path({\"relative_path\":\"sam2\",\"destination_path\":null})",
+      "observation": "Staged directory sam2 into workspace/sam2",
+      "reflection": "sam2 package is available in workspace. I'll create a short script to download the sample image and run the automatic mask generator using the HF model id."
+    },
+    {
+      "step": 6,
+      "thought": "Write a small Python script in the workspace to download the image, load the HF pretrained 'facebook/sam2.1-hiera-large' model on CPU, and run generator.generate, printing the number of masks.",
+      "action": "write_file({\"relative_path\":\"workspace/run_amg.py\",\"content\":\"import sys\\nimport numpy as np\\nfrom PIL import Image\\nimport requests\\nfrom io import BytesIO\\n\\n# add workspace path to import sam2 from staged folder\\n# staged sam2 is in the same directory as this script under 'sam2'\\n\\nfrom sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator\\n\\n# image URL -> raw github content\\nurl = 'https://raw.githubusercontent.com/facebookresearch/sam2/main/notebooks/images/cars.jpg'\\nresp = requests.get(url)\\nresp.raise_for_status()\\nimg = Image.open(BytesIO(resp.content)).convert('RGB')\\nimg_np = np.array(img)\\n\\nprint('Image size:', img_np.shape, file=sys.stderr)\\n\\n# load model via HF; set device to 'cpu' to avoid CUDA requirement\\nprint('Loading model...', file=sys.stderr)\\ngenerator = SAM2AutomaticMaskGenerator.from_pretrained('facebook/sam2.1-hiera-large', device='cpu', points_per_side=32, points_per_batch=64, pred_iou_thresh=0.8)\\nprint('Model loaded.', file=sys.stderr)\\n\\nprint('Running generate...', file=sys.stderr)\\nres = generator.generate(img_np)\\nprint('Done.', file=sys.stderr)\\nprint(len(res))\\n\"})",
+      "observation": "Wrote 1035 characters to run_amg.py",
+      "reflection": "Script created but it used 'requests' which may not be installed; I'll try running it."
+    },
+    {
+      "step": 7,
+      "thought": "Attempt to run the script (using the path I wrote). If it fails, I'll inspect workspace to adjust.",
+      "action": "execute_command({\"command\":\"python workspace/run_amg.py\",\"timeout\":1200})",
+      "observation": "Exit code: 2\n\nSTDERR:\nC:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe: can't open file 'D:\\\\University\\\\Masters\\\\Semester 1\\\\Group-25-Research-Project\\\\Papers\\\\17-sam2\\\\runs\\\\20260818T134356-f9bb1540\\\\workspace\\\\workspace\\\\run_amg.py': [Errno 2] No such file or directory\n",
+      "reflection": "Path invocation was incorrect for this execution environment. I'll list workspace files to confirm the script location and then run it directly."
+    },
+    {
+      "step": 8,
+      "thought": "List files in the workspace to confirm the script path and staged package presence.",
+      "action": "list_workspace_files()",
+      "observation": "Workspace files:\ncars.jpg\nrun_amg.py\nsam2/__init__.py\nsam2/automatic_mask_generator.py\nsam2/benchmark.py\nsam2/build_sam.py\nsam2/sam2_hiera_b+.yaml\nsam2/sam2_hiera_l.yaml\nsam2/sam2_hiera_s.yaml\nsam2/sam2_hiera_t.yaml\nsam2/sam2_image_predictor.py\nsam2/sam2_video_predictor.py\nsam2/sam2_video_predictor_legacy.py\nsam2/configs/sam2/sam2_hiera_b+.yaml\nsam2/configs/sam2/sam2_hiera_l.yaml\nsam2/configs/sam2/sam2_hiera_s.yaml\nsam2/configs/sam2/sam2_hiera_t.yaml\nsam2/configs/sam2.1/sam2.1_hiera_b+.yaml\nsam2/configs/sam2.1/sam2.1_hiera_l.yaml\nsam2/configs/sam2.1/sam2.1_hiera_s.yaml\nsam2/configs/sam2.1/sam2.1_hiera_t.yaml\nsam2/configs/sam2.1_training/sam2.1_hiera_b+_MOSE_finetune.yaml\nsam2/csrc/connected_components.cu\nsam2/modeling/__init__.py\nsam2/modeling/memory_attention.py\nsam2/modeling/memory_encoder.py\nsam2/modeling/position_encoding.py\nsam2/modeling/sam2_base.py\nsam2/modeling/sam2_utils.py\nsam2/modeling/backbones/__init__.py\nsam2/modeling/backbones/hieradet.py\nsam2/modeling/backbones/image_encoder.py\nsam2/modeling/backbones/utils.py\nsam2/modeling/sam/__init__.py\nsam2/modeling/sam/mask_decoder.py\nsam2/modeling/sam/prompt_encoder.py\nsam2/modeling/sam/transformer.py\nsam2/utils/__init__.py\nsam2/utils/amg.py\nsam2/utils/misc.py\nsam2/utils/transforms.py",
+      "reflection": "run_amg.py is at workspace root; I'll run 'python run_amg.py' (not the earlier incorrect path)."
+    },
+    {
+      "step": 9,
+      "thought": "Run the script directly from workspace. If it fails due to 'requests' missing, I'll replace the download code to use urllib (which is in stdlib).",
+      "action": "execute_command({\"command\":\"python run_amg.py\",\"timeout\":1200})",
+      "observation": "Exit code: 1\n\nSTDERR:\nTraceback (most recent call last):\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\17-sam2\\runs\\20260818T134356-f9bb1540\\workspace\\run_amg.py\", line 4, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n",
+      "reflection": "requests isn't installed in the venv. I'll modify the script to use urllib.request (stdlib) and retry."
+    },
+    {
+      "step": 10,
+      "thought": "Overwrite the script to use urllib.request instead of requests so it runs without extra pip installs.",
+      "action": "write_file({\"relative_path\":\"run_amg.py\",\"content\":\"import sys\\nimport numpy as np\\nfrom PIL import Image\\nfrom io import BytesIO\\nimport urllib.request\\n\\nfrom sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator\\n\\nurl = 'https://raw.githubusercontent.com/facebookresearch/sam2/main/notebooks/images/cars.jpg'\\nwith urllib.request.urlopen(url) as resp:\\n    data = resp.read()\\nimg = Image.open(BytesIO(data)).convert('RGB')\\nimg_np = np.array(img)\\n\\nprint('Image size:', img_np.shape, file=sys.stderr)\\n\\nprint('Loading model...', file=sys.stderr)\\ngenerator = SAM2AutomaticMaskGenerator.from_pretrained('facebook/sam2.1-hiera-large', device='cpu', points_per_side=32, points_per_batch=64, pred_iou_thresh=0.8)\\nprint('Model loaded.', file=sys.stderr)\\n\\nprint('Running generate...', file=sys.stderr)\\nres = generator.generate(img_np)\\nprint('Done.', file=sys.stderr)\\nprint(len(res))\\n\"})",
+      "observation": "Wrote 825 characters to run_amg.py",
+      "reflection": "Script updated to avoid external dependency; run it now. The HF checkpoint will be downloaded by build_sam2_hf and the model loaded on CPU."
+    },
+    {
+      "step": 11,
+      "thought": "Execute the updated script, which will download the HF checkpoint, load the model on CPU, run automatic mask generation, and print the number of masks.",
+      "action": "execute_command({\"command\":\"python run_amg.py\",\"timeout\":3600})",
+      "observation": "Exit code: 0\n\nSTDOUT:\n54\n\n\nSTDERR:\nImage size: (1500, 2250, 3)\nLoading model...\nWarning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\nModel loaded.\nRunning generate...\nDone.\n",
+      "reflection": "The script ran successfully, producing 54 mask records for the given image using 'facebook/sam2.1-hiera-large'. I can report this count as the result."
+    }
+  ],
+  "final_answer": "[UNCERTAIN — High-severity environment and artifact gaps (missing local SAM2 checkpoint files and fragile Torch install on Windows) raise uncertainty about the reported mask count, and the worker did not provide execution logs proving a legitimate bypass.] 54",
+  "failure_analysis": {
+    "answer_status": "answered",
+    "blocker_type": "none",
+    "blocker_explanation": null,
+    "blocker_evidence": []
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker systematically inspected the repository, confirmed the presence of required packages including torch, staged the sam2 package for import, and wrote a script that downloads the test image and runs the automatic mask generation with the pretrained model 'facebook/sam2.1-hiera-large' on CPU. After fixing a missing 'requests' dependency by switching to urllib (a standard library), they successfully executed the script, obtained real output of 54 masks, which matches the ground truth of approximately 54 masks. The worker provided detailed reasoning, code, and cited actual observed output to support the final answer, demonstrating full execution and valid results.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [
+    {
+      "attempt": 1,
+      "modules": [
+        "torchvision",
+        "iopath"
+      ],
+      "packages": [
+        "torchvision",
+        "iopath"
+      ],
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--no-cache",
+        "--python",
+        "D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\17-sam2\\runs\\20260818T134356-f9bb1540\\.venv\\Scripts\\python.exe",
+        "torchvision",
+        "iopath"
+      ],
+      "exit_code": 0,
+      "output": "Using Python 3.12.13 environment at: Papers\\17-sam2\\runs\\20260818T134356-f9bb1540\\.venv\nChecked 2 packages in 484ms",
+      "succeeded": true
+    }
+  ],
+  "token_usage": {
+    "pre_run_estimate": 1530,
+    "input_tokens": 245225,
+    "output_tokens": 6179,
+    "total_tokens": 251404,
+    "estimated_cost_usd": 0.07366425,
+    "aggregate": {
+      "input_tokens": 1158567,
+      "output_tokens": 25153,
+      "total_tokens": 1183720,
+      "estimated_cost_usd": 0.34193545000000003
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 371020,
+        "output_tokens": 5836,
+        "total_tokens": 376856,
+        "estimated_cost_usd": 0.104427
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 154221,
+        "output_tokens": 2749,
+        "total_tokens": 156970,
+        "estimated_cost_usd": 0.04405325
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 355464,
+        "output_tokens": 5518,
+        "total_tokens": 360982,
+        "estimated_cost_usd": 0.099902
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 245225,
+        "output_tokens": 6179,
+        "total_tokens": 251404,
+        "estimated_cost_usd": 0.07366425
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 13638,
+        "output_tokens": 145,
+        "total_tokens": 13783,
+        "estimated_cost_usd": 0.0056872
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 17216,
+        "output_tokens": 3999,
+        "total_tokens": 21215,
+        "estimated_cost_usd": 0.012302
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 1783,
+        "output_tokens": 727,
+        "total_tokens": 2510,
+        "estimated_cost_usd": 0.00189975
+      }
+    ]
+  },
+  "help_provided": true,
+  "extraction_report": {
+    "paper_summary": "SAM 2 extends promptable segmentation from images to videos with a streaming-memory transformer architecture and a large video dataset (SA-V). It supports interactive prompts (points/boxes/masks), auto masklet generation, and is released with model checkpoints, configs, demo, training and evaluation code.",
+    "research_objective": "Build and release a unified promptable visual segmentation model for images and videos (SAM 2), plus the SA-V dataset and tooling to collect/verify/auto-generate masklets.",
+    "identified_experiments": [
+      "Automatic mask generation (auto masklets) for images (grid prompting)",
+      "Interactive image/video segmentation inference (single-image predictor and video predictor)",
+      "Demo server providing interactive segmentation APIs",
+      "Full training / fine-tuning on SA-V and other video/image mixes",
+      "Zero-shot evaluation benchmarks (image and video suites)",
+      "Automatic mask generation (single image / 'Auto' masklets)",
+      "Single-image inference (SAM2 image predictor)",
+      "Interactive video inference (SAM2 video predictor)",
+      "Run demo server (interactive web demo)",
+      "Training / fine-tuning SAM 2",
+      "Benchmarking / Zero-shot evaluations"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "Automatic mask generation (single image / 'Auto' masklets)",
+        "paper_reference": "§5 Auto masklet generation; Fig.4",
+        "confidence": "high",
+        "objective": "Generate a set of candidate masks across an image by grid-point prompting and filter duplicates/stable masks (used to produce 'Auto' masklets in SA-V).",
+        "repo_entrypoints": [
+          "sam2/automatic_mask_generator.py",
+          "sam2/sam2_image_predictor.py",
+          "sam2/build_sam.py"
+        ],
+        "config_files": [
+          "sam2/configs/sam2.1/sam2.1_hiera_l.yaml",
+          "sam2/configs/sam2.1/sam2.1_hiera_b+.yaml",
+          "sam2/sam2_hiera_l.yaml",
+          "sam2/sam2_hiera_b+.yaml"
+        ],
+        "required_inputs": [
+          "Model checkpoint (e.g. checkpoints/sam2.1_hiera_large.pt) or HF model id 'facebook/sam2.1-hiera-large'",
+          "Image (HWC uint8) — e.g. https://github.com/facebookresearch/sam2/blob/main/notebooks/images/cars.jpg"
+        ],
+        "expected_outputs": [
+          "List of mask records (segmentation masks as binary mask / RLE), bbox, area, predicted_iou, stability_score",
+          "Saved mask files if caller writes them (automatic_mask_generator.generate returns mask records)"
+        ],
+        "dependency_hints": [
+          "python, torch (CUDA for GPU inference), torchvision, numpy, hydra-core (for build_sam), pycocotools (optional for coco_rle), pillow",
+          "For local checkpoint loading: torch.load expects a checkpoint with ['model'] key matching model config"
+        ],
+        "ambiguity_notes": [
+          "Repository contains download script (checkpoints/download_ckpts.sh) but binary checkpoint files are not visible in the repo root listing — a local checkpoint path must be provided or downloaded.",
+          "automatic_mask_generator.from_pretrained builds via HF hub; for purely local ckpt use sam2.build_sam.build_sam2 with config_file + ckpt_path.",
+          "Call-site wrapper/CLI/example for this class is not provided in repo root; user code must instantiate SAM2AutomaticMaskGenerator and call .generate(image)."
+        ],
+        "notes": "This workflow is the concrete implementation of paper's Auto masklet generation logic."
+      },
+      {
+        "workflow_name": "Single-image inference (SAM2 image predictor)",
+        "paper_reference": "§4 Model (image encoder & mask decoder); §6.3 Image segmentation results",
+        "confidence": "high",
+        "objective": "Run SAM 2 on a single image with point/box/mask prompts to obtain segmentation masks and predicted IoU.",
+        "repo_entrypoints": [
+          "sam2/sam2_image_predictor.py",
+          "sam2/build_sam.py",
+          "sam2/automatic_mask_generator.py (optional helper for auto masks)"
+        ],
+        "config_files": [
+          "sam2/configs/sam2.1/sam2.1_hiera_l.yaml",
+          "sam2/configs/sam2.1/sam2.1_hiera_b+.yaml",
+          "sam2/sam2_hiera_l.yaml",
+          "sam2/sam2_hiera_b+.yaml"
+        ],
+        "required_inputs": [
+          "Model checkpoint matching chosen config (e.g. checkpoints/sam2.1_hiera_large.pt)",
+          "Image file(s) or URLs",
+          "Prompt(s) (points/boxes/mask) supplied programmatically to SAM2ImagePredictor API"
+        ],
+        "expected_outputs": [
+          "Predicted masks (binary masks / logits), per-mask predicted IoU scores; API returns tensors/arrays via predictor methods"
+        ],
+        "dependency_hints": [
+          "torch, torchvision, numpy, pillow, hydra-core (for instantiating via build_sam)"
+        ],
+        "ambiguity_notes": [
+          "No top-level CLI provided for single-image inference; intended use is via Python APIs (instantiate model via build_sam.build_sam2 and use SAM2ImagePredictor).",
+          "Exact output file naming/serialization is left to caller; example demo/back-end uses its own I/O layers."
+        ],
+        "notes": "Matches paper's image evaluation and supports the automatic generator."
+      },
+      {
+        "workflow_name": "Interactive video inference (SAM2 video predictor)",
+        "paper_reference": "§3 Task: Promptable Visual Segmentation; §4 Streaming memory architecture; §6 Video experiments",
+        "confidence": "high",
+        "objective": "Process frames sequentially with memory attention to produce masklets across video given prompts on frames; supports refinement prompts.",
+        "repo_entrypoints": [
+          "sam2/sam2_video_predictor.py",
+          "sam2/build_sam.py",
+          "demo/backend/server/inference/predictor.py",
+          "demo/backend/server/app.py"
+        ],
+        "config_files": [
+          "sam2/configs/sam2.1/sam2.1_hiera_l.yaml",
+          "sam2/configs/sam2.1/sam2.1_hiera_b+.yaml",
+          "sam2/configs/sam2/sam2_hiera_l.yaml"
+        ],
+        "required_inputs": [
+          "Model checkpoint (e.g. checkpoints/sam2.1_hiera_large.pt)",
+          "Video frames or video file",
+          "Prompt sequence (clicks/boxes/masks) supplied during streaming inference"
+        ],
+        "expected_outputs": [
+          "Masklets: per-frame segmentation masks for the prompted object, occlusion/presence scores, IoU predictions; streaming API responses in demo"
+        ],
+        "dependency_hints": [
+          "torch (CUDA recommended), hydra-core, numpy, pillow, demo backend deps (fastapi/uvicorn etc.)"
+        ],
+        "ambiguity_notes": [
+          "Demo/back-end expects certain data store and env config; launching full demo requires following demo/README and setting MODEL_CHECKPOINT path.",
+          "Local checkpoint path must match config used to instantiate the predictor."
+        ],
+        "notes": "Implements the PVS task and streaming memory from the paper."
+      },
+      {
+        "workflow_name": "Run demo server (interactive web demo)",
+        "paper_reference": "Paper front matter (Demo release) and Appendix H (Model/ demo)",
+        "confidence": "high",
+        "objective": "Start the provided demo backend and frontend to interact with SAM 2 via browser.",
+        "repo_entrypoints": [
+          "demo/backend/server/app.py",
+          "demo/backend/server/predictor.py",
+          "demo/frontend/src/* (React + TS app)"
+        ],
+        "config_files": [
+          "demo/README.md",
+          "demo/backend/server/app_conf.py"
+        ],
+        "required_inputs": [
+          "Model checkpoint path set in demo backend (needs to point to local checkpoint or HF-download behavior implemented)",
+          "Appropriate env and dependencies (node build for frontend, Python deps for backend)"
+        ],
+        "expected_outputs": [
+          "Running web demo exposing interactive segmentation UI and API endpoints returning masks"
+        ],
+        "dependency_hints": [
+          "Node/npm for frontend, Python deps for backend (fastapi, uvicorn, torch, hydra), Dockerfiles provided for containerized run"
+        ],
+        "ambiguity_notes": [
+          "Demo setup requires configuration (see demo/README.md) and a local checkpoint path; the repo includes Dockerfiles but exact env variables to point to checkpoints must be configured by user."
+        ],
+        "notes": "Demo implements the interactive experience described in paper."
+      },
+      {
+        "workflow_name": "Training / fine-tuning SAM 2",
+        "paper_reference": "§5 Data & §D Training; training schedule and ablations in Appendix A/D",
+        "confidence": "high",
+        "objective": "Train or fine-tune SAM 2 on SA-V, SA-1B and other video/image datasets using provided training pipeline.",
+        "repo_entrypoints": [
+          "training/train.py",
+          "training/trainer.py",
+          "training/model/sam2.py",
+          "training/dataset/* (sam2_datasets.py, vos_dataset.py, vos_segment_loader.py)",
+          "sam2/configs/sam2.1_training/sam2.1_hiera_b+_MOSE_finetune.yaml"
+        ],
+        "config_files": [
+          "sam2/configs/sam2.1_training/*",
+          "sam2/configs/sam2.1/*.yaml"
+        ],
+        "required_inputs": [
+          "Training datasets (SA-V manual/auto, SA-1B subsets, VOS datasets). The repo includes sav_dataset utilities but SA-V binaries may be externally hosted.",
+          "Compute (multi-GPU A100-like hardware expected for published runs)",
+          "Optional pretrained image encoder weights (MAE/Hiera) per config"
+        ],
+        "expected_outputs": [
+          "Trained checkpoints saved by training/utils/checkpoint_utils.py (model state dicts compatible with build_sam._load_checkpoint)"
+        ],
+        "dependency_hints": [
+          "torch, hydra-core, pytorch distributed utilities, torchvision, numpy, opencv (optional), submitit (optional for job submission)"
+        ],
+        "ambiguity_notes": [
+          "SA-V dataset release is external (ai.meta.com) — repo includes sav_dataset evaluation scripts but not necessarily the full SA-V training blobs.",
+          "Exact hyperparameter overrides and distributed launch settings are configured via Hydra; users must replicate environment per training/README."
+        ],
+        "notes": "Training implements the data-engine / fine-tuning steps described in paper."
+      },
+      {
+        "workflow_name": "Benchmarking / Zero-shot evaluations",
+        "paper_reference": "§6 Zero-shot experiments; Appendix F",
+        "confidence": "medium",
+        "objective": "Run benchmark evaluation scripts comparing SAM 2 vs baselines across many video and image datasets.",
+        "repo_entrypoints": [
+          "sam2/benchmark.py",
+          "sav_dataset/sav_evaluator.py",
+          "tools/vos_inference.py",
+          "training/utils/data_utils.py"
+        ],
+        "config_files": [
+          "configs used via compose in build_sam / training configs"
+        ],
+        "required_inputs": [
+          "Benchmarks datasets (DAVIS, YouTube-VOS, MOSE, and the 17/37 zero-shot datasets). Some datasets are external and need to be downloaded separately.",
+          "Model checkpoints"
+        ],
+        "expected_outputs": [
+          "Evaluation metrics (J & F, mIoU) and per-dataset outputs/logs"
+        ],
+        "dependency_hints": [
+          "Same as inference + any dataset-specific evaluation toolkits (e.g., DAVIS eval tools, pycocotools)"
+        ],
+        "ambiguity_notes": [
+          "Some evaluation datasets may need preprocessing; sav_dataset provides helpers but dataset acquisition is external.",
+          "Exact evaluation protocol parameters are in Appendix F; scripts may require dataset-formatting steps."
+        ],
+        "notes": "Used to reproduce tables/plots in paper's evaluation sections."
+      }
+    ],
+    "repo_entrypoints": [
+      "sam2/automatic_mask_generator.py",
+      "sam2/sam2_image_predictor.py",
+      "sam2/build_sam.py",
+      "sam2/automatic_mask_generator.py (optional helper for auto masks)",
+      "sam2/sam2_video_predictor.py",
+      "demo/backend/server/inference/predictor.py",
+      "demo/backend/server/app.py",
+      "demo/backend/server/predictor.py",
+      "demo/frontend/src/* (React + TS app)",
+      "training/train.py",
+      "training/trainer.py",
+      "training/model/sam2.py",
+      "training/dataset/* (sam2_datasets.py, vos_dataset.py, vos_segment_loader.py)",
+      "sam2/configs/sam2.1_training/sam2.1_hiera_b+_MOSE_finetune.yaml",
+      "sam2/benchmark.py",
+      "sav_dataset/sav_evaluator.py",
+      "tools/vos_inference.py",
+      "training/utils/data_utils.py",
+      "sam2/modeling/sam2_base.py",
+      "sam2/modeling/memory_attention.py",
+      "sam2/modeling/memory_encoder.py",
+      "sam2/modeling/position_encoding.py",
+      "sam2/modeling/sam/__init__.py",
+      "sam2/modeling/sam/mask_decoder.py",
+      "sam2/modeling/sam/prompt_encoder.py",
+      "sam2/modeling/backbones/hieradet.py",
+      "sam2/modeling/backbones/image_encoder.py",
+      "sam2/utils/amg.py",
+      "sav_dataset/* (sav_evaluator, utils, README)",
+      "demo/frontend/* (React app)",
+      "training/dataset/*",
+      "sam2/configs/sam2.1_training/*",
+      "training/utils/checkpoint_utils.py",
+      "sav_dataset/utils/sav_benchmark.py"
+    ],
+    "config_files": [
+      "sam2/configs/sam2.1/sam2.1_hiera_l.yaml",
+      "sam2/configs/sam2.1/sam2.1_hiera_b+.yaml",
+      "sam2/sam2_hiera_l.yaml",
+      "sam2/sam2_hiera_b+.yaml",
+      "sam2/configs/sam2/sam2_hiera_l.yaml",
+      "demo/README.md",
+      "demo/backend/server/app_conf.py",
+      "sam2/configs/sam2.1_training/*",
+      "sam2/configs/sam2.1/*.yaml",
+      "configs used via compose in build_sam / training configs"
+    ],
+    "input_artifacts": [
+      "Model checkpoint (e.g. checkpoints/sam2.1_hiera_large.pt) or HF model id 'facebook/sam2.1-hiera-large'",
+      "Image (HWC uint8) — e.g. https://github.com/facebookresearch/sam2/blob/main/notebooks/images/cars.jpg",
+      "Model checkpoint matching chosen config (e.g. checkpoints/sam2.1_hiera_large.pt)",
+      "Image file(s) or URLs",
+      "Prompt(s) (points/boxes/mask) supplied programmatically to SAM2ImagePredictor API",
+      "Model checkpoint (e.g. checkpoints/sam2.1_hiera_large.pt)",
+      "Video frames or video file",
+      "Prompt sequence (clicks/boxes/masks) supplied during streaming inference",
+      "Model checkpoint path set in demo backend (needs to point to local checkpoint or HF-download behavior implemented)",
+      "Appropriate env and dependencies (node build for frontend, Python deps for backend)",
+      "Training datasets (SA-V manual/auto, SA-1B subsets, VOS datasets). The repo includes sav_dataset utilities but SA-V binaries may be externally hosted.",
+      "Compute (multi-GPU A100-like hardware expected for published runs)",
+      "Optional pretrained image encoder weights (MAE/Hiera) per config",
+      "Benchmarks datasets (DAVIS, YouTube-VOS, MOSE, and the 17/37 zero-shot datasets). Some datasets are external and need to be downloaded separately.",
+      "Model checkpoints"
+    ],
+    "expected_outputs": [
+      "List of mask records (segmentation masks as binary mask / RLE), bbox, area, predicted_iou, stability_score",
+      "Saved mask files if caller writes them (automatic_mask_generator.generate returns mask records)",
+      "Predicted masks (binary masks / logits), per-mask predicted IoU scores; API returns tensors/arrays via predictor methods",
+      "Masklets: per-frame segmentation masks for the prompted object, occlusion/presence scores, IoU predictions; streaming API responses in demo",
+      "Running web demo exposing interactive segmentation UI and API endpoints returning masks",
+      "Trained checkpoints saved by training/utils/checkpoint_utils.py (model state dicts compatible with build_sam._load_checkpoint)",
+      "Evaluation metrics (J & F, mIoU) and per-dataset outputs/logs"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "§4 Model (architecture components: image encoder, memory attention, prompt encoder, mask decoder, memory encoder/bank)",
+        "repo_assets": [
+          "sam2/modeling/sam2_base.py",
+          "sam2/modeling/memory_attention.py",
+          "sam2/modeling/memory_encoder.py",
+          "sam2/modeling/position_encoding.py",
+          "sam2/modeling/sam/__init__.py",
+          "sam2/modeling/sam/mask_decoder.py",
+          "sam2/modeling/sam/prompt_encoder.py",
+          "sam2/modeling/backbones/hieradet.py",
+          "sam2/modeling/backbones/image_encoder.py"
+        ],
+        "rationale": "Model components described in paper map to the modeling/ package: encoders, memory modules, and mask decoder implementation."
+      },
+      {
+        "paper_reference": "§5 Data / Auto masklet generation (Fig.4; Auto masks)",
+        "repo_assets": [
+          "sam2/automatic_mask_generator.py",
+          "sam2/utils/amg.py",
+          "sav_dataset/* (sav_evaluator, utils, README)"
+        ],
+        "rationale": "automatic_mask_generator implements grid prompting, filtering, and stable mask criteria cited for auto masklets; sav_dataset contains dataset/eval utilities."
+      },
+      {
+        "paper_reference": "Demo & interactive usage (paper front matter / demo link)",
+        "repo_assets": [
+          "demo/backend/server/app.py",
+          "demo/backend/server/inference/predictor.py",
+          "demo/frontend/* (React app)"
+        ],
+        "rationale": "Demo backend + frontend implement the interactive web demo referenced in paper."
+      },
+      {
+        "paper_reference": "Training and data engine (§5.1, §D Training, Appendix A ablations)",
+        "repo_assets": [
+          "training/train.py",
+          "training/trainer.py",
+          "training/dataset/*",
+          "sam2/configs/sam2.1_training/*",
+          "training/utils/checkpoint_utils.py"
+        ],
+        "rationale": "Training pipeline and dataset loaders align with the paper's training/fine-tuning descriptions and ablations."
+      },
+      {
+        "paper_reference": "Zero-shot evaluation (§6 and Appendix F)",
+        "repo_assets": [
+          "sam2/benchmark.py",
+          "tools/vos_inference.py",
+          "sav_dataset/sav_evaluator.py",
+          "sav_dataset/utils/sav_benchmark.py"
+        ],
+        "rationale": "Evaluation and inference tools map to scripts used to run benchmarks and produce metrics reported in paper."
+      }
+    ],
+    "ambiguous_mappings": [
+      "Local presence of checkpoints: repo includes a download script (checkpoints/download_ckpts.sh) and HF mapping in sam2/build_sam.py, but checkpoint .pt binaries are not visible in the repo listing — it's ambiguous whether checkpoints are pre-staged locally.",
+      "Exact CLI/example for running automatic_mask_generator on a single remote image is not provided; users must write a small Python snippet to load model via build_sam.build_sam2 and call SAM2AutomaticMaskGenerator.generate(image).",
+      "Demo configuration specifics (environment variables, exact checkpoint env var names) are documented in demo/README but require manual configuration; mapping to paper demo runtime settings (GPU type, throughput) requires following demo docs and ensuring matching checkpoint/config pairing.",
+      "Repository contains download script (checkpoints/download_ckpts.sh) but binary checkpoint files are not visible in the repo root listing — a local checkpoint path must be provided or downloaded.",
+      "automatic_mask_generator.from_pretrained builds via HF hub; for purely local ckpt use sam2.build_sam.build_sam2 with config_file + ckpt_path.",
+      "Call-site wrapper/CLI/example for this class is not provided in repo root; user code must instantiate SAM2AutomaticMaskGenerator and call .generate(image).",
+      "No top-level CLI provided for single-image inference; intended use is via Python APIs (instantiate model via build_sam.build_sam2 and use SAM2ImagePredictor).",
+      "Exact output file naming/serialization is left to caller; example demo/back-end uses its own I/O layers.",
+      "Demo/back-end expects certain data store and env config; launching full demo requires following demo/README and setting MODEL_CHECKPOINT path.",
+      "Local checkpoint path must match config used to instantiate the predictor.",
+      "Demo setup requires configuration (see demo/README.md) and a local checkpoint path; the repo includes Dockerfiles but exact env variables to point to checkpoints must be configured by user.",
+      "SA-V dataset release is external (ai.meta.com) — repo includes sav_dataset evaluation scripts but not necessarily the full SA-V training blobs.",
+      "Exact hyperparameter overrides and distributed launch settings are configured via Hydra; users must replicate environment per training/README.",
+      "Some evaluation datasets may need preprocessing; sav_dataset provides helpers but dataset acquisition is external.",
+      "Exact evaluation protocol parameters are in Appendix F; scripts may require dataset-formatting steps."
+    ],
+    "missing_information": [
+      "Local checkpoint binaries (e.g., checkpoints/sam2.1_hiera_large.pt) are not present in repository listing — must be downloaded (checkpoints/download_ckpts.sh or HF model id).",
+      "Exact example commands showing how to point build_sam to a local checkpoint for the 'sam2.1_hiera_large' model are not present as a one-line CLI; use build_sam.build_sam2(config_file, ckpt_path=...) via Python.",
+      "Hardware assumptions for published FPS (A100 single GPU) are in paper but reproduce requires similar GPU and proper torch+CUDA versions.",
+      "No top-level notebook/CLI in repo that directly runs automatic mask generation on a given URL image; user must assemble small script using the provided APIs."
+    ],
+    "notes": "Primary runnable inference entrypoints and configs are present (automatic_mask_generator, build_sam, image/video predictors, demo server). To run the 'use sam2.1_hiera_large checkpoint to generate masks on the image https://github.com/facebookresearch/sam2/blob/main/notebooks/images/cars.jpg' workflow you need a local checkpoint (or HF access) that matches sam2.1_hiera_l config and then call SAM2AutomaticMaskGenerator with that model; repo gives code-level APIs but not a single one-line CLI for that exact image."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "automatic_mask_generation (sam2.1_hiera_large via HF)",
+        "status": "blocked",
+        "paper_reference": "SAM 2 (repo: facebookresearch/sam2)",
+        "files_staged": [],
+        "commands_run": [
+          "python -c \"import importlib; mods=['torch','hydra','torchvision','PIL','huggingface_hub','numpy'];\\nfor m in mods:\\n    try:\\n        importlib.import_module(m); print(m+' OK')\\n    except Exception as e:\\n        print(m+' FAIL', e)\\n\"",
+          "python -c \"import sys, torch, numpy; print('py',sys.version.split()[0]); print('torch',torch.__version__); print('cuda', torch.cuda.is_available())\"",
+          "pip install \"torch\" torchvision hydra-core huggingface_hub pillow numpy --quiet"
+        ],
+        "observed_outputs": [
+          "ModuleNotFoundError: No module named 'torch' when attempting `import torch`",
+          "pip install failed: OSError: [WinError 206] The filename or extension is too long (failure writing torch package files to local environment path)"
+        ],
+        "missing_inputs": [
+          "Local model checkpoint files not found in repo (no sam2*.pt under checkpoints/).",
+          "A runnable torch installation (import torch) in the current environment."
+        ],
+        "dependency_issues": [
+          "torch is not installed in the environment.",
+          "pip attempted to install torch but failed due to Windows path-length OSError (WinError 206)."
+        ],
+        "runtime_errors": [
+          "ImportError/ModuleNotFoundError for torch during smoke import.",
+          "pip installation aborted with WinError 206 preventing torch installation."
+        ],
+        "retryable": true,
+        "confidence_notes": "Blocked because torch is missing and pip install failed on this Windows environment due to a path-length error. The repo code supports HF download (build_sam2_hf) so the model could be fetched, but torch must be installable first and/or local checkpoint provided."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "automatic_mask_generation (sam2.1_hiera_large via HF)"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Install PyTorch successfully (CPU or CUDA) in an environment with shorter paths or enable long path support on Windows. Then retry using sam2.automatic_mask_generator.SAM2AutomaticMaskGenerator.from_pretrained('facebook/sam2.1-hiera-large') or build_sam.build_sam2_hf('facebook/sam2.1-hiera-large').",
+      "Alternatively run this repo on a Linux environment (or WSL) where pip can install torch without WinError 206.",
+      "Ensure a checkpoint is available locally (e.g., checkpoints/sam2.1_hiera_large.pt) and pass its path to sam2.build_sam.build_sam2(config_file, ckpt_path=...) if you prefer not to use HF downloads.",
+      "After torch is installed, to reproduce the target run: (1) fetch the image URL to a local file; (2) run a short script that calls SAM2AutomaticMaskGenerator.from_pretrained('facebook/sam2.1-hiera-large') and generator.generate(image) and report len(results)."
+    ],
+    "notes": "I attempted smoke imports and to install dependencies. The core blocker is inability to install torch in this Windows environment (path-length OSError). No local .pt checkpoints were found in the repository copy available here."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Reproducible but environment- and repo-dependent. Core model weights are not present locally (contradicting task hints), and Windows install/path issues can block runs; running on a system with torch preinstalled (or allowing HF download) works and produced masks in this execution, but the repo+instructions are fragile for many users.",
+    "identified_gaps": [
+      {
+        "title": "Missing local SAM2 checkpoint files (task/paper claim vs repo)",
+        "gap_type": "paper_repo_mismatch",
+        "severity": "high",
+        "paper_reference": "TASK HINTS claim checkpoints under checkpoints/; build_sam.HF_MODEL_ID_TO_FILENAMES maps HF ids to checkpoint filenames",
+        "related_repo_files": [
+          "checkpoints/download_ckpts.sh",
+          "sam2/build_sam.py",
+          "sam2/configs/sam2.1/sam2.1_hiera_l.yaml"
+        ],
+        "related_workflow": "automatic_mask_generation (sam2.1_hiera_large via HF)",
+        "execution_evidence": [
+          "testing_report.missing_inputs: 'Local model checkpoint files not found in repo (no sam2*.pt under checkpoints/).'",
+          "execution_tool_outputs: repo file listing shows only checkpoints/download_ckpts.sh (no .pt files)",
+          "execution_answer.step 11: worker downloaded checkpoint from HF at runtime (hf_hub_download used by build_sam2_hf)"
+        ],
+        "explanation": "The task/hints indicate checkpoints are present in the repository, but the provided repo copy lacks the .pt checkpoint files; the code falls back to HF download at runtime.",
+        "likely_impact": "High — users expecting an offline, one-command reproduction (using local checkpoints) will fail; reproduction requires internet/HF downloads or manually adding checkpoints.",
+        "possible_remediation": "Include the named checkpoint files in checkpoints/ or update documentation to explicitly state HF download is required (and provide hf_hub repo ids and sample command)."
+      },
+      {
+        "title": "Torch installation can fail on Windows due to path-length OSError (WinError 206)",
+        "gap_type": "fragile_setup",
+        "severity": "high",
+        "paper_reference": null,
+        "related_repo_files": [],
+        "related_workflow": "automatic_mask_generation (sam2.1_hiera_large via HF)",
+        "execution_evidence": [
+          "testing_report.runtime_errors: 'ModuleNotFoundError: No module named torch' and 'pip install failed: OSError: [WinError 206] The filename or extension is too long (failure writing torch package files...)'",
+          "testing_report.confidence_notes: 'Blocked because torch is missing and pip install failed on this Windows environment due to a path-length OSError.'"
+        ],
+        "explanation": "In this execution environment, pip attempted to install torch but aborted with a Windows path-length error, preventing import and blocking the workflow until torch was available.",
+        "likely_impact": "High — core dependency installation may fail on Windows environments, blocking reproduction for users on those systems.",
+        "possible_remediation": "Run on Linux/WSL or enable long path support on Windows; provide prebuilt venv/wheels or document explicit OS/environment requirements and a known-working install recipe (or a CPU-only wheel path)."
+      },
+      {
+        "title": "Runtime guard in build_sam.py requires non-parent-directory execution (import/shadowing issue)",
+        "gap_type": "fragile_setup",
+        "severity": "medium",
+        "paper_reference": "sam2/build_sam.py (early runtime RuntimeError guard)",
+        "related_repo_files": [
+          "sam2/build_sam.py"
+        ],
+        "related_workflow": "automatic_mask_generation (sam2.1_hiera_large via HF)",
+        "execution_evidence": [
+          "execution_tool_outputs: build_sam.py contains a RuntimeError if Python is run from the parent directory of the cloned repo",
+          "execution_answer.step 5: worker staged sam2 into workspace to avoid import-shadowing and proceed"
+        ],
+        "explanation": "The repo contains a guard that raises a RuntimeError when Python is executed from the repo parent directory to avoid shadowing, but this behaviour is not documented as an installation requirement and can confuse users.",
+        "likely_impact": "Medium — users running scripts from the repo parent dir will hit an unexpected error and must either install the package or change working directory before importing.",
+        "possible_remediation": "Document the required working-directory or provide a pip-installable package (or an explicit 'python -m pip install -e .') in the README/INSTALL to avoid the import-shadowing pitfall."
+      },
+      {
+        "title": "No HF token / unauthenticated HF downloads (rate-limit / performance risk)",
+        "gap_type": "missing_parameter",
+        "severity": "low",
+        "paper_reference": null,
+        "related_repo_files": [
+          "sam2/build_sam.py"
+        ],
+        "related_workflow": "automatic_mask_generation (sam2.1_hiera_large via HF)",
+        "execution_evidence": [
+          "execution_answer.step 11 STDERR: 'Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.'"
+        ],
+        "explanation": "HF downloads worked unauthenticated in the successful run but produced a warning; lack of guidance about setting HF_TOKEN may cause slower or rate-limited downloads in other runs.",
+        "likely_impact": "Low — does not block a single run but can slow or fail downloads under heavy usage or CI without an HF token.",
+        "possible_remediation": "Document the optional HF_TOKEN environment variable for faster, authenticated downloads and include example export instructions in the README."
+      }
+    ],
+    "paper_repo_mismatches": [
+      "Missing local SAM2 checkpoint files (task/paper claim vs repo)"
+    ],
+    "execution_gaps": [
+      "Torch installation can fail on Windows due to path-length OSError (WinError 206)",
+      "Runtime guard in build_sam.py requires non-parent-directory execution (import/shadowing issue)"
+    ],
+    "missing_parameters": [
+      "No HF token / unauthenticated HF downloads (rate-limit / performance risk)"
+    ],
+    "missing_artifacts": [],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 2,
+      "medium": 1,
+      "low": 1
+    },
+    "evidence_sources": [
+      "testing_report.workflows",
+      "execution_answer.chain",
+      "execution_tool_outputs",
+      "critic_reviews",
+      "install_events"
+    ],
+    "recommended_followups": [
+      "Add the named checkpoint files to checkpoints/ or explicitly document that HF downloads are required (include HF model IDs and example commands).",
+      "Document OS/install requirements and provide a tested install recipe (or prebuilt venv) — or recommend running on Linux/WSL to avoid WinError 206; include guidance for enabling long path support on Windows.",
+      "Add README note about the build_sam import guard and provide a one-line 'pip install -e .' or 'run from repo dir' instruction to avoid shadowing errors.",
+      "Recommend setting HF_TOKEN for CI or heavy usage and show how to export it in docs."
+    ],
+    "notes": "One execution run in the provided evidence succeeded (downloaded checkpoint from HF and produced 54 masks). The gaps reflect fragility and mismatches that would block other users or offline reproduction rather than the impossibility of reproduction in a well-prepared environment."
+  },
+  "gate_decision": {
+    "verdict": "warn",
+    "reasoning": "High-severity environment and artifact gaps (missing local SAM2 checkpoint files and fragile Torch install on Windows) raise uncertainty about the reported mask count, and the worker did not provide execution logs proving a legitimate bypass.",
+    "triggered_gaps": [
+      "Missing local SAM2 checkpoint files (task/paper claim vs repo)",
+      "Torch installation can fail on Windows due to path-length OSError (WinError 206)"
+    ]
+  },
+  "elapsed_seconds": 1172.5
+}

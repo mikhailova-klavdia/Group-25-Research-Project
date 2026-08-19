@@ -1,0 +1,351 @@
+{
+  "id": "SC_FRAMEWORK_001",
+  "team": "testing-worker-critic-readme",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.11.11.687874v1",
+  "question": "Load the AnnData object from 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad'. How many observations (cells) are in the dataset?",
+  "ground_truth": "5000",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "List all readable files to locate the repository and confirm available notebooks and data files before searching for .h5ad artifacts.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\07-SC-Framework\\repo:\n.gitattributes\n.gitconfig\n.gitignore\n.gitlab-ci.yml\n.gitmodules\nCHANGES.md\nDockerfile\nLICENSE\nMANIFEST.in\nREADME.md\npyproject.toml\nsctoolbox_env.yml\n.github/ISSUE_TEMPLATE/bug_report.yml\n.gitlab/issue_templates/bug.md\n.gitlab/merge_request_templates/new_release_template.md\natac_analysis/notebooks/01_assembling_anndata.ipynb\natac_analysis/notebooks/02_QC_filtering.ipynb\natac_analysis/notebooks/03_normalization_batch_correction.ipynb\natac_analysis/notebooks/04_clustering.ipynb\natac_analysis/notebooks/0A_tobias.ipynb\natac_analysis/notebooks/99-report.ipynb\natac_analysis/notebooks/config.yaml\natac_analysis/notebooks/test_data/10k_PBMCs_merged_barcodes.tsv\natac_analysis/notebooks/test_data/hg38.blacklist.v2.bed\natac_analysis/notebooks/test_data/references/10k_pbmc_ATACv1p1_nextgem_Chromium_X_summary.json\natac_analysis/notebooks/test_data/references/10k_pbmc_ATACv2_nextgem_Chromium_Controller_summary.json\natac_analysis/notebooks/test_data/references/process_testdata.ipynb\ndocs/Makefile\ndocs/make.bat\ndocs/required_packages.txt\ndocs/source/CHANGES.md\ndocs/source/build_api.py\ndocs/source/cite.rst\ndocs/source/conf.py\ndocs/source/development.rst\ndocs/source/faq.rst\ndocs/source/guidance.rst\ndocs/source/how_to_start.rst\ndocs/source/index.rst\ndocs/source/introduction.rst\ndocs/source/notebooks.rst\ndocs/source/plot_pre_code.py\ndocs/source/utils_pre_code.py\ndocs/source/API/_settings.rst\ndocs/source/API/index.rst\ndocs/source/atac-notebooks/index.rst\ndocs/source/general-notebooks/index.rst\ndocs/source/rna-notebooks/index.rst\ndocs/source/tutorials/index.rst\ndocs/source/tutorials/Multiome_Analysis/Tutorial_00.ipynb\ndocs/source/tutorials/Multiome_Analysis/Tutorial_multi.ipynb\ndocs/source/tutorials/Multiome_Analysis/index.rst\ndocs/source/tutorials/scATAC-seq_Analysis/index.rst\ndocs/source/tutorials/scRNA-seq_Analysis/index.rst\ndocs/source/tutorials/scRNA-seq_Analysis/Advanced_Analysis/Tutorial_annotation.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Advanced_Analysis/Tutorial_ligand_receptor.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Advanced_Analysis/Tutorial_marker.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Advanced_Analysis/Tutorial_proportion.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Advanced_Analysis/index.rst\ndocs/source/tutorials/scRNA-seq_Analysis/Core_Analysis/Tutorial_00.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Core_Analysis/Tutorial_01.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Core_Analysis/Tutorial_02.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Core_Analysis/Tutorial_03.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Core_Analysis/Tutorial_04.ipynb\ndocs/source/tutorials/scRNA-seq_Analysis/Core_Analysis/index.rst\ndocs/source/_static/css/custom.css\ndocs/source/_static/js/custom.js\ndocs/source/_templates/module.rst_t\ngeneral_notebooks/GSEA.ipynb\ngeneral_notebooks/Palantir.ipynb\ngeneral_notebooks/annotation.ipynb\ngeneral_notebooks/group_markers.ipynb\ngeneral_notebooks/multiomics.ipynb\ngeneral_notebooks/prepare_for_cellxgene.ipynb\ngeneral_notebooks/proportion_analysis.ipynb\ngeneral_notebooks/pseudotime_analysis.ipynb\nrna_analysis/notebooks/01_assembling_anndata.ipynb\nrna_analysis/notebooks/02_QC_filtering.ipynb\nrna_analysis/notebooks/03_normalization_batch_correction.ipynb\nrna_analysis/notebooks/04_clustering.ipynb\nrna_analysis/notebooks/0A1_ligand_receptor.ipynb\nrna_analysis/notebooks/0A2_ligand_receptor_hub_genes.ipynb\nrna_analysis/notebooks/0B_velocity_analysis.ipynb\nrna_analysis/notebooks/0C_PILOT_trajectory.ipynb\nrna_analysis/notebooks/99-report.ipynb\nrna_analysis/notebooks/config.yaml\nscripts/change_notebook_version.py\nscripts/check_changes.py\nscripts/check_notebook_version.py\nscripts/check_notebooks.py\nscripts/collect_changes.py\nscripts/run_coverage.sh\nscripts/run_notebooks.py\nsrc/sctoolbox/__init__.py\nsrc/sctoolbox/_modules.py\nsrc/sctoolbox/_settings.py\nsrc/sctoolbox/_version.py\nsrc/sctoolbox/data/SCSA_custom.py\nsrc/sctoolbox/data/celltype_markers/setup_markers.ipynb\nsrc/sctoolbox/data/gene_lists/create_marker_gene_lists.ipynb\nsrc/sctoolbox/data/gene_lists/human_apoptosis_genes.txt\nsrc/sctoolbox/data/gene_lists/human_cellcycle_genes.txt\nsrc/sctoolbox/data/gene_lists/human_gender_genes.txt\nsrc/sctoolbox/data/gene_lists/human_mito_genes.txt\nsrc/sctoolbox/data/gene_lists/mouse_apoptosis_genes.txt\nsrc/sctoolbox/data/gene_lists/mouse_cellcycle_genes.txt\nsrc/sctoolbox/data/gene_lists/mouse_gender_genes.txt\nsrc/sctoolbox/data/gene_lists/mouse_mito_genes.txt\nsrc/sctoolbox/data/gene_lists/rat_cellcycle_genes.txt\nsrc/sctoolbox/data/gene_lists/rat_gender_genes.txt\nsrc/sctoolbox/data/gene_lists/rat_mito_genes.txt\nsrc/sctoolbox/data/gene_lists/zebrafish_cellcycle_genes.txt\nsrc/sctoolbox/data/gene_lists/zebrafish_mito_genes.txt\nsrc/sctoolbox/data/method_templates/ATAC-methods.md\nsrc/sctoolbox/data/method_templates/RNA-methods.md\nsrc/sctoolbox/plotting/__init__.py\nsrc/sctoolbox/plotting/clustering.py\nsrc/sctoolbox/plotting/embedding.py\nsrc/sctoolbox/plotting/general.py\nsrc/sctoolbox/plotting/genometracks.py\nsrc/sctoolbox/plotting/gsea.py\nsrc/sctoolbox/plotting/highly_variable.py\nsrc/sctoolbox/plotting/marker_genes.py\nsrc/sctoolbox/plotting/multiomics.py\nsrc/sctoolbox/plotting/planet_plot.py\nsrc/sctoolbox/plotting/qc_filter.py\nsrc/sctoolbox/plotting/velocity.py\nsrc/sctoolbox/tools/__init__.py\nsrc/sctoolbox/tools/amulet.py\nsrc/sctoolbox/tools/bam.py\nsrc/sctoolbox/tools/calc_overlap_fc.py\nsrc/sctoolbox/tools/celltype_annotation.py\nsrc/sctoolbox/tools/clustering.py\nsrc/sctoolbox/tools/dim_reduction.py\nsrc/sctoolbox/tools/download_data.py\nsrc/sctoolbox/tools/embedding.py\nsrc/sctoolbox/tools/frip.py\nsrc/sctoolbox/tools/gene_correlation.py\nsrc/sctoolbox/tools/gsea.py\nsrc/sctoolbox/tools/highly_variable.py\nsrc/sctoolbox/tools/insertsize.py\nsrc/sctoolbox/tools/marker_genes.py\nsrc/sctoolbox/tools/multiomics.py\nsrc/sctoolbox/tools/norm_correct.py\nsrc/sctoolbox/tools/palantir_analysis.py\nsrc/sctoolbox/tools/peak_annotation.py\nsrc/sctoolbox/tools/qc_filter.py\nsrc/sctoolbox/tools/receptor_ligand.py\nsrc/sctoolbox/tools/report.py\nsrc/sctoolbox/tools/tobias.py\nsrc/sctoolbox/tools/tsse.py\nsrc/sctoolbox/utils/__init__.py\nsrc/sctoolbox/utils/adata.py\nsrc/sctoolbox/utils/assemblers.py\nsrc/sctoolbox/utils/bioutils.py\nsrc/sctoolbox/utils/checker.py\nsrc/sctoolbox/utils/cli.py\nsrc/sctoolbox/utils/creators.py\nsrc/sctoolbox/utils/decorator.py\nsrc/sctoolbox/utils/general.py\nsrc/sctoolbox/utils/io.py\nsrc/sctoolbox/utils/jupyter.py\nsrc/sctoolbox/utils/multiprocessing.py\nsrc/sctoolbox/utils/tables.py\nsrc/SC_Framework.egg-info/PKG-INFO\nsrc/SC_Framework.egg-info/SOURCES.txt\nsrc/SC_Framework.egg-info/dependency_links.txt\nsrc/SC_Framework.egg-info/entry_points.txt\nsrc/SC_Framework.egg-info/requires.txt\nsrc/SC_Framework.egg-info/top_level.txt\ntests/__init__.py\ntests/test_settings.py\ntests/data/cellxgene_anno.csv\ntests/data/genes.gtf\ntests/data/test_config.yaml\ntests/data/test_config_nokey.yaml\ntests/data/test_score_genes.txt\ntests/data/atac/cropped_testing.narrowPeak\ntests/data/atac/hg38.blacklist.v2.bed\ntests/data/atac/hg38.blacklist.v2_sorted.bed\ntests/data/atac/mm10_atac_fragments.bed\ntests/data/atac/mm10_sorted_fragments.bed\ntests/data/atac/mm10_tss.bed\ntests/data/atac/nucleosomal_score.csv\ntests/data/atac/gtf_testdata/cropped_corrupted_format_gencode.v41.gtf\ntests/data/atac/gtf_testdata/cropped_gencode.v41.gff3\ntests/data/atac/gtf_testdata/cropped_gencode.v41.gtf\ntests/data/atac/gtf_testdata/cropped_gencode.v41.unsorted.gtf\ntests/data/atac/gtf_testdata/cropped_missing_column_gencode.v41.gtf\ntests/data/quant/Ctrl-1/solo/Gene/Features.stats\ntests/data/quant/Ctrl-1/solo/Gene/Summary.csv\ntests/data/quant/Ctrl-1/solo/Gene/UMIperCellSorted.txt\ntests/data/quant/Ctrl-2/solo/Gene/Features.stats\ntests/data/quant/Ctrl-2/solo/Gene/Summary.csv\ntests/data/quant/Ctrl-2/solo/Gene/UMIperCellSorted.txt\ntests/data/quant/KO-1/solo/Gene/Features.stats\ntests/data/quant/KO-1/solo/Gene/Summary.csv\ntests/data/quant/KO-1/solo/Gene/UMIperCellSorted.txt\ntests/data/quant/KO-2/solo/Gene/Features.stats\ntests/data/quant/KO-2/solo/Gene/Summary.csv\ntests/data/quant/KO-2/solo/Gene/UMIperCellSorted.txt\ntests/data/solo/Gene/filtered/barcodes.tsv\ntests/data/solo/Gene/filtered/genes.tsv\ntests/data/solo/Gene/filtered/matrix.mtx\ntests/data/solo/Velocyto/filtered/ambiguous.mtx\ntests/data/solo/Velocyto/filtered/barcodes.tsv\ntests/data/solo/Velocyto/filtered/genes.tsv\ntests/data/solo/Velocyto/filtered/spliced.mtx\ntests/data/solo/Velocyto/filtered/unspliced.mtx\ntests/data/tracks/links.arcs\ntests/data/tracks/tad_classification.bed\ntests/data/tracks/vhighlight.bed\ntests/data/tracks/vlines.bed\ntests/plotting/__init__.py\ntests/plotting/test_clustering.py\ntests/plotting/test_embedding_pl.py\ntests/plotting/test_general.py\ntests/plotting/test_genometracks.py\ntests/plotting/test_gsea_plotting.py\ntests/plotting/test_highly_variable.py\ntests/plotting/test_marker_genes.py\ntests/plotting/test_multiomics.py\ntests/plotting/test_planet_plot.py\ntests/plotting/test_qc_filter.py\ntests/plotting/test_velocity.py\ntests/tools/__init__.py\ntests/tools/test_amulet.py\ntests/tools/test_bam.py\ntests/tools/test_calc_overlap_fc.py\ntests/tools/test_celltype_annotation.py\ntests/tools/test_clustering.py\ntests/tools/test_dim_reduction.py\ntests/tools/test_download_data.py\ntests/tools/test_embedding_tl.py\ntests/tools/test_frip.py\ntests/tools/test_gene_correlation.py\ntests/tools/test_gsea.py\ntests/tools/test_highly_variable.py\ntests/tools/test_insertsize.py\ntests/tools/test_marker_genes.py\ntests/tools/test_multiomics.py\ntests/tools/test_norm_correct.py\ntests/tools/test_peak_annotation.py\ntests/tools/test_qc_filter.py\ntests/tools/test_receptor_ligand.py\ntests/tools/test_tobias.py\ntests/tools/test_tsse.py\ntests/utils/__init__.py\ntests/utils/test_adata.py\ntests/utils/test_assemblers.py\ntests/utils/test_bioutils.py\ntests/utils/test_checker.py\ntests/utils/test_creators.py\ntests/utils/test_decorator.py\ntests/utils/test_general.py\ntests/utils/test_io.py\ntests/utils/test_jupyter.py\ntests/utils/test_tables.py",
+      "reflection": "Repo listed successfully; next search specifically for .h5ad artifacts to find the target AnnData file."
+    },
+    {
+      "step": 2,
+      "thought": "Find all .h5ad files to locate the exact path of the adata_rna.h5ad mentioned in the task.",
+      "action": "find_repo_files({\"pattern\":\".h5ad\",\"include_binary\":true})",
+      "observation": "Filename results for '.h5ad' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\07-SC-Framework\\repo:\natac_analysis/notebooks/test_data/10k_PBMCs_merged_adata.h5ad [artifact, 19.1 MB]\nrna_analysis/notebooks/test_data/adata_rna.h5ad [artifact, 26.3 MB]\nrna_analysis/notebooks/test_data/vdata_rna.h5ad [artifact, 22.1 MB]\ntests/data/adata.h5ad [artifact, 268.5 KB]\ntests/data/atac/anndata_2.h5ad [artifact, 21.4 MB]\ntests/data/atac/homo_sapiens_liver.h5ad [artifact, 4.0 MB]\ntests/data/atac/mm10_atac.h5ad [artifact, 1.3 MB]\ntests/data/atac/mm10_atac_named_var.h5ad [artifact, 1.4 MB]\ntests/data/scsa/adata_scsa.h5ad [artifact, 522.4 KB]\ntests/tools/data/pbmc3k_raw.h5ad [artifact, 5.6 MB]",
+      "reflection": "Identified the repo path for the target file; resolve the question path to confirm mapping."
+    },
+    {
+      "step": 3,
+      "thought": "Resolve the question's provided path to the actual repository path to confirm the correct file to stage.",
+      "action": "resolve_repo_path({\"question_path\":\"SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad\"})",
+      "observation": "Resolving question path 'SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\07-SC-Framework\\repo:\nbasename: rna_analysis/notebooks/test_data/adata_rna.h5ad [artifact, 26.3 MB]",
+      "reflection": "Confirmed the correct repo file; stage it into the workspace for inspection."
+    },
+    {
+      "step": 4,
+      "thought": "Stage the resolved .h5ad file into the workspace so it can be opened by inspection scripts.",
+      "action": "stage_repo_path({\"relative_path\":\"rna_analysis/notebooks/test_data/adata_rna.h5ad\",\"destination_path\":\"adata_rna.h5ad\"})",
+      "observation": "Staged file rna_analysis/notebooks/test_data/adata_rna.h5ad into workspace/adata_rna.h5ad",
+      "reflection": "File is available in workspace; check the virtual environment status to know which packages are preinstalled."
+    },
+    {
+      "step": 5,
+      "thought": "Check the shared venv to see if h5py/numpy are available before attempting to run an inspection script.",
+      "action": "venv_status()",
+      "observation": "Venv path: D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\07-SC-Framework\\runs\\20260818T120604-bbaae9b6\\.venv\nPython: Python 3.12.13\nFree disk: 212.0 GiB\nInstalled packages: 3\nh5py==3.16.0\nnumpy==1.26.4\npip==26.2.1",
+      "reflection": "Dependencies present; proceed to create a small inspection script to read the H5AD file and report the number of observations."
+    },
+    {
+      "step": 6,
+      "thought": "Write a short Python script that opens the staged .h5ad with h5py and prints the obs length, to produce an auditable execution output.",
+      "action": "write_file({\"relative_path\":\"workspace_inspect.py\",\"content\":\"import h5py\\nf = h5py.File('adata_rna.h5ad','r')\\nprint('keys:', list(f.keys()))\\nprint('attrs:', dict(f.attrs))\\nif 'obs' in f:\\n    obs_keys = list(f['obs'].keys())\\n    print('obs keys sample:', obs_keys[:10])\\n    if '_index' in f['obs']:\\n        print('obs_length:', len(f['obs']['_index']))\\n    else:\\n        first = obs_keys[0]\\n        print('obs_length (from first obs field):', len(f['obs'][first]))\\nelse:\\n    print('no obs group found')\\nf.close()\"})",
+      "observation": "Wrote 449 characters to workspace_inspect.py",
+      "reflection": "Inspection script created; run it to read the H5AD and print the number of observations."
+    },
+    {
+      "step": 7,
+      "thought": "Execute the inspection script to read the staged H5AD and obtain the number of observations (cells).",
+      "action": "execute_command({\"command\":\"python workspace_inspect.py\",\"timeout\":120})",
+      "observation": "Exit code: 0\n\nSTDOUT:\nkeys: ['X', 'layers', 'obs', 'obsm', 'obsp', 'uns', 'var', 'varm', 'varp']\nattrs: {'encoding-type': 'anndata', 'encoding-version': '0.1.0'}\nobs keys sample: ['_index', 'batch', 'celltype', 'chamber', 'condition', 'donor', 'orig.ident', 'sample', 'timepoint']\nobs_length: 5000\n",
+      "reflection": "The script successfully read the file and reported obs_length = 5000; this answers the question."
+    }
+  ],
+  "final_answer": "5000 cells",
+  "failure_analysis": {
+    "answer_status": "answered",
+    "blocker_type": "none",
+    "blocker_explanation": null,
+    "blocker_evidence": []
+  },
+  "correct": true,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker successfully located and staged the target .h5ad file specified in the question, verified that the required dependencies (h5py and numpy) were installed in the environment, wrote and executed a Python inspection script that opened the AnnData H5AD file and printed out the length of the observations group. The output from the executed script explicitly showed 'obs_length: 5000', which directly answers the question about the number of observations (cells) in the dataset. The final answer of \"5000 cells\" is fully grounded in real execution output, meeting the requirement for a truthful execution-based answer without guesswork or fabricated data.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [],
+  "token_usage": {
+    "pre_run_estimate": 1537,
+    "input_tokens": 90541,
+    "output_tokens": 3209,
+    "total_tokens": 93750,
+    "estimated_cost_usd": 0.02905325,
+    "aggregate": {
+      "input_tokens": 278514,
+      "output_tokens": 12150,
+      "total_tokens": 290664,
+      "estimated_cost_usd": 0.0948323
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 124618,
+        "output_tokens": 3746,
+        "total_tokens": 128364,
+        "estimated_cost_usd": 0.0386465
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 47933,
+        "output_tokens": 2593,
+        "total_tokens": 50526,
+        "estimated_cost_usd": 0.01716925
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 90541,
+        "output_tokens": 3209,
+        "total_tokens": 93750,
+        "estimated_cost_usd": 0.02905325
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 6420,
+        "output_tokens": 148,
+        "total_tokens": 6568,
+        "estimated_cost_usd": 0.0028048000000000005
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 7559,
+        "output_tokens": 2179,
+        "total_tokens": 9738,
+        "estimated_cost_usd": 0.00624775
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 1443,
+        "output_tokens": 275,
+        "total_tokens": 1718,
+        "estimated_cost_usd": 0.0009107500000000001
+      }
+    ]
+  },
+  "help_provided": true,
+  "extraction_report": {
+    "paper_summary": "SC-Framework: a FAIR, notebook-driven environment (Python package + Jupyter notebooks) for standardized, reproducible single-cell analysis (RNA/ATAC/multiomic) with example workflows and reporting.",
+    "research_objective": "Provide a modular, reproducible framework (sctoolbox + notebooks) to assemble, QC, normalize/batch-correct, embed/cluster, and perform downstream analyses on single-cell datasets.",
+    "identified_experiments": [
+      "Assembling/loading an AnnData object from .h5ad / STARsolo / MTX / Seurat (rna_analysis/notebooks/01_assembling_anndata.ipynb)",
+      "QC and filtering (rna_analysis/notebooks/02_QC_filtering.ipynb)",
+      "Normalization, batch correction (rna_analysis/notebooks/03_normalization_batch_correction.ipynb)",
+      "Embedding & clustering (rna_analysis/notebooks/04_clustering.ipynb)",
+      "Downstream analyses (annotation, receptor-ligand, proportion analysis) via downstream notebooks",
+      "Assemble / Load AnnData (RNA) - Notebook 01_assembling_anndata"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "Assemble / Load AnnData (RNA) - Notebook 01_assembling_anndata",
+        "paper_reference": "Methods / Notebook series (assembly) described in paper; Notebook 01 referenced in repo",
+        "confidence": "high",
+        "objective": "Load an existing .h5ad (or assemble from quant/mtx/Seurat) into an AnnData object prepared for downstream notebooks; optionally save an h5ad export.",
+        "repo_entrypoints": [
+          "rna_analysis/notebooks/01_assembling_anndata.ipynb",
+          "src/sctoolbox/utils/assemblers.py (via sctoolbox.utils.assemblers used in notebook)"
+        ],
+        "config_files": [
+          "rna_analysis/notebooks/config.yaml"
+        ],
+        "required_inputs": [
+          "rna_analysis/notebooks/test_data/adata_rna.h5ad (path_h5ad = \"test_data/adata_rna.h5ad\" in notebook)",
+          "alternatively: STARsolo quant folders or mtx/barcodes/genes (variables path_quant/path_mtx/path_rds in notebook)"
+        ],
+        "expected_outputs": [
+          "adata (AnnData object) in-memory (variable name: adata)",
+          "Saved h5ad export by default: anndata_1.h5ad (utils.adata.save_h5ad call in notebook)",
+          "Report files: 01_dataset_overview.md, 01_obs.png, 01_var.png (notebook saves these when utils.adata.save_h5ad called)"
+        ],
+        "dependency_hints": [
+          "sctoolbox (package defined in repo)",
+          "anndata (AnnData read/write)",
+          "pandas",
+          "scanpy (optional for downstream)",
+          "sctoolbox.utils.assemblers.from_h5ad / from_quant / from_mtx / from_R"
+        ],
+        "ambiguity_notes": [
+          "The notebook uses a relative path 'test_data/adata_rna.h5ad' relative to rna_analysis/notebooks; exact file contents (dimensions, n_obs) are not inspectable from repo text alone."
+        ],
+        "notes": "Notebook sets path_h5ad = \"test_data/adata_rna.h5ad\" and calls assembler.from_h5ad(path_h5ad,...)."
+      }
+    ],
+    "repo_entrypoints": [
+      "rna_analysis/notebooks/01_assembling_anndata.ipynb",
+      "src/sctoolbox/utils/assemblers.py (via sctoolbox.utils.assemblers used in notebook)",
+      "rna_analysis/notebooks/test_data/adata_rna.h5ad"
+    ],
+    "config_files": [
+      "rna_analysis/notebooks/config.yaml"
+    ],
+    "input_artifacts": [
+      "rna_analysis/notebooks/test_data/adata_rna.h5ad (path_h5ad = \"test_data/adata_rna.h5ad\" in notebook)",
+      "alternatively: STARsolo quant folders or mtx/barcodes/genes (variables path_quant/path_mtx/path_rds in notebook)"
+    ],
+    "expected_outputs": [
+      "adata (AnnData object) in-memory (variable name: adata)",
+      "Saved h5ad export by default: anndata_1.h5ad (utils.adata.save_h5ad call in notebook)",
+      "Report files: 01_dataset_overview.md, 01_obs.png, 01_var.png (notebook saves these when utils.adata.save_h5ad called)"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "Notebook-based assembly step described in Methods / Fig. workflow",
+        "repo_assets": [
+          "rna_analysis/notebooks/01_assembling_anndata.ipynb",
+          "rna_analysis/notebooks/test_data/adata_rna.h5ad"
+        ],
+        "rationale": "Notebook 01 explicitly sets path_h5ad = \"test_data/adata_rna.h5ad\" and calls assembler.from_h5ad; this maps the paper's assembly description to the repo assets."
+      }
+    ],
+    "ambiguous_mappings": [
+      "Cannot verify internal contents (e.g., adata.n_obs) of rna_analysis/notebooks/test_data/adata_rna.h5ad from repository text alone because the file is a binary HDF5 artifact not readable via the extraction tools.",
+      "The notebook uses a relative path 'test_data/adata_rna.h5ad' relative to rna_analysis/notebooks; exact file contents (dimensions, n_obs) are not inspectable from repo text alone."
+    ],
+    "missing_information": [
+      "The actual number of observations (adata.n_obs) inside rna_analysis/notebooks/test_data/adata_rna.h5ad could not be read by the extraction agent due to inability to open binary .h5ad artifact in this environment."
+    ],
+    "notes": "To obtain adata.n_obs run locally or in an execution agent: python -c \"import anndata; ad = anndata.read_h5ad('rna_analysis/notebooks/test_data/adata_rna.h5ad'); print(ad.n_obs)\". The resolved repository path is rna_analysis/notebooks/test_data/adata_rna.h5ad."
+  },
+  "testing_report": {
+    "overall_status": "ready",
+    "workflows": [
+      {
+        "workflow_name": "Assemble / Load AnnData (RNA) - Notebook 01_assembling_anndata",
+        "status": "validated",
+        "paper_reference": "rna_analysis/notebooks/01_assembling_anndata.ipynb",
+        "files_staged": [
+          "rna_analysis/notebooks/test_data/adata_rna.h5ad -> workspace/adata_rna.h5ad"
+        ],
+        "commands_run": [
+          "pip install h5py --no-deps -q",
+          "pip install \"numpy<2\" -q",
+          "python workspace_inspect.py  # opens adata_rna.h5ad with h5py and prints obs length"
+        ],
+        "observed_outputs": [
+          "keys: ['X', 'layers', 'obs', 'obsm', 'obsp', 'uns', 'var', 'varm', 'varp']",
+          "attrs: {'encoding-type': 'anndata', 'encoding-version': '0.1.0'}",
+          "obs keys sample: ['_index', 'batch', 'celltype', 'chamber', 'condition']",
+          "obs length from _index : 5000"
+        ],
+        "missing_inputs": [],
+        "dependency_issues": [
+          "h5py was installed without dependencies; numpy was initially missing and was installed (pip install \"numpy<2\") to allow h5py to import."
+        ],
+        "runtime_errors": [],
+        "retryable": false,
+        "confidence_notes": "Opened the repository H5AD with h5py and read obs metadata; observed n_obs = 5000."
+      }
+    ],
+    "validated_workflows": [
+      "Assemble / Load AnnData (RNA) - Notebook 01_assembling_anndata"
+    ],
+    "partial_workflows": [],
+    "blocked_workflows": [],
+    "failed_workflows": [],
+    "recommendations": [
+      "Downstream worker can load rna_analysis/notebooks/test_data/adata_rna.h5ad with anndata.read_h5ad or h5py; expect 5000 observations.",
+      "If using packages from the notebook, ensure anndata and scanpy are installed in the execution environment."
+    ],
+    "notes": "Exact evidence: running a small h5py script printed obs length = 5000 for rna_analysis/notebooks/test_data/adata_rna.h5ad."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Reproduction of the core task (loading adata_rna.h5ad and reporting n_obs=5000) succeeded with direct execution evidence. Two low-to-medium issues were identified that affect convenience/robustness but do not block the validated workflow.",
+    "identified_gaps": [
+      {
+        "title": "Question path differs from repository path",
+        "gap_type": "paper_repo_mismatch",
+        "severity": "low",
+        "paper_reference": "SC-Framework/notebooks/01_assembling_anndata_rna/data/adata_rna.h5ad",
+        "related_repo_files": [
+          "rna_analysis/notebooks/test_data/adata_rna.h5ad",
+          "rna_analysis/notebooks/01_assembling_anndata.ipynb"
+        ],
+        "related_workflow": "Assemble / Load AnnData (RNA) - Notebook 01_assembling_anndata",
+        "execution_evidence": [
+          "execution_answer.resolve_repo_path resolved the question path to rna_analysis/notebooks/test_data/adata_rna.h5ad",
+          "execution_tool_outputs: 'Resolving question path ... basename: rna_analysis/notebooks/test_data/adata_rna.h5ad [artifact, 26.3 MB]'",
+          "testing_report.files_staged shows rna_analysis/notebooks/test_data/adata_rna.h5ad -> workspace/adata_rna.h5ad"
+        ],
+        "explanation": "The path given in the question (SC-Framework/...) does not exactly match the repository layout; the file exists under rna_analysis/notebooks/test_data/. This mapping was resolved during staging but could confuse users following paper paths literally.",
+        "likely_impact": "Low — causes confusion or an extra lookup step but does not prevent reproduction when mapping is found.",
+        "possible_remediation": "Document or standardize canonical file paths in the paper/notebook README (or update paper path to repository path)."
+      },
+      {
+        "title": "Fragile dependency: numpy version pin required for reliable h5py import",
+        "gap_type": "fragile_setup",
+        "severity": "medium",
+        "paper_reference": "rna_analysis/notebooks/01_assembling_anndata.ipynb",
+        "related_repo_files": [
+          "rna_analysis/notebooks/01_assembling_anndata.ipynb",
+          "docs/required_packages.txt",
+          "pyproject.toml"
+        ],
+        "related_workflow": "Assemble / Load AnnData (RNA) - Notebook 01_assembling_anndata",
+        "execution_evidence": [
+          "testing_report.dependency_issues: 'h5py was installed without dependencies; numpy was initially missing and was installed (pip install \"numpy<2\") to allow h5py to import.'",
+          "execution_tool_outputs: venv shows h5py==3.16.0 and numpy==1.26.4 installed",
+          "execution_answer.step 5 / step 7: inspection script executed after ensuring numpy<2, producing obs_length: 5000"
+        ],
+        "explanation": "The reproduction required ensuring a NumPy version compatible with the installed h5py (the run installed 'numpy<2') to successfully import h5py and read the file. Environments with NumPy 2.x could fail to import h5py and thus block the workflow.",
+        "likely_impact": "Medium — can block users from opening the H5AD file if a NumPy/h5py version mismatch exists.",
+        "possible_remediation": "Add explicit dependency pins (e.g., numpy<2, h5py version) to requirements/docs and note them in the notebook README."
+      }
+    ],
+    "paper_repo_mismatches": [
+      "Question path differs from repository path"
+    ],
+    "execution_gaps": [
+      "Fragile dependency: numpy version pin required for reliable h5py import"
+    ],
+    "missing_parameters": [],
+    "missing_artifacts": [],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 0,
+      "medium": 1,
+      "low": 1
+    },
+    "evidence_sources": [
+      "testing_report.workflows (Assemble / Load AnnData (RNA) - Notebook 01_assembling_anndata)",
+      "execution_answer.chain (staging, inspect script, execution output)",
+      "execution_tool_outputs (file listings, venv info, script STDOUT)",
+      "critic_reviews"
+    ],
+    "recommended_followups": [
+      "Clarify canonical file paths in the paper/notebook or add a short mapping note from paper path to repo path.",
+      "Add explicit dependency guidance (e.g., pin numpy<2 and required h5py/anndata versions) in requirements/docs and the notebook README to avoid import failures."
+    ],
+    "notes": "The core question was executed and validated: the inspection script printed 'obs_length: 5000'. The gaps are documentation/dependency robustness issues, not failures of the measured workflow."
+  },
+  "gate_decision": {
+    "verdict": "pass",
+    "reasoning": "The worker provided direct execution evidence loading the AnnData file and reporting n_obs=5000; the remaining low/medium gaps do not invalidate this result.",
+    "triggered_gaps": []
+  },
+  "elapsed_seconds": 275.7
+}

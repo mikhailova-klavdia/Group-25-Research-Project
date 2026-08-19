@@ -1,0 +1,4 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,used_help,elapsed_s
+2026-08-19T06:45:08+00:00,USHER_001,Papers\03-USHER,ok,False,EXECUTION_REQUIRED — gate blocked: High-severity missing artifacts and an exec,548147,0.1604,yes,244.6
+2026-08-19T06:50:00+00:00,SCISTREECNA_001,Papers\09-ScisTreeCNA,ok,False,EXECUTION_REQUIRED — gate blocked: High-severity fragile_setup and execution_g,1464609,0.3944,yes,292.1
+2026-08-19T06:59:48+00:00,PPLM_001,Papers\14-PPLM,ok,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing/wrong-format affini,1649526,0.4576,yes,588.0

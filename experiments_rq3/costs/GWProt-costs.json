@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2026-08-18T12:35:41.279951+00:00",
+    "run_id": "20260818T122633-b62a2eb8",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the GWProt library, load all PDB files from 'GWProt/repo/GWProt/docs/Examples/Example_Data/KRAS Proteins/' directo",
+    "pre_estimate_tokens": 1542,
+    "input_tokens": 295514,
+    "output_tokens": 8571,
+    "total_tokens": 304085,
+    "cost_usd": 0.091021
+  },
+  {
+    "timestamp": "2026-08-18T12:37:53.719599+00:00",
+    "run_id": "20260818T123545-f8102a1e",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the ligand metadata file at 'GWProt/repo/GWProt/docs/Examples/Example_Data/KRAS Ligands.csv', count how many uniqu",
+    "pre_estimate_tokens": 1546,
+    "input_tokens": 38182,
+    "output_tokens": 1406,
+    "total_tokens": 39588,
+    "cost_usd": 0.012358
+  }
+]

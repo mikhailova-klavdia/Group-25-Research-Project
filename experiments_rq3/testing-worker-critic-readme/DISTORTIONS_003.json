@@ -1,0 +1,317 @@
+{
+  "id": "DISTORTIONS_003",
+  "team": "testing-worker-critic-readme",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.08.21.671523v1",
+  "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 features) and metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. Sample 100 cells from each of 8 specific cell types: Ciliated_amphid_neuron, Pharyngeal_neuron, GLR, Glia, Body_wall_muscle, Pharyngeal_muscle, Hypodermis, and Intestine using stratified sampling with seed 42. How many total cells are in the sampled subset?",
+  "ground_truth": "800",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "List repository files to locate the C. elegans tutorial and any references to the data URLs before running anything.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\repo:\n.gitignore\nLICENSE\nMANIFEST.in\nREADME.md\nmkdocs.yml\npyproject.toml\ndistortions/__init__.py\ndistortions/geometry/__init__.py\ndistortions/geometry/adjacency.py\ndistortions/geometry/affinity.py\ndistortions/geometry/geometry.py\ndistortions/geometry/laplacian.py\ndistortions/geometry/neighborhoods.py\ndistortions/geometry/rmetric.py\ndistortions/geometry/sensitivity.py\ndistortions/geometry/utils.py\ndistortions/visualization/README.md\ndistortions/visualization/__init__.py\ndistortions/visualization/eigenvalues.py\ndistortions/visualization/interactive.py\ndistortions/visualization/render.js\ndistortions/visualization/umap.py\ndocs/index.md\ndocs/reference/api.md\ndocs/tutorials/additional_baselines.qmd\ndocs/tutorials/c_elegans.ipynb\ndocs/tutorials/custom_neighbors.ipynb\ndocs/tutorials/fixed_transform.ipynb\ndocs/tutorials/hydra-80.ipynb\ndocs/tutorials/link_data.ipynb\ndocs/tutorials/sensitivity_vis.qmd\ndocs/tutorials/svg.ipynb\ndocs/tutorials/swiss_roll.Rmd\ndocs/tutorials/swiss_roll.ipynb\ndocs/tutorials/two_clusters.ipynb\ndocs/tutorials/baselines/README.md\ndocs/tutorials/baselines/Snakefile\ndocs/tutorials/baselines/visualize.Rmd\ndocs/tutorials/baselines/scripts/generate_noisy_swiss_roll.py\ndocs/tutorials/baselines/scripts/run_baselines.R\ndocs/tutorials/baselines/scripts/variable_density_swiss_roll.py\ndocs/tutorials/data/README.md\ndocs/tutorials/data/data/data-prep.qmd\nsite/404.html\nsite/index.html\nsite/sitemap.xml\nsite/assets/_mkdocstrings.css\nsite/assets/javascripts/bundle.13a4f30d.min.js\nsite/assets/javascripts/lunr/tinyseg.js\nsite/assets/javascripts/lunr/min/lunr.ar.min.js\nsite/assets/javascripts/lunr/min/lunr.da.min.js\nsite/assets/javascripts/lunr/min/lunr.de.min.js\nsite/assets/javascripts/lunr/min/lunr.du.min.js\nsite/assets/javascripts/lunr/min/lunr.el.min.js\nsite/assets/javascripts/lunr/min/lunr.es.min.js\nsite/assets/javascripts/lunr/min/lunr.fi.min.js\nsite/assets/javascripts/lunr/min/lunr.fr.min.js\nsite/assets/javascripts/lunr/min/lunr.he.min.js\nsite/assets/javascripts/lunr/min/lunr.hi.min.js\nsite/assets/javascripts/lunr/min/lunr.hu.min.js\nsite/assets/javascripts/lunr/min/lunr.hy.min.js\nsite/assets/javascripts/lunr/min/lunr.it.min.js\nsite/assets/javascripts/lunr/min/lunr.ja.min.js\nsite/assets/javascripts/lunr/min/lunr.jp.min.js\nsite/assets/javascripts/lunr/min/lunr.kn.min.js\nsite/assets/javascripts/lunr/min/lunr.ko.min.js\nsite/assets/javascripts/lunr/min/lunr.multi.min.js\nsite/assets/javascripts/lunr/min/lunr.nl.min.js\nsite/assets/javascripts/lunr/min/lunr.no.min.js\nsite/assets/javascripts/lunr/min/lunr.pt.min.js\nsite/assets/javascripts/lunr/min/lunr.ro.min.js\nsite/assets/javascripts/lunr/min/lunr.ru.min.js\nsite/assets/javascripts/lunr/min/lunr.sa.min.js\nsite/assets/javascripts/lunr/min/lunr.stemmer.support.min.js\nsite/assets/javascripts/lunr/min/lunr.sv.min.js\nsite/assets/javascripts/lunr/min/lunr.ta.min.js\nsite/assets/javascripts/lunr/min/lunr.te.min.js\nsite/assets/javascripts/lunr/min/lunr.th.min.js\nsite/assets/javascripts/lunr/min/lunr.tr.min.js\nsite/assets/javascripts/lunr/min/lunr.vi.min.js\nsite/assets/javascripts/lunr/min/lunr.zh.min.js\nsite/assets/javascripts/workers/search.d50fe291.min.js\nsite/assets/stylesheets/main.342714a4.min.css\nsite/assets/stylesheets/main.342714a4.min.css.map\nsite/assets/stylesheets/palette.06af60db.min.css\nsite/assets/stylesheets/palette.06af60db.min.css.map\nsite/tutorials/sensitivity_vis.qmd\nsite/tutorials/swiss_roll.Rmd\nsite/tutorials/baselines/Snakefile\nsite/tutorials/baselines/index.html\nsite/tutorials/baselines/visualize.Rmd\nsite/tutorials/baselines/data/pscore_0.0.csv\nsite/tutorials/baselines/data/pscore_0.5.csv\nsite/tutorials/baselines/data/pscore_1.0.csv\nsite/tutorials/baselines/data/pscore_1.5.csv\nsite/tutorials/baselines/data/pscore_2.0.csv\nsite/tutorials/baselines/data/pscore_2.5.csv\nsite/tutorials/baselines/data/pscore_3.0.csv\nsite/tutorials/baselines/data/runtime_0.0.txt\nsite/tutorials/baselines/data/runtime_0.5.txt\nsite/tutorials/baselines/data/runtime_1.0.txt\nsite/tutorials/baselines/data/runtime_1.5.txt\nsite/tutorials/baselines/data/runtime_2.0.txt\nsite/tutorials/baselines/data/runtime_2.5.txt\nsite/tutorials/baselines/data/runtime_3.0.txt\nsite/tutorials/baselines/data/runtime_dist_0.0.txt\nsite/tutorials/baselines/data/runtime_dist_0.5.txt\nsite/tutorials/baselines/data/runtime_dist_1.0.txt\nsite/tutorials/baselines/data/runtime_dist_1.5.txt\nsite/tutorials/baselines/data/runtime_dist_2.0.txt\nsite/tutorials/baselines/data/runtime_dist_2.5.txt\nsite/tutorials/baselines/data/runtime_dist_3.0.txt\nsite/tutorials/baselines/data/runtime_sleepwalk_0.0.txt\nsite/tutorials/baselines/data/runtime_sleepwalk_0.5.txt\nsite/tutorials/baselines/data/runtime_sleepwalk_1.0.txt\nsite/tutorials/baselines/data/runtime_sleepwalk_1.5.txt\nsite/tutorials/baselines/data/runtime_sleepwalk_2.0.txt\nsite/tutorials/baselines/data/runtime_sleepwalk_2.5.txt\nsite/tutorials/baselines/data/runtime_sleepwalk_3.0.txt\nsite/tutorials/baselines/data/swiss_noise_0.0.csv\nsite/tutorials/baselines/data/swiss_noise_0.0_embedding.csv\nsite/tutorials/baselines/data/swiss_noise_0.5.csv\nsite/tutorials/baselines/data/swiss_noise_0.5_embedding.csv\nsite/tutorials/baselines/data/swiss_noise_1.0.csv\nsite/tutorials/baselines/data/swiss_noise_1.0_embedding.csv\nsite/tutorials/baselines/data/swiss_noise_1.5.csv\nsite/tutorials/baselines/data/swiss_noise_1.5_embedding.csv\nsite/tutorials/baselines/data/swiss_noise_2.0.csv\nsite/tutorials/baselines/data/swiss_noise_2.0_embedding.csv\nsite/tutorials/baselines/data/swiss_noise_2.5.csv\nsite/tutorials/baselines/data/swiss_noise_2.5_embedding.csv\nsite/tutorials/baselines/data/swiss_noise_3.0.csv\nsite/tutorials/baselines/data/swiss_noise_3.0_embedding.csv\nsite/tutorials/baselines/data_backup/pscore_0.0.csv\nsite/tutorials/baselines/data_backup/pscore_0.5.csv\nsite/tutorials/baselines/data_backup/pscore_1.0.csv\nsite/tutorials/baselines/data_backup/pscore_1.5.csv\nsite/tutorials/baselines/data_backup/pscore_2.0.csv\nsite/tutorials/baselines/data_backup/pscore_2.5.csv\nsite/tutorials/baselines/data_backup/pscore_3.0.csv\nsite/tutorials/baselines/data_backup/runtime_0.0.txt\nsite/tutorials/baselines/data_backup/runtime_0.5.txt\nsite/tutorials/baselines/data_backup/runtime_1.0.txt\nsite/tutorials/baselines/data_backup/runtime_1.5.txt\nsite/tutorials/baselines/data_backup/runtime_2.0.txt\nsite/tutorials/baselines/data_backup/runtime_2.5.txt\nsite/tutorials/baselines/data_backup/runtime_3.0.txt\nsite/tutorials/baselines/data_backup/runtime_dist_0.0.txt\nsite/tutorials/baselines/data_backup/runtime_dist_0.5.txt\nsite/tutorials/baselines/data_backup/runtime_dist_1.0.txt\nsite/tutorials/baselines/data_backup/runtime_dist_1.5.txt\nsite/tutorials/baselines/data_backup/runtime_dist_2.0.txt\nsite/tutorials/baselines/data_backup/runtime_dist_2.5.txt\nsite/tutorials/baselines/data_backup/runtime_dist_3.0.txt\nsite/tutorials/baselines/data_backup/swiss_noise_0.0.csv\nsite/tutorials/baselines/data_backup/swiss_noise_0.0_embedding.csv\nsite/tutorials/baselines/data_backup/swiss_noise_0.5.csv\nsite/tutorials/baselines/data_backup/swiss_noise_0.5_embedding.csv\nsite/tutorials/baselines/data_backup/swiss_noise_1.0.csv\nsite/tutorials/baselines/data_backup/swiss_noise_1.0_embedding.csv\nsite/tutorials/baselines/data_backup/swiss_noise_1.5.csv\nsite/tutorials/baselines/data_backup/swiss_noise_1.5_embedding.csv\nsite/tutorials/baselines/data_backup/swiss_noise_2.0.csv\nsite/tutorials/baselines/data_backup/swiss_noise_2.0_embedding.csv\nsite/tutorials/baselines/data_backup/swiss_noise_2.5.csv\nsite/tutorials/baselines/data_backup/swiss_noise_2.5_embedding.csv\nsite/tutorials/baselines/data_backup/swiss_noise_3.0.csv\nsite/tutorials/baselines/data_backup/swiss_noise_3.0_embedding.csv\nsite/tutorials/baselines/scripts/generate_noisy_swiss_roll.py\nsite/tutorials/baselines/scripts/run_baselines.R\nsite/tutorials/baselines/scripts/variable_density_swiss_roll.py",
+      "reflection": "Found the c_elegans notebook in docs/tutorials; next search the notebook for the remote data URLs used."
+    },
+    {
+      "step": 2,
+      "thought": "Search the repository for the c-elegans string to find the exact remote URLs the notebook uses (so I can fetch them).",
+      "action": "search_repo({\"query\":\"c-elegans\"})",
+      "observation": "Search results for 'c-elegans' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\repo:\ndocs/tutorials/c_elegans.ipynb:27: \"data_url = \\\"https://raw.githubusercontent.com/krisrs1128/distortions-data/main/data/c-elegans_qc_final.txt\\\"\\n\",\ndocs/tutorials/c_elegans.ipynb:28: \"metadata_url = \\\"https://raw.githubusercontent.com/krisrs1128/distortions-data/main/data/c-elegans_qc_final_metadata.txt\\\"\\n\",",
+      "reflection": "I can fetch the two remote files used by the notebook. I'll create a small script to download the metadata and perform stratified sampling (seed=42, up to 100 per target type)."
+    },
+    {
+      "step": 3,
+      "thought": "Write a Python script into the workspace that downloads the metadata and performs the stratified sampling of the listed 8 cell types with seed 42.",
+      "action": "write_file({\"relative_path\":\"workspace/run_c_elegans_sampling.py\",\"content\":\"...\"})",
+      "observation": "Wrote 2164 characters to run_c_elegans_sampling.py",
+      "reflection": "Script created. I'll check the workspace to confirm the script is present before executing."
+    },
+    {
+      "step": 4,
+      "thought": "List workspace files to confirm the sampling script exists and see any cached files.",
+      "action": "list_workspace_files()",
+      "observation": "Workspace files:\nrun_c_elegans_sampling.py\nrun_sampling.py\nraw.githubusercontent.com/krisrs1128/distortions-data/main/data/c-elegans_qc_final.txt",
+      "reflection": "Script is present. I'll run it. If it errors, I'll inspect and fix the script."
+    },
+    {
+      "step": 5,
+      "thought": "Execute the sampling script to load metadata and sample cells.",
+      "action": "execute_command({\"command\":\"python run_c_elegans_sampling.py\",\"timeout\":120})",
+      "observation": "Exit code: 1\n\nSTDERR:\nTraceback (most recent call last):\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\runs\\20260818T151712-4720cf47\\workspace\\run_c_elegans_sampling.py\", line 21, in <module>\n    md = read_metadata(metadata_url)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\runs\\20260818T151712-4720cf47\\workspace\\run_c_elegans_sampling.py\", line 18, in read_metadata\n    md = pd.read_csv(url, engine='python', low_memory=False)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\runs\\20260818T151712-4720cf47\\.venv\\Lib\\site-packages\\pandas\\io\\parsers\\readers.py\", line 873, in read_csv\n    return _read(filepath_or_buffer, kwds)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\runs\\20260818T151712-4720cf47\\.venv\\Lib\\site-packages\\pandas\\io\\parsers\\readers.py\", line 300, in _read\n    parser = TextFileReader(filepath_or_buffer, **kwds)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\runs\\20260818T151712-4720cf47\\.venv\\Lib\\site-packages\\pandas\\io\\parsers\\readers.py\", line 1632, in __init__\n    options = self._get_options_with_defaults(engine)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\10-distortions\\runs\\20260818T151712-4720cf47\\.venv\\Lib\\site-packages\\pandas\\io\\parsers\\readers.py\", line 1684, in _get_options_with_defaults\n    raise ValueError(\nValueError: The 'low_memory' option is not supported with the 'python' engine\n",
+      "reflection": "The script needs a small fix removing low_memory when engine='python'. I'll patch the script and re-run."
+    },
+    {
+      "step": 6,
+      "thought": "Patch the script to remove the incompatible pandas argument and save it.",
+      "action": "write_file({\"relative_path\":\"run_c_elegans_sampling.py\",\"content\":\"...patched...\"})",
+      "observation": "Wrote 2118 characters to run_c_elegans_sampling.py",
+      "reflection": "Patched script saved at workspace root. I'll run it again to get sampling results."
+    },
+    {
+      "step": 7,
+      "thought": "Run the corrected sampling script to produce the sampled counts and total selected cells.",
+      "action": "execute_command({\"command\":\"python run_c_elegans_sampling.py\",\"timeout\":120})",
+      "observation": "Exit code: 0\n\nSTDOUT:\nmetadata shape: (86024, 15)\ncolumns: ['Unnamed: 0', 'cell', 'n.umi', 'time.point', 'batch', 'Size_Factor', 'cell.type', 'cell.subtype', 'plot.cell.type', 'raw.embryo.time', 'embryo.time', 'embryo.time.bin', 'raw.embryo.time.bin', 'lineage', 'passed_initial_QC_or_later_whitelisted']\nusing cell-type column: cell.type\ncounts in metadata for each target type (total available):\nCiliated_amphid_neuron: 6090\nPharyngeal_neuron: 1471\nGLR: 768\nGlia: 1857\nBody_wall_muscle: 17520\nPharyngeal_muscle: 2562\nHypodermis: 7746\nIntestine: 1732\nnumber selected per type (capped at 100):\nCiliated_amphid_neuron: 100\nPharyngeal_neuron: 100\nGLR: 100\nGlia: 100\nBody_wall_muscle: 100\nPharyngeal_muscle: 100\nHypodermis: 100\nIntestine: 100\ntotal selected: 800\n",
+      "reflection": "The script successfully sampled up to 100 cells for each of the 8 specified types with seed 42, producing a total of 800 selected cells."
+    }
+  ],
+  "final_answer": "800",
+  "failure_analysis": {
+    "answer_status": "answered",
+    "blocker_type": "none",
+    "blocker_explanation": null,
+    "blocker_evidence": []
+  },
+  "correct": true,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker first located the c_elegans notebook and identified the remote URLs from which the notebook fetches the expression and metadata files (step 2). They wrote and executed a Python script that downloads the remote metadata and performs the required stratified sampling of 100 cells per each of the 8 specified cell types using seed 42. After fixing a pandas read_csv argument error, they successfully ran the script (step 7) and obtained detailed output showing the counts in metadata for each target cell type, confirmed sampling 100 per type, and a total sampled cell count of 800. The final answer \"800\" is directly grounded in the real, successful execution output. There is no blocking issue or unsupported assumption, and the worker correctly used the remote files as the local paths are missing. This complies fully with the task requirements and integrity rules.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [],
+  "token_usage": {
+    "pre_run_estimate": 1629,
+    "input_tokens": 99600,
+    "output_tokens": 5118,
+    "total_tokens": 104718,
+    "estimated_cost_usd": 0.035136,
+    "aggregate": {
+      "input_tokens": 254946,
+      "output_tokens": 12947,
+      "total_tokens": 267893,
+      "estimated_cost_usd": 0.09062195
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 47374,
+        "output_tokens": 3194,
+        "total_tokens": 50568,
+        "estimated_cost_usd": 0.018231499999999998
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 91811,
+        "output_tokens": 2117,
+        "total_tokens": 93928,
+        "estimated_cost_usd": 0.027186750000000003
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 99600,
+        "output_tokens": 5118,
+        "total_tokens": 104718,
+        "estimated_cost_usd": 0.035136
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 7119,
+        "output_tokens": 191,
+        "total_tokens": 7310,
+        "estimated_cost_usd": 0.0031532000000000005
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 7435,
+        "output_tokens": 1981,
+        "total_tokens": 9416,
+        "estimated_cost_usd": 0.00582075
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 1607,
+        "output_tokens": 346,
+        "total_tokens": 1953,
+        "estimated_cost_usd": 0.00109375
+      }
+    ]
+  },
+  "help_provided": true,
+  "extraction_report": {
+    "paper_summary": "Distortions: methods to measure local geometric distortion in low-dimensional embeddings (UMAP/DensMAP) and visualize/summarize distortions on single-cell datasets (example: C. elegans).",
+    "research_objective": "Quantify and visualize local distortions introduced by dimensionality reduction (UMAP/DensMAP) on single-cell expression data; demonstrate on C. elegans data.",
+    "identified_experiments": [
+      "C. elegans tutorial: load expression + metadata, compute UMAP/DensMAP embeddings, sample subset of cell types, compute local distortion metrics, produce plots/condition-number summaries",
+      "C. elegans sampling + distortion analysis"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "C. elegans sampling + distortion analysis",
+        "paper_reference": "docs/tutorials/c_elegans.ipynb (notebook cells)",
+        "confidence": "high",
+        "objective": "Load C. elegans expression and metadata, stratified-sample 100 cells per chosen cell type (seed=42), compute embeddings and local distortion metrics, save visualizations/summary.",
+        "repo_entrypoints": [
+          "docs/tutorials/c_elegans.ipynb"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "Local paths requested by user (not found in repo): distortions/notebooks/c_elegans/data/c_elegans_data.csv, distortions/notebooks/c_elegans/data/c_elegans_metadata.csv",
+          "Remote URLs actually used by the notebook: https://raw.githubusercontent.com/krisrs1128/distortions-data/main/data/c-elegans_qc_final.txt (expression data, tab-delimited) and https://raw.githubusercontent.com/krisrs1128/distortions-data/main/data/c-elegans_qc_final_metadata.txt (metadata, CSV)"
+        ],
+        "expected_outputs": [
+          "Sampled AnnData object (adata) with ~ (up to) 800 cells (adata.X.shape)",
+          "UMAP/DensUMAP embeddings for sampled cells (adata.obsm['X_UMAP'], adata.obsm['X_DenseUMAP'])",
+          "Plots saved (condition_number_ratios.svg, threshold_fractions.svg) and interactive visualizations"
+        ],
+        "dependency_hints": [
+          "numpy, pandas, scipy, scanpy, umap-learn, anndata, altair, distortions (this repo)"
+        ],
+        "ambiguity_notes": [
+          "The notebook reads data from remote GitHub raw URLs; the user-specified local CSV paths (distortions/notebooks/c_elegans/data/...) are not present in this repository, so the sampling cannot be executed here without fetching the remote files or placing equivalent local files.",
+          "The notebook's sampling code caps per-class samples at min(class_count, 100). If any of the eight chosen cell types have <100 members, total sampled cells will be <800."
+        ],
+        "notes": "Sampling code in notebook uses numpy.random.default_rng(seed=42) and picks up to 100 per selected class: Ciliated_amphid_neuron, Pharyngeal_neuron, GLR, Glia, Body_wall_muscle, Pharyngeal_muscle, Hypodermis, Intestine."
+      }
+    ],
+    "repo_entrypoints": [
+      "docs/tutorials/c_elegans.ipynb"
+    ],
+    "config_files": [],
+    "input_artifacts": [
+      "Local paths requested by user (not found in repo): distortions/notebooks/c_elegans/data/c_elegans_data.csv, distortions/notebooks/c_elegans/data/c_elegans_metadata.csv",
+      "Remote URLs actually used by the notebook: https://raw.githubusercontent.com/krisrs1128/distortions-data/main/data/c-elegans_qc_final.txt (expression data, tab-delimited) and https://raw.githubusercontent.com/krisrs1128/distortions-data/main/data/c-elegans_qc_final_metadata.txt (metadata, CSV)"
+    ],
+    "expected_outputs": [
+      "Sampled AnnData object (adata) with ~ (up to) 800 cells (adata.X.shape)",
+      "UMAP/DensUMAP embeddings for sampled cells (adata.obsm['X_UMAP'], adata.obsm['X_DenseUMAP'])",
+      "Plots saved (condition_number_ratios.svg, threshold_fractions.svg) and interactive visualizations"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "Notebook cells that load data and perform sampling (docs/tutorials/c_elegans.ipynb cells ~2-7)",
+        "repo_assets": [
+          "docs/tutorials/c_elegans.ipynb"
+        ],
+        "rationale": "The notebook contains the exact code to load the dataset, define the picked_cell_type list, and perform stratified sampling with seed=42."
+      }
+    ],
+    "ambiguous_mappings": [
+      "User-specified local CSV paths (distortions/notebooks/c_elegans/data/...) are not found in repo; unclear whether they are expected to be present in a separate data submodule or downloaded at runtime from the notebook's GitHub URLs.",
+      "The notebook reads data from remote GitHub raw URLs; the user-specified local CSV paths (distortions/notebooks/c_elegans/data/...) are not present in this repository, so the sampling cannot be executed here without fetching the remote files or placing equivalent local files.",
+      "The notebook's sampling code caps per-class samples at min(class_count, 100). If any of the eight chosen cell types have <100 members, total sampled cells will be <800."
+    ],
+    "missing_information": [
+      "Local files requested by the user: distortions/notebooks/c_elegans/data/c_elegans_data.csv and distortions/notebooks/c_elegans/data/c_elegans_metadata.csv are not present in the repository and could not be read for sampling.",
+      "Counts per cell type in the metadata are not available locally, so cannot confirm whether each selected cell type has >=100 cells (and thus whether total sampled cells = 8*100 = 800)."
+    ],
+    "notes": "To produce the exact sampled-cell count here, the downstream agent should either (A) provide the local CSVs at the specified paths, or (B) allow the notebook to fetch the remote files (URLs are in the notebook). If every selected cell type has >=100 cells, the sampled subset contains 800 cells; otherwise the notebook's min(len(indices),100) behavior yields fewer."
+  },
+  "testing_report": {
+    "overall_status": "ready",
+    "workflows": [
+      {
+        "workflow_name": "C. elegans sampling + distortion analysis",
+        "status": "validated",
+        "paper_reference": "docs/tutorials/c_elegans.ipynb",
+        "files_staged": [
+          "run_sampling.py"
+        ],
+        "commands_run": [
+          "pip install numpy pandas",
+          "python run_sampling.py"
+        ],
+        "observed_outputs": [
+          "Data shape: (86024, 100)",
+          "Metadata shape: (86024, 15)",
+          "Number sampled indices: 800",
+          "Counts per selected class (label code): Counter({np.int8(2): 100, np.int8(3): 100, np.int8(25): 100, np.int8(14): 100, np.int8(24): 100, np.int8(16): 100, np.int8(11): 100, np.int8(13): 100})"
+        ],
+        "missing_inputs": [
+          "Local files expected at distortions/notebooks/c_elegans/data/c_elegans_data.csv and distortions/notebooks/c_elegans/data/c_elegans_metadata.csv were not present in the repo; notebook reads from remote URLs instead."
+        ],
+        "dependency_issues": [],
+        "runtime_errors": [],
+        "retryable": false,
+        "confidence_notes": "Ran the notebook's data-loading and sampling code against the remote GitHub raw URLs; sampling returned 800 cells (8 classes × 100 each)."
+      }
+    ],
+    "validated_workflows": [
+      "C. elegans sampling + distortion analysis"
+    ],
+    "partial_workflows": [],
+    "blocked_workflows": [],
+    "failed_workflows": [],
+    "recommendations": [
+      "Downstream worker can run the full notebook; it will fetch data from the notebook's embedded GitHub raw URLs.",
+      "If local data paths are required, place the two CSV/TSV files at distortions/notebooks/c_elegans/data/ or update the notebook to point to local files."
+    ],
+    "notes": "Sampling was executed exactly as in the notebook (seed=42); result: total sampled cells = 800."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Reproducible end-to-end, but the notebook expects local data paths that are not present in the repo; the workflow instead fetches remote CSVs at runtime. This mismatch and missing local artifacts can hinder offline or air-gapped reproduction.",
+    "identified_gaps": [
+      {
+        "title": "Local C. elegans data files absent; notebook fetches remote URLs",
+        "gap_type": "missing_artifact",
+        "severity": "medium",
+        "paper_reference": "docs/tutorials/c_elegans.ipynb (data loading cells)",
+        "related_repo_files": [
+          "docs/tutorials/c_elegans.ipynb",
+          "distortions/notebooks/c_elegans/data/c_elegans_data.csv",
+          "distortions/notebooks/c_elegans/data/c_elegans_metadata.csv"
+        ],
+        "related_workflow": "C. elegans sampling + distortion analysis",
+        "execution_evidence": [
+          "testing_report.workflows.observed_outputs: 'Local files expected at distortions/notebooks/c_elegans/data/... were not present in the repo; notebook reads from remote URLs instead.'",
+          "execution_tool_outputs: notebook contains data_url and metadata_url pointing to raw.githubusercontent.com/krisrs1128/distortions-data/main/data/...",
+          "execution_answer.chain: script downloaded remote metadata and sampling produced 'total selected: 800'.",
+          "execution_tool_outputs STDOUT from run script: 'metadata shape: (86024, 15)' and 'total selected: 800'."
+        ],
+        "explanation": "The tutorial/notebook references or implies local CSV files under distortions/notebooks/c_elegans/data/, but those files are not present in the repo. The notebook's cells instead load data from remote raw GitHub URLs at runtime; reproducing the notebook therefore requires network access or manually placing the CSVs in the expected local paths.",
+        "likely_impact": "Prevents offline or air-gapped reproduction using only repository contents; may confuse users who expect the data to be bundled in the repo. Does not block reproduction when network access is available (execution succeeded using remote files).",
+        "possible_remediation": "Include the two CSV/TSV files in the repo under the documented local path or update the notebook and README to clearly document the remote data dependency and provide explicit download steps (or a helper script) to populate local data files."
+      }
+    ],
+    "paper_repo_mismatches": [],
+    "execution_gaps": [],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Local C. elegans data files absent; notebook fetches remote URLs"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 0,
+      "medium": 1,
+      "low": 0
+    },
+    "evidence_sources": [
+      "testing_report.workflows (C. elegans sampling + distortion analysis)",
+      "execution_answer.chain (steps 2-7)",
+      "execution_tool_outputs (repo tree, search results, script STDOUT/STDERR)",
+      "critic_reviews"
+    ],
+    "recommended_followups": [
+      "Add the c-elegans data files to distortions/notebooks/c_elegans/data/ in the repo or provide a small helper script that downloads them into that path.",
+      "Update docs/tutorials/c_elegans.ipynb and README to state explicitly that the notebook fetches remote data and list the raw.githubusercontent URLs used."
+    ],
+    "notes": "Despite the missing local data files, the executor successfully reproduced the sampling by downloading the remote metadata and obtained a sampled subset of 800 cells (8 types × 100 each)."
+  },
+  "gate_decision": {
+    "verdict": "pass",
+    "reasoning": "The missing-local-files issue is medium-severity and does not invalidate the reported sampled count (800), which follows directly from taking 100 cells × 8 strata and was achievable by the workflow fetching the remote CSVs at runtime.",
+    "triggered_gaps": []
+  },
+  "elapsed_seconds": 278.6
+}
