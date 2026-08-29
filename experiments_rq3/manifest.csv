@@ -1,0 +1,77 @@
+timestamp,id,project,status,correct,final_answer,tokens,cost_usd,used_help,elapsed_s
+2026-08-20T20:58:11+00:00,SC_FRAMEWORK_001,Papers\07-SC-Framework,ok,True,5000,423043,0.1258,yes,229.3
+2026-08-20T21:01:01+00:00,SEGMA_001,Papers\08-SEGMA,no_chain,,,,,,170.2
+2026-08-20T21:07:59+00:00,SEGMA_001,Papers\08-SEGMA,no_chain,,,,,,130.7
+2026-08-20T21:14:38+00:00,SENTIEON_CLI_001,Papers\04-sentieon-cli,ok,True,CONSERVATIVE,1983061,0.5494,yes,398.7
+2026-08-20T21:23:58+00:00,SAM2_001,Papers\17-sam2,no_chain,,,,,,560.5
+2026-08-20T21:39:48+00:00,SEGMA_001,Papers\08-SEGMA,recovered,True,187 amino acids,313331,0.1006,yes,0.0
+2026-08-20T21:39:48+00:00,SAM2_001,Papers\17-sam2,recovered,False,[UNCERTAIN — The worker produced a concrete result but multiple unresolved gap,1076619,0.3127,yes,0.0
+2026-08-20T21:39:48+00:00,SAM2_002,Papers\17-sam2,recovered,False,[UNCERTAIN — High-severity environment and artifact gaps (missing local SAM2 c,1183720,0.3419,yes,0.0
+2026-08-20T21:39:48+00:00,TABPFN_001,Papers\18-tabpfn,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (missing 'tor,1048944,0.3015,yes,0.0
+2026-08-20T21:39:48+00:00,TABPFN_002,Papers\18-tabpfn,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (missing PyTo,929815,0.2599,yes,0.0
+2026-08-20T21:39:48+00:00,CYTEONTO_001,Papers\01-CyteOnto,recovered,True,4,175289,0.0595,yes,0.0
+2026-08-20T21:39:48+00:00,CYTEONTO_002,Papers\01-CyteOnto,recovered,True,stem cell,183012,0.0607,yes,0.0
+2026-08-20T21:39:48+00:00,CYTEONTO_003,Papers\01-CyteOnto,recovered,True,ovum,106862,0.0396,yes,0.0
+2026-08-20T21:39:48+00:00,GWAS_EPISTASIS_BIAS_001,Papers\02-GWAS-Epistasis-Bias,recovered,True,5.03698201089221e-08,273934,0.0864,yes,0.0
+2026-08-20T21:39:48+00:00,GWAS_EPISTASIS_BIAS_002,Papers\02-GWAS-Epistasis-Bias,recovered,True,[UNCERTAIN — The worker reports a successful run yielding 0 significant result,506457,0.1715,yes,0.0
+2026-08-20T21:39:48+00:00,GWAS_EPISTASIS_BIAS_003,Papers\02-GWAS-Epistasis-Bias,recovered,True,0.79,480072,0.1583,yes,0.0
+2026-08-20T21:39:48+00:00,GWPROT_001,Papers\05-GWProt,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (the native ',996351,0.2855,yes,0.0
+2026-08-20T21:39:48+00:00,GWPROT_002,Papers\05-GWProt,recovered,True,4,170842,0.0556,yes,0.0
+2026-08-20T21:49:48+00:00,LARIS_001,Papers\06-LARIS,timeout,,,,,,600.0
+2026-08-20T21:49:48+00:00,LARIS_002,Papers\06-LARIS,recovered,False,"[UNCERTAIN — The worker produced 2951 LR pairs by execution, but a high-severi",910696,0.2597,yes,0.0
+2026-08-20T21:59:48+00:00,LARIS_003,Papers\06-LARIS,timeout,,,,,,600.0
+2026-08-20T21:59:48+00:00,SCISTREECNA_001,Papers\09-ScisTreeCNA,recovered,False,EXECUTION_REQUIRED — gate blocked: High-severity fragile_setup and execution_g,1464609,0.3944,yes,0.0
+2026-08-20T21:59:48+00:00,SCISTREECNA_002,Papers\09-ScisTreeCNA,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (missing CuPy,1623907,0.4327,yes,0.0
+2026-08-20T21:59:48+00:00,USHER_001,Papers\03-USHER,recovered,False,EXECUTION_REQUIRED — gate blocked: High-severity missing artifacts and an exec,548147,0.1604,yes,0.0
+2026-08-20T21:59:48+00:00,ARCADIA_PUBLIC_001,Papers\11-ARCADIA_public,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (raw cite_,283848,0.0875,yes,0.0
+2026-08-20T21:59:48+00:00,ARCADIA_PUBLIC_002,Papers\11-ARCADIA_public,recovered,True,6,89263,0.0398,yes,0.0
+2026-08-20T21:59:48+00:00,REGFORMER_001,Papers\12-RegFormer,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (pretraine,579696,0.163,yes,0.0
+2026-08-20T21:59:48+00:00,REGFORMER_002,Papers\12-RegFormer,recovered,False,EXECUTION_REQUIRED — gate blocked: High-severity missing_artifact gaps (pre-ge,401929,0.1247,yes,0.0
+2026-08-20T21:59:48+00:00,METAPOINTFINDER_001,Papers\15-metapointfinder,recovered,True,1182 sequences,869734,0.24,yes,0.0
+2026-08-20T21:59:48+00:00,METAPOINTFINDER_002,Papers\15-metapointfinder,recovered,True,37,880888,0.2469,yes,0.0
+2026-08-20T21:59:48+00:00,METAPOINTFINDER_003,Papers\15-metapointfinder,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the reque,287923,0.0917,yes,0.0
+2026-08-20T21:59:48+00:00,METAPOINTFINDER_004,Papers\15-metapointfinder,recovered,True,[UNCERTAIN — A medium-severity missing_artifact gap (the input FASTA was not p,269365,0.0908,yes,0.0
+2026-08-20T21:59:48+00:00,METAPOINTFINDER_005,Papers\15-metapointfinder,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact gap shows ,316145,0.1019,yes,0.0
+2026-08-20T21:59:48+00:00,CROSSPPI_001,Papers\16-CrossPPI,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity fragile_setup (PyTorch inst,921271,0.2744,yes,0.0
+2026-08-20T21:59:48+00:00,CROSSPPI_002,Papers\16-CrossPPI,recovered,False,EXECUTION_REQUIRED — gate blocked: The worker gave a numeric pKD without cited,663118,0.2,yes,0.0
+2026-08-20T21:59:48+00:00,CROSSPPI_003,Papers\16-CrossPPI,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (broken/incom,661252,0.2059,yes,0.0
+2026-08-20T21:59:48+00:00,CROSSPPI_004,Papers\16-CrossPPI,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity execution_gap (the broken/p,553101,0.1758,yes,0.0
+2026-08-20T21:59:48+00:00,PPLM_001,Papers\14-PPLM,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing/wrong-format affini,1649526,0.4576,yes,0.0
+2026-08-20T21:59:48+00:00,PPLM_002,Papers\14-PPLM,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (weights/a,337300,0.1086,yes,0.0
+2026-08-20T21:59:48+00:00,PPLM_003,Papers\14-PPLM,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing artifact (the pretr,470433,0.1551,yes,0.0
+2026-08-20T21:59:48+00:00,PPLM_004,Papers\14-PPLM,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the pretr,607714,0.1863,yes,0.0
+2026-08-20T21:59:48+00:00,PPLM_005,Papers\14-PPLM,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the pretr,832185,0.246,yes,0.0
+2026-08-20T21:59:48+00:00,PPLM_006,Papers\14-PPLM,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (core PPI ,668780,0.1963,yes,0.0
+2026-08-20T21:59:48+00:00,DISTORTIONS_001,Papers\10-distortions,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (local CSV,386626,0.1279,yes,0.0
+2026-08-20T21:59:48+00:00,DISTORTIONS_002,Papers\10-distortions,recovered,True,6,622671,0.1843,yes,0.0
+2026-08-20T21:59:48+00:00,DISTORTIONS_003,Papers\10-distortions,recovered,True,800,267893,0.0906,yes,0.0
+2026-08-20T21:59:48+00:00,FADVI_001,Papers\13-fadvi,recovered,False,EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (the pretr,555852,0.1623,yes,0.0
+2026-08-20T21:59:48+00:00,FADVI_002,Papers\13-fadvi,recovered,False,"EXECUTION_REQUIRED — gate blocked: High-severity missing artifacts, missing ru",308286,0.0977,yes,0.0
+2026-08-20T21:59:48+00:00,FADVI_003,Papers\13-fadvi,recovered,False,EXECUTION_REQUIRED — gate blocked: High-severity missing runtime dependencies ,391955,0.1187,yes,0.0
+2026-08-20T22:44:01+00:00,LARIS_001,Papers\06-LARIS,no_chain,,,,,,759.4
+2026-08-20T23:04:16+00:00,LARIS_003,Papers\06-LARIS,no_chain,,,,,,1214.4
+2026-08-21T01:38:05+00:00,LARIS_001,Papers\06-LARIS,no_chain,,,,,,1193.4
+2026-08-21T01:52:18+00:00,LARIS_003,Papers\06-LARIS,no_chain,,,,,,852.9
+2026-08-23T11:45:18+00:00,LARIS_001,Papers\06-LARIS,no_chain,,,,,,707.0
+2026-08-23T11:52:35+00:00,LARIS_003,Papers\06-LARIS,no_chain,,,,,,436.9
+2026-08-23T11:52:43+00:00,SCISTREECNA_002,Papers\09-ScisTreeCNA,exit_1,,,,,,7.8
+2026-08-23T14:07:12+00:00,SCISTREECNA_002,Papers\09-ScisTreeCNA,no_chain,,,,,,182.1
+2026-08-23T14:09:51+00:00,USHER_001,Papers\03-USHER,no_chain,,,,,,158.9
+2026-08-23T14:15:26+00:00,ARCADIA_PUBLIC_001,Papers\11-ARCADIA_public,no_chain,,,,,,334.6
+2026-08-23T14:18:05+00:00,ARCADIA_PUBLIC_002,Papers\11-ARCADIA_public,no_chain,,,,,,159.4
+2026-08-23T14:21:59+00:00,REGFORMER_001,Papers\12-RegFormer,ok,False,EXECUTION_REQUIRED — required files (precomputed embeddings and/or the dataset,714810,0.2041,yes,234.2
+2026-08-23T14:24:50+00:00,REGFORMER_002,Papers\12-RegFormer,ok,True,0.8841,752114,0.2054,yes,171.2
+2026-08-23T14:32:03+00:00,CROSSPPI_002,Papers\16-CrossPPI,no_chain,,,,,,432.6
+2026-08-23T14:41:25+00:00,CROSSPPI_003,Papers\16-CrossPPI,exit_1,,,,,,561.7
+2026-08-23T14:41:30+00:00,CROSSPPI_004,Papers\16-CrossPPI,exit_1,,,,,,5.7
+2026-08-23T14:44:54+00:00,DISTORTIONS_002,Papers\10-distortions,no_chain,,,,,,203.8
+2026-08-23T14:49:57+00:00,DISTORTIONS_003,Papers\10-distortions,no_chain,,,,,,302.5
+2026-08-23T14:52:09+00:00,FADVI_002,Papers\13-fadvi,ok,False,Required file 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv' not fo,344303,0.1036,yes,132.1
+2026-08-23T14:54:26+00:00,FADVI_003,Papers\13-fadvi,ok,False,Required file 'fadvi/notebooks/advanced_usage/data/expression_matrix.csv' not fo,477105,0.1427,yes,137.6
+2026-08-23T15:29:43+00:00,CROSSPPI_006,Papers\16-CrossPPI,no_chain,,,,,,185.6
+2026-08-23T15:44:10+00:00,SCISTREECNA_003,Papers\09-ScisTreeCNA,no_chain,,,,,,866.9
+2026-08-23T15:48:23+00:00,DISTORTIONS_006,Papers\10-distortions,no_chain,,,,,,253.3
+2026-08-23T15:53:00+00:00,USHER_002,Papers\03-USHER,no_chain,,,,,,276.9
+2026-08-23T15:59:16+00:00,DISTORTIONS_005,Papers\10-distortions,no_chain,,,,,,376.4
+2026-08-23T16:02:11+00:00,ARCADIA_PUBLIC_003,Papers\11-ARCADIA_public,no_chain,,,,,,174.8
+2026-08-23T16:06:08+00:00,REGFORMER_003,Papers\12-RegFormer,ok,False,EXECUTION_REQUIRED — The requested files RegFormer/notebooks/cell_emb/data/emb,884570,0.2451,yes,237.5

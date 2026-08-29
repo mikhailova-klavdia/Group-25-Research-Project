@@ -12,6 +12,11 @@ papers/
 Papers/
 Paper2AgentBench/
 
+# RQ3 static-help experiment folder for testing-worker-critic (branch-independent,
+# same treatment as papers/ above -- this folder's contents differ per checked-out
+# branch's baseline data, so it deliberately isn't git-tracked)
+rq3-twc-readme-assist/
+
 # Per-repo reference link (local use only)
 biorxiv_link.txt
 

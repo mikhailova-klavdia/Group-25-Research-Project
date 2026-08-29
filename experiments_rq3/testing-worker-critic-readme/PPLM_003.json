@@ -1,0 +1,552 @@
+{
+  "id": "PPLM_003",
+  "team": "testing-worker-critic-readme",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1",
+  "question": "Run the PPLM tool using the protein sequence file seq1.fasta located at PPLM/notebooks/run_pplm/data/seq1.fasta as the first protein and seq2.fasta located at PPLM/notebooks/run_pplm/data/seq2.fasta as the second protein, saving the output pickle file to PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and using GPU device 0. What is the shape of the embed_A embeddings in the output pickle file (format as tuple)?",
+  "ground_truth": "(122, 1280)",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "List the repository to locate run scripts, example sequences, and any pretrained weights (.pt). This identifies whether the required checkpoint is present before attempting execution.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo:\nREADME.md\nenvironment.yml\nrun_pplm-affinity.py\nrun_pplm-contact.py\nrun_pplm-contact2.py\nrun_pplm-ppi.py\nrun_pplm.py\ndata/readme.md\ndata/affinity/cv_folds.csv\nexample/heterodimer.af3.pdb\nexample/heterodimer.afm.pdb\nexample/homodimer.af3.pdb\nexample/homodimer.afm.pdb\nexample/ligand.fasta\nexample/protein1.pdb\nexample/protein2.pdb\nexample/receptor.fasta\nexample/seq1.fasta\nexample/seq2.fasta\nexample/seq_pairs.fasta\npplm/__init__.py\npplm/axial_attention.py\npplm/constants.py\npplm/data.py\npplm/modules.py\npplm/multihead_attention.py\npplm/pplm.py\npplm/rotary_embedding.py\npplm/models/download_model.sh\npplm_affinity/__init__.py\npplm_affinity/model.py\npplm_contact/LoadHHM.py\npplm_contact/Module.py\npplm_contact/__init__.py\npplm_contact/config.py\npplm_contact/model.py\npplm_contact/predict.py\npplm_contact/predict2.py\npplm_contact/utils.py\npplm_contact/external_tools/extract_esm_msa_features.py\npplm_contact/external_tools/esm/__init__.py\npplm_contact/external_tools/esm/axial_attention.py\npplm_contact/external_tools/esm/constants.py\npplm_contact/external_tools/esm/data.py\npplm_contact/external_tools/esm/modules.py\npplm_contact/external_tools/esm/multihead_attention.py\npplm_contact/external_tools/esm/pretrained.py\npplm_contact/external_tools/esm/rotary_embedding.py\npplm_contact/external_tools/esm/version.py\npplm_contact/external_tools/esm/esmfold/v1/__init__.py\npplm_contact/external_tools/esm/esmfold/v1/categorical_mixture.py\npplm_contact/external_tools/esm/esmfold/v1/esmfold.py\npplm_contact/external_tools/esm/esmfold/v1/misc.py\npplm_contact/external_tools/esm/esmfold/v1/pretrained.py\npplm_contact/external_tools/esm/esmfold/v1/tri_self_attn_block.py\npplm_contact/external_tools/esm/esmfold/v1/trunk.py\npplm_contact/external_tools/esm/inverse_folding/__init__.py\npplm_contact/external_tools/esm/inverse_folding/features.py\npplm_contact/external_tools/esm/inverse_folding/gvp_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_modules.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_utils.py\npplm_contact/external_tools/esm/inverse_folding/multichain_util.py\npplm_contact/external_tools/esm/inverse_folding/transformer_decoder.py\npplm_contact/external_tools/esm/inverse_folding/transformer_layer.py\npplm_contact/external_tools/esm/inverse_folding/util.py\npplm_contact/external_tools/esm/model/__init__.py\npplm_contact/external_tools/esm/model/esm1.py\npplm_contact/external_tools/esm/model/esm2.py\npplm_contact/external_tools/esm/model/msa_transformer.py\npplm_contact/external_tools/esm/models/download_model.sh\npplm_contact/models/download_model.sh\npplm_ppi/__init__.py\npplm_ppi/model.py\nweights/download_weights.sh",
+      "reflection": "run_pplm.py and example sequences exist but no .pt checkpoint listed at top level; search for .pt artifacts next."
+    },
+    {
+      "step": 2,
+      "thought": "Search the repository for any .pt files (model checkpoints) so I can confirm whether the required pplm_t33_650M.pt is present.",
+      "action": "find_repo_files({\"pattern\":\".pt\",\"include_binary\":true})",
+      "observation": "No filenames matched '.pt' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo",
+      "reflection": "No .pt checkpoints present in the repo. I should inspect run_pplm.py to see the exact path it expects and the provided download helper."
+    },
+    {
+      "step": 3,
+      "thought": "Read run_pplm.py to confirm the checkpoint path it attempts to load and to verify output embed extraction logic (so I know the required artifact name).",
+      "action": "read_repo_file({\"relative_path\":\"run_pplm.py\"})",
+      "observation": "Contents of D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo\\run_pplm.py:\nimport argparse\nimport pathlib\nimport pickle\nimport torch\nfrom pplm import PPLM, Alphabet\n\n\ndef main():\n    parser = argparse.ArgumentParser(\n        description=\"PPLM: Protein-Protein Language Model.\"\n    )\n    parser.add_argument(\n        \"seqA_path\",\n        type=pathlib.Path,\n        help=\"sequence file of the first sequence.\",\n    )\n    parser.add_argument(\n        \"seqB_path\",\n        type=pathlib.Path,\n        help=\"sequence file of the second sequence.\",\n    )\n\n    parser.add_argument(\n        \"out_pkl_path\",\n        type=pathlib.Path,\n        help=\"output path to storge the embedding and attention weights produced by PPLM\",\n    )\n\n    parser.add_argument(\n        \"--gpu_id\",\n        type=int,\n        default=0,\n        help=\"gpu device specified\",\n    )\n\n    args = parser.parse_args()\n\n    ##### Loading PPLM Model #####\n    alphabet = Alphabet.from_architecture()\n    batch_converter = alphabet.get_batch_converter()\n    model_data = torch.load(\"pplm/models/pplm_t33_650M.pt\", map_location=\"cpu\")\n    model_param = model_data[\"param\"]\n    model_state = model_data[\"model\"]\n\n    model = PPLM(\n        num_layers=model_param['encoder_layers'],\n        embed_dim=model_param['encoder_embed_dim'],\n        attention_heads=model_param['encoder_attention_heads'],\n        token_dropout=False,\n        alphabet=alphabet\n    )\n\n    assigned_device = \"cuda:\" + str(args.gpu_id)\n    device = assigned_device if torch.cuda.is_available() else \"cpu\"\n\n    model.to(device)\n    model.load_state_dict(model_state, strict=False)\n\n\n    with torch.no_grad():\n        seqA, seqB = '', ''\n        for line in open(args.seqA_path, \"r\").readlines():\n            if not line.startswith(\">\"):\n                seqA += line.strip()\n        for line in open(args.seqB_path, \"r\").readlines():\n            if not line.startswith(\">\"):\n                seqB += line.strip()\n        lenA, lenB = len(seqA), len(seqB)\n\n\n        seqA_labels, seqA_strs, seqA_tokens = batch_converter([('seqA', seqA)])\n        seqB_labels, seqB_strs, seqB_tokens = batch_converter([('seqB', seqB)])\n        tokens = torch.cat([seqA_tokens, seqB_tokens], dim=-1).to(device)\n\n        inter_chain_mask = torch.ones((lenA + 2 + lenB + 2, lenA + 2 + lenB + 2), device=device)\n        inter_chain_mask[:lenA + 2, :lenA + 2] = 0\n        inter_chain_mask[lenA + 2:, lenA + 2:] = 0\n\n        ##### running PPLM #####\n        out = model(tokens, inter_chain_mask, repr_layers=[33], need_head_weights=True, return_contacts=False)\n\n        ### Intra-protein embedding and attention weights, as well as inter-protein attention weights\n        embed_A = out['representations'][33][0, 1:(lenA + 1), :].cpu().numpy()\n        embed_B = out['representations'][33][0, -(lenB + 1):-1, :].cpu().numpy()\n        attn_AA = out['attentions'].squeeze()[:, :, 1:(lenA + 1), 1:(lenA + 1)].reshape(20*33, lenA, lenA).cpu().numpy()\n        attn_AB = out['attentions'].squeeze()[:, :, 1:(lenA + 1), -(lenB + 1):-1].reshape(20*33, lenA, lenB).cpu().numpy()\n        attn_BA = out['attentions'].squeeze()[:, :, -(lenB + 1):-1, 1:(lenA + 1)].reshape(20*33, lenB, lenA).cpu().numpy()\n        attn_BB = out['attentions'].squeeze()[:, :, -(lenB + 1):-1, -(lenB + 1):-1].reshape(20*33, lenB, lenB).cpu().numpy()\n\n        inter_attn = (attn_AB + attn_BA.transpose(0, 2, 1)) / 2\n\n        ### Full size of embedding and attention weights\n        # embed = np.concatenate((embed_A, embed_B), axis=0)\n        # attn = np.zeros((20*33, lenA + lenB, lenA + lenB))\n        # attn[:, :lenA, :lenA] = attn_AA\n        # attn[:, :lenA, lenA:] = attn_AB\n        # attn[:, lenA:, :lenA] = attn_BA\n        # attn[:, lenA:, lenA:] = attn_BB\n\n        output = {\n            'embed_A': embed_A,\n            'embed_B': embed_B,\n            'attn_AA': attn_AA,\n            'attn_BB': attn_BB,\n            'inter_attn': inter_attn,\n            # 'embed': embed,\n            # 'attn': attn,\n        }\n\n        with open(args.out_pkl_path, mode='wb') as fw:\n            pickle.dump(output, fw)\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "reflection": "The script requires pplm/models/pplm_t33_650M.pt to run. I need to download the checkpoint (there is a download script). Stage files and try the download."
+    },
+    {
+      "step": 4,
+      "thought": "Read the provided model download helper to see where it would fetch the checkpoint from and whether it's feasible to run here.",
+      "action": "read_repo_file({\"relative_path\":\"pplm/models/download_model.sh\"})",
+      "observation": "Contents of D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo\\pplm\\models\\download_model.sh:\n#!/bin/bash\n\nwget https://zhanggroup.org/PPLM/bin/codes/pplm_parameters/pplm_t33_650M.pt\n",
+      "reflection": "Checkpoint is downloadable via wget from a public URL, but I need to run the download in the workspace; try staging necessary files and invoke the download script."
+    },
+    {
+      "step": 5,
+      "thought": "Stage the pplm package into the workspace so run_pplm.py can import it, and stage run_pplm.py and the example sequences to the expected notebook data path so I can run the script locally if the checkpoint is available.",
+      "action": "stage_repo_path({\"relative_path\":\"pplm\",\"destination_path\":\"workspace/pplm\"})",
+      "observation": "Contents of D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo\\weights\\download_weights.sh:\n#!/usr/bin/env bash\nset -e\n\necho \"========== Download PPLM weights ==========\"\nif wget --spider -q \"https://zhanggroup.org/PPLM/bin/weights/pplm_t33_650M.pt\"; then\n    echo \"   File found on zhanggroup.org. Downloading with wget...\"\n    wget \"https://zhanggroup.org/PPLM/bin/weights/pplm_t33_650M.pt\"\nelse\n    echo \"   File not accessible on zhanggroup.org. Downloading from Google Drive...\"\n    gdown --fuzzy \"https://drive.google.com/file/d/1teZBp3m_OQ4nciTmiepUDP8p9BXoVEwa/view?usp=drive_link\"\nfi\n\necho \"========== Download PPLM-PPI weights ==========\"\nif wget --spider -q \"https://zhanggroup.org/PPLM/bin/weights/ppi_models.pkl\"; then\n    echo \"   File found on zhanggroup.org. Downloading with wget...\"\n    wget \"https://zhanggroup.org/PPLM/bin/weights/ppi_models.pkl\"\nelse\n    echo \"   File not accessible on zhanggroup.org. Downloading from Google Drive...\"\n    gdown --fuzzy \"https://drive.google.com/file/d/1Xdb3SG0CRY49WqH4jUJhM-yqsLOejz7_/view?usp=share_link\"\nfi\n\necho \"========== Download PPLM-Affinity weights ==========\"\nif wget --spider -q \"https://zhanggroup.org/PPLM/bin/weights/affinity_models.pkl\"; then\n    echo \"   File found on zhanggroup.org. Downloading with wget...\"\n    wget \"https://zhanggroup.org/PPLM/bin/weights/affinity_models.pkl\"\nelse\n    echo \"   File not accessible on zhanggroup.org. Downloading from Google Drive...\"\n    gdown --fuzzy \"https://drive.google.com/file/d/1s99QyTYjngRUUpy8VXJPhTXYHwmw9agp/view?usp=share_link\"\nfi\n\necho \"========== Download PPLM-Contact weights ==========\"\nif wget --spider -q \"https://zhanggroup.org/PPLM/bin/weights/pplm_contact_models.pkl\"; then\n    echo \"   File found on zhanggroup.org. Downloading with wget...\"\n    wget \"https://zhanggroup.org/PPLM/bin/weights/pplm_contact_models.pkl\"\nelse\n    echo \"   File not accessible on zhanggroup.org. Downloading from Google Drive...\"\n    gdown --fuzzy \"https://drive.google.com/file/d/1QxSFXojCQmLzgrTz398lUEdIZmqVVV9E/view?usp=share_link\"\nfi\n\necho \"========== Download PPLM-Contact2 weights ==========\"\nif wget --spider -q \"https://zhanggroup.org/PPLM/bin/weights/pplm_contact2_models.pkl\"; then\n    echo \"   File found on zhanggroup.org. Downloading with wget...\"\n    wget \"https://zhanggroup.org/PPLM/bin/weights/pplm_contact2_models.pkl\"\nelse\n    echo \"   File not accessible on zhanggroup.org. Downloading from Google Drive...\"\n    gdown --fuzzy \"https://drive.google.com/file/d/1SSEkfyiwtUVO4ZSN10HC5T2v-EGOHXle/view?usp=share_link\"\nfi\n",
+      "reflection": "pplm package staged. Next stage run_pplm.py and the two example fasta files."
+    },
+    {
+      "step": 6,
+      "thought": "Stage the run_pplm.py script into the workspace for execution.",
+      "action": "stage_repo_path({\"relative_path\":\"run_pplm.py\",\"destination_path\":\"workspace/run_pplm.py\"})",
+      "observation": "Staged file run_pplm.py into workspace/workspace/run_pplm.py",
+      "reflection": "run_pplm.py staged. Now stage the example sequence files into the requested PPLM/notebooks/run_pplm/data path."
+    },
+    {
+      "step": 7,
+      "thought": "Stage example/seq1.fasta into the workspace path PPLM/notebooks/run_pplm/data/seq1.fasta as the question requests that path.",
+      "action": "stage_repo_path({\"relative_path\":\"example/seq1.fasta\",\"destination_path\":\"workspace/PPLM/notebooks/run_pplm/data/seq1.fasta\"})",
+      "observation": "Staged file example/seq2.fasta into workspace/workspace/PPLM/notebooks/run_pplm/data/seq2.fasta",
+      "reflection": "seq1.fasta staged. Stage seq2.fasta similarly."
+    },
+    {
+      "step": 8,
+      "thought": "Stage example/seq2.fasta into the workspace path PPLM/notebooks/run_pplm/data/seq2.fasta.",
+      "action": "stage_repo_path({\"relative_path\":\"example/seq2.fasta\",\"destination_path\":\"workspace/PPLM/notebooks/run_pplm/data/seq2.fasta\"})",
+      "observation": "Staged file example/seq1.fasta into workspace/workspace/PPLM/notebooks/run_pplm/data/seq1.fasta",
+      "reflection": "Both sequences and scripts staged. Verify workspace contents and attempt to run the model download helper to get the checkpoint."
+    },
+    {
+      "step": 9,
+      "thought": "List workspace files to confirm staged paths and the presence of the download script before attempting download.",
+      "action": "list_workspace_files()",
+      "observation": "No filenames matched '.pkl' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo",
+      "reflection": "download_model.sh is available under workspace/pplm/models. Attempt to run it to fetch pplm_t33_650M.pt into workspace/pplm/models."
+    },
+    {
+      "step": 10,
+      "thought": "Run the model download script in the workspace to obtain pplm/models/pplm_t33_650M.pt so run_pplm.py can load it. If download fails, I will report missing weights.",
+      "action": "execute_command({\"command\":\"mkdir -p PPLM/notebooks/run_pplm/output && bash workspace/pplm/models/download_model.sh\",\"timeout\":120000})",
+      "observation": "Staged directory pplm into workspace/workspace/pplm",
+      "reflection": "The download script could not be executed in this environment (shell/platform limitation or missing wget). The required checkpoint pplm/models/pplm_t33_650M.pt is not present and could not be downloaded here, so I cannot run run_pplm.py to produce the output pickle and read embed_A shape."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: A high-severity missing artifact (the pretrained checkpoint) prevented running the workflow and the worker did not demonstrate a valid bypass. (gaps: Missing pretrained checkpoint pplm_t33_650M.pt)",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. A high-severity missing artifact (the pretrained checkpoint) prevented running the workflow and the worker did not demonstrate a valid bypass. Original answer was: EXECUTION_REQUIRED — missing model checkpoint pplm/models/pplm_t33_650M.pt and the repository's download script could not be run in this environment to fetch it.",
+    "blocker_evidence": [
+      "find_repo_files('.pt') returned: No filenames matched '.pt' under the repo.",
+      "run_pplm.py contains: torch.load(\"pplm/models/pplm_t33_650M.pt\", map_location=\"cpu\").",
+      "Attempt to run download script failed: STDERR: \"The syntax of the command is incorrect.\" (Exit code 1)."
+    ]
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker performed an extensive and methodical exploration of the repository, verifying required input files and crucially the presence of the pretrained model checkpoint 'pplm_t33_650M.pt' needed by run_pplm.py. They attempted to locate the checkpoint within the repo and confirmed its absence. They identified that the checkpoint could be downloaded using the included download script and examined this script's content. The worker staged necessary files and attempted to execute the download script within the current environment; however, this attempt failed due to a platform/shell limitation. Hence, the worker correctly reported a blocker of missing weights preventing actual execution of run_pplm.py. The final answer clearly states EXECUTION_REQUIRED due to the inability to obtain the required checkpoint and thus inability to produce actual output embeddings. There is no fabrication of output or shape data—all reasoning is grounded in real tool outputs and attempted executions. This honest and detailed blocking explanation with real tool evidence constitutes a valid pass verdict for integrity.",
+      "missing_packages": [],
+      "suggested_action": null
+    }
+  ],
+  "install_events": [
+    {
+      "attempt": 1,
+      "modules": [
+        "torch"
+      ],
+      "packages": [
+        "torch"
+      ],
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--no-cache",
+        "--python",
+        "D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T165821-ea161af8\\.venv\\Scripts\\python.exe",
+        "torch"
+      ],
+      "exit_code": 0,
+      "output": "Using Python 3.12.13 environment at: Papers\\14-PPLM\\runs\\20260818T165821-ea161af8\\.venv\nChecked 1 package in 322ms",
+      "succeeded": true
+    }
+  ],
+  "token_usage": {
+    "pre_run_estimate": 1611,
+    "input_tokens": 108192,
+    "output_tokens": 6348,
+    "total_tokens": 114540,
+    "estimated_cost_usd": 0.039744,
+    "aggregate": {
+      "input_tokens": 449786,
+      "output_tokens": 20647,
+      "total_tokens": 470433,
+      "estimated_cost_usd": 0.15507835
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 106811,
+        "output_tokens": 3506,
+        "total_tokens": 110317,
+        "estimated_cost_usd": 0.03371475
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 98859,
+        "output_tokens": 3153,
+        "total_tokens": 102012,
+        "estimated_cost_usd": 0.03102075
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 115568,
+        "output_tokens": 3893,
+        "total_tokens": 119461,
+        "estimated_cost_usd": 0.036678
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 108192,
+        "output_tokens": 6348,
+        "total_tokens": 114540,
+        "estimated_cost_usd": 0.039744
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 9495,
+        "output_tokens": 216,
+        "total_tokens": 9711,
+        "estimated_cost_usd": 0.0041436
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 8773,
+        "output_tokens": 2969,
+        "total_tokens": 11742,
+        "estimated_cost_usd": 0.00813125
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 2088,
+        "output_tokens": 562,
+        "total_tokens": 2650,
+        "estimated_cost_usd": 0.001646
+      }
+    ]
+  },
+  "help_provided": true,
+  "extraction_report": {
+    "paper_summary": "PPLM: paired-sequence protein language model for PPI, affinity, and contact prediction.",
+    "research_objective": "Model paired protein sequences to produce per-residue embeddings and attentions for downstream PPI/affinity/contact tasks.",
+    "identified_experiments": [
+      "Generate per-chain embeddings and attention with run_pplm.py",
+      "PPI prediction via run_pplm-ppi.py",
+      "Affinity prediction via run_pplm-affinity.py",
+      "Contact prediction via run_pplm-contact.py / contact2",
+      "Generate PPLM embeddings and attentions (run_pplm.py)",
+      "PPI prediction (run_pplm-ppi.py)",
+      "Affinity prediction (run_pplm-affinity.py)",
+      "Contact prediction (run_pplm-contact.py / run_pplm-contact2.py)"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "Generate PPLM embeddings and attentions (run_pplm.py)",
+        "paper_reference": null,
+        "confidence": "high",
+        "objective": "Run the PPLM model on two sequences to produce per-chain embeddings and attention maps.",
+        "repo_entrypoints": [
+          "run_pplm.py"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "example/seq1.fasta (or provided seq1.fasta)",
+          "example/seq2.fasta (or provided seq2.fasta)",
+          "weights/pplm_t33_650M.pt (checkpoint required)"
+        ],
+        "expected_outputs": [
+          "output pickle with keys: embed_A, embed_B, attn_AA, attn_BB, inter_attn"
+        ],
+        "dependency_hints": [
+          "PyTorch",
+          "numpy (<2 may be required with some torch builds)",
+          "GPU recommended (cuda)"
+        ],
+        "ambiguity_notes": [
+          "Checkpoint weights are not present in repo by default; run_pplm.py loads pplm/models/pplm_t33_650M.pt or weights/pplm_t33_650M.pt. If missing, download via weights/download_weights.sh."
+        ],
+        "notes": "embed_A is extracted as out['representations'][33][0,1:lenA+1,:] (shape = (lenA, embedding_dim))."
+      },
+      {
+        "workflow_name": "PPI prediction (run_pplm-ppi.py)",
+        "paper_reference": "PPLM-PPI in README",
+        "confidence": "medium",
+        "objective": "Use PPLM features to predict interaction probability.",
+        "repo_entrypoints": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "weights/ppi_models.pkl",
+          "weights/pplm_t33_650M.pt",
+          "two fasta sequences"
+        ],
+        "expected_outputs": [
+          "printed Predicted interaction score (float)"
+        ],
+        "dependency_hints": [
+          "PyTorch",
+          "weights/ppi_models.pkl",
+          "GPU recommended"
+        ],
+        "ambiguity_notes": [
+          "Weights not included by default."
+        ],
+        "notes": ""
+      },
+      {
+        "workflow_name": "Affinity prediction (run_pplm-affinity.py)",
+        "paper_reference": "PPLM-Affinity in README",
+        "confidence": "medium",
+        "objective": "Predict binding affinity using PPLM features and affinity models.",
+        "repo_entrypoints": [
+          "run_pplm-affinity.py",
+          "pplm_affinity/"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "weights/affinity_models.pkl",
+          "weights/pplm_t33_650M.pt",
+          "receptor.fasta",
+          "ligand.fasta"
+        ],
+        "expected_outputs": [
+          "printed Predicted binding affinity (float)"
+        ],
+        "dependency_hints": [
+          "PyTorch",
+          "weights/affinity_models.pkl"
+        ],
+        "ambiguity_notes": [
+          "Weights not included by default."
+        ],
+        "notes": ""
+      },
+      {
+        "workflow_name": "Contact prediction (run_pplm-contact.py / run_pplm-contact2.py)",
+        "paper_reference": "PPLM-Contact in README",
+        "confidence": "medium",
+        "objective": "Predict inter-residue contact probabilities using PPLM and auxiliary tools (MSA, CCMpred).",
+        "repo_entrypoints": [
+          "run_pplm-contact.py",
+          "run_pplm-contact2.py",
+          "pplm_contact/"
+        ],
+        "config_files": [
+          "pplm_contact/config.py"
+        ],
+        "required_inputs": [
+          "external tools/databases (HH-suite3, Uniclust30, CCMpred), weights/pplm_contact_models.pkl, optional ESM-MSA model"
+        ],
+        "expected_outputs": [
+          "predicted contact files (text)"
+        ],
+        "dependency_hints": [
+          "HH-suite3, CCMpred, ESM-MSA, PyTorch"
+        ],
+        "ambiguity_notes": [
+          "Several external dependencies must be installed and databases downloaded; not all provided in repo."
+        ],
+        "notes": ""
+      }
+    ],
+    "repo_entrypoints": [
+      "run_pplm.py",
+      "run_pplm-ppi.py",
+      "pplm_ppi/",
+      "run_pplm-affinity.py",
+      "pplm_affinity/",
+      "run_pplm-contact.py",
+      "run_pplm-contact2.py",
+      "pplm_contact/"
+    ],
+    "config_files": [
+      "pplm_contact/config.py"
+    ],
+    "input_artifacts": [
+      "example/seq1.fasta (or provided seq1.fasta)",
+      "example/seq2.fasta (or provided seq2.fasta)",
+      "weights/pplm_t33_650M.pt (checkpoint required)",
+      "weights/ppi_models.pkl",
+      "weights/pplm_t33_650M.pt",
+      "two fasta sequences",
+      "weights/affinity_models.pkl",
+      "receptor.fasta",
+      "ligand.fasta",
+      "external tools/databases (HH-suite3, Uniclust30, CCMpred), weights/pplm_contact_models.pkl, optional ESM-MSA model"
+    ],
+    "expected_outputs": [
+      "output pickle with keys: embed_A, embed_B, attn_AA, attn_BB, inter_attn",
+      "printed Predicted interaction score (float)",
+      "printed Predicted binding affinity (float)",
+      "predicted contact files (text)"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "Embedding extraction (script)",
+        "repo_assets": [
+          "run_pplm.py"
+        ],
+        "rationale": "run_pplm.py implements embedding extraction and writes embed_A/embed_B and attention arrays to a pickle."
+      },
+      {
+        "paper_reference": "PPI prediction",
+        "repo_assets": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/"
+        ],
+        "rationale": "run_pplm-ppi.py loads PPLM features and ppi_models.pkl to produce interaction score."
+      },
+      {
+        "paper_reference": "Affinity prediction",
+        "repo_assets": [
+          "run_pplm-affinity.py",
+          "pplm_affinity/"
+        ],
+        "rationale": "run_pplm-affinity.py uses affinity_models.pkl and PPLM features."
+      },
+      {
+        "paper_reference": "Contact prediction",
+        "repo_assets": [
+          "run_pplm-contact.py",
+          "pplm_contact/"
+        ],
+        "rationale": "run_pplm-contact scripts and module implement contact prediction pipeline."
+      }
+    ],
+    "ambiguous_mappings": [
+      "Exact encoder_embed_dim is read from checkpoint (model_data['param']['encoder_embed_dim']). If checkpoint absent, code default is 1280 defined in PPLM.__init__, but authoritative value requires loading the checkpoint.",
+      "Checkpoint weights are not present in repo by default; run_pplm.py loads pplm/models/pplm_t33_650M.pt or weights/pplm_t33_650M.pt. If missing, download via weights/download_weights.sh.",
+      "Weights not included by default.",
+      "Several external dependencies must be installed and databases downloaded; not all provided in repo."
+    ],
+    "missing_information": [
+      "weights/pplm_t33_650M.pt and downstream model weight files are not present in the repository root; they must be downloaded to run the workflows."
+    ],
+    "notes": "embed_A extraction logic: embed_A = out['representations'][33][0, 1:(lenA + 1), :], so shape = (lenA, encoder_embed_dim). Using example/seq1.fasta (length 122) and default embed_dim=1280, expected shape would be (122, 1280). The exact embed_dim value is determined by the checkpoint param 'encoder_embed_dim'."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "Generate PPLM embeddings (run_pplm.py)",
+        "status": "blocked",
+        "paper_reference": null,
+        "files_staged": [
+          "run_pplm.py",
+          "PPLM/notebooks/run_pplm/data/seq1.fasta",
+          "PPLM/notebooks/run_pplm/data/seq2.fasta"
+        ],
+        "commands_run": [
+          "python -c \"import os; os.makedirs('PPLM/notebooks/run_pplm/output', exist_ok=True)\" & python run_pplm.py PPLM/notebooks/run_pplm/data/seq1.fasta PPLM/notebooks/run_pplm/data/seq2.fasta PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl --gpu_id 0"
+        ],
+        "observed_outputs": [
+          "Traceback (most recent call last):",
+          "  File \".../workspace/run_pplm.py\", line 4, in <module>",
+          "    import torch",
+          "ModuleNotFoundError: No module named 'torch'"
+        ],
+        "missing_inputs": [
+          "pplm/models/pplm_t33_650M.pt (checkpoint file required by run_pplm.py)"
+        ],
+        "dependency_issues": [
+          "Python package 'torch' is not installed in the execution environment (ModuleNotFoundError)."
+        ],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "Attempted to run run_pplm.py on the provided seq files; execution failed immediately due to missing torch and the model checkpoint file not present at pplm/models/pplm_t33_650M.pt."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "Generate PPLM embeddings (run_pplm.py)"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Install PyTorch in the environment (e.g. pip install torch) and re-run.",
+      "Place the pretrained checkpoint pplm_t33_650M.pt at pplm/models/pplm_t33_650M.pt (or adjust the script path). The repo includes weights/download_weights.sh for obtaining it if needed.",
+      "After installing torch and adding the checkpoint, re-run the same command to produce the output pickle and then inspect the 'embed_A' shape in the generated file."
+    ],
+    "notes": "The requested input paths (PPLM/notebooks/run_pplm/data/seq1.fasta and seq2.fasta) resolved to repo/example/seq1.fasta and example/seq2.fasta and were staged for testing. Execution could not proceed due to missing torch and missing checkpoint."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Blocked: core embedding workflow could not be executed due to a missing pretrained checkpoint and environment/run-time issues that prevented obtaining it or running the script.",
+    "identified_gaps": [
+      {
+        "title": "Missing pretrained checkpoint pplm_t33_650M.pt",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": null,
+        "related_repo_files": [
+          "run_pplm.py",
+          "pplm/models/download_model.sh",
+          "weights/download_weights.sh"
+        ],
+        "related_workflow": "Generate PPLM embeddings (run_pplm.py)",
+        "execution_evidence": [
+          "find_repo_files('.pt') returned: No filenames matched '.pt' in the repo.",
+          "run_pplm.py contains: torch.load(\"pplm/models/pplm_t33_650M.pt\", map_location=\"cpu\").",
+          "pplm/models/download_model.sh contains wget URL to https://zhanggroup.org/PPLM/bin/codes/pplm_parameters/pplm_t33_650M.pt",
+          "Attempt to run the included download script in the workspace failed: STDERR: \"The syntax of the command is incorrect.\" (Exit code 1)."
+        ],
+        "explanation": "The script expects a local checkpoint at pplm/models/pplm_t33_650M.pt; no .pt checkpoint is present in the repository/workspace and the provided helper to fetch it could not be executed here, so the model cannot be loaded.",
+        "likely_impact": "Blocks reproduction of the main embedding generation workflow and prevents producing the requested output pickle (and thus reading embed_A shape).",
+        "possible_remediation": "Place pplm_t33_650M.pt at pplm/models/pplm_t33_650M.pt (or run the download script in a POSIX environment with wget/gdown) before running run_pplm.py."
+      },
+      {
+        "title": "Missing PyTorch runtime dependency (ModuleNotFoundError)",
+        "gap_type": "execution_gap",
+        "severity": "medium",
+        "paper_reference": null,
+        "related_repo_files": [
+          "run_pplm.py",
+          "environment.yml"
+        ],
+        "related_workflow": "Generate PPLM embeddings (run_pplm.py)",
+        "execution_evidence": [
+          "Observed error when invoking run_pplm.py: ModuleNotFoundError: No module named 'torch' (testing_report.workflows observed_outputs).",
+          "execution_answer notes attempting to run run_pplm.py failed immediately due to missing torch."
+        ],
+        "explanation": "The runtime environment used to attempt execution did not have PyTorch installed, causing immediate failure before the script could load model weights or produce outputs.",
+        "likely_impact": "Prevents any execution of run_pplm.py until PyTorch is installed; once installed, the missing-checkpoint issue still remains.",
+        "possible_remediation": "Install PyTorch in the execution environment (e.g. pip install torch) and ensure compatibility (e.g. NumPy version) before re-running."
+      },
+      {
+        "title": "Repository download helper not runnable in this environment",
+        "gap_type": "fragile_setup",
+        "severity": "medium",
+        "paper_reference": null,
+        "related_repo_files": [
+          "pplm/models/download_model.sh",
+          "weights/download_weights.sh"
+        ],
+        "related_workflow": "Generate PPLM embeddings (run_pplm.py)",
+        "execution_evidence": [
+          "pplm/models/download_model.sh is a bash script that runs wget to fetch the checkpoint.",
+          "Executing the download script in the workspace returned: 'The syntax of the command is incorrect.' (Exit code 1)."
+        ],
+        "explanation": "The repo provides shell scripts to retrieve weights, but they failed to run in the provided execution environment (likely due to platform/shell limitations or missing wget/gdown), impeding automatic retrieval of required artifacts.",
+        "likely_impact": "Makes automated, in-environment acquisition of required weights brittle; manual download or running the script in a suitable shell is required.",
+        "possible_remediation": "Run the provided download scripts in a POSIX shell with wget/gdown available, or manually download and place the required weight files into the expected paths."
+      }
+    ],
+    "paper_repo_mismatches": [],
+    "execution_gaps": [
+      "Missing PyTorch runtime dependency (ModuleNotFoundError)",
+      "Repository download helper not runnable in this environment"
+    ],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Missing pretrained checkpoint pplm_t33_650M.pt"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 1,
+      "medium": 2,
+      "low": 0
+    },
+    "evidence_sources": [
+      "testing_report.workflows",
+      "execution_answer.chain",
+      "execution_tool_outputs",
+      "critic_reviews",
+      "install_events"
+    ],
+    "recommended_followups": [
+      "Place pplm_t33_650M.pt at pplm/models/pplm_t33_650M.pt (or run the repo's download script in a POSIX environment with wget/gdown) and re-run run_pplm.py.",
+      "Ensure PyTorch is installed in the execution environment (pip install torch) and address NumPy compatibility if needed, then re-run.",
+      "After successful run, open the produced PPLM/notebooks/run_pplm/output/seq1-seq2.pplm.pkl and read output['embed_A'].shape to obtain the requested tuple."
+    ],
+    "notes": "The repo contains explicit helpers to download weights, but in this test environment the helpers could not be executed and no .pt files were present; the run was therefore blocked and no embed_A shape could be produced from real execution."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "A high-severity missing artifact (the pretrained checkpoint) prevented running the workflow and the worker did not demonstrate a valid bypass.",
+    "triggered_gaps": [
+      "Missing pretrained checkpoint pplm_t33_650M.pt"
+    ]
+  },
+  "elapsed_seconds": 795.7
+}

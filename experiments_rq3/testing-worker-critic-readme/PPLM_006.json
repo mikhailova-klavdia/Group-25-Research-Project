@@ -1,0 +1,647 @@
+{
+  "id": "PPLM_006",
+  "team": "testing-worker-critic-readme",
+  "model": "gpt-5-mini-2025-08-07",
+  "repo_link": "https://www.biorxiv.org/content/10.1101/2025.07.07.663595v1",
+  "question": "Using the PPLM protein-protein interaction prediction tool, predict the interaction probability between the first protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq1.fasta and the second protein sequence in the file at PPLM/notebooks/run_pplm-ppi/data/seq2.fasta, using GPU device 0. What is the predicted interaction score reported in the output?",
+  "ground_truth": "0.94310874",
+  "chain": [
+    {
+      "step": 1,
+      "thought": "I will list all readable files to map the repository layout and confirm presence/absence of weight files and example FASTAs.",
+      "action": "list_repo_files()",
+      "observation": "Readable repository files under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo:\nREADME.md\nenvironment.yml\nrun_pplm-affinity.py\nrun_pplm-contact.py\nrun_pplm-contact2.py\nrun_pplm-ppi.py\nrun_pplm.py\ndata/readme.md\ndata/affinity/cv_folds.csv\nexample/heterodimer.af3.pdb\nexample/heterodimer.afm.pdb\nexample/homodimer.af3.pdb\nexample/homodimer.afm.pdb\nexample/ligand.fasta\nexample/protein1.pdb\nexample/protein2.pdb\nexample/receptor.fasta\nexample/seq1.fasta\nexample/seq2.fasta\nexample/seq_pairs.fasta\npplm/__init__.py\npplm/axial_attention.py\npplm/constants.py\npplm/data.py\npplm/modules.py\npplm/multihead_attention.py\npplm/pplm.py\npplm/rotary_embedding.py\npplm/models/download_model.sh\npplm_affinity/__init__.py\npplm_affinity/model.py\npplm_contact/LoadHHM.py\npplm_contact/Module.py\npplm_contact/__init__.py\npplm_contact/config.py\npplm_contact/model.py\npplm_contact/predict.py\npplm_contact/predict2.py\npplm_contact/utils.py\npplm_contact/external_tools/extract_esm_msa_features.py\npplm_contact/external_tools/esm/__init__.py\npplm_contact/external_tools/esm/axial_attention.py\npplm_contact/external_tools/esm/constants.py\npplm_contact/external_tools/esm/data.py\npplm_contact/external_tools/esm/modules.py\npplm_contact/external_tools/esm/multihead_attention.py\npplm_contact/external_tools/esm/pretrained.py\npplm_contact/external_tools/esm/rotary_embedding.py\npplm_contact/external_tools/esm/version.py\npplm_contact/external_tools/esm/esmfold/v1/__init__.py\npplm_contact/external_tools/esm/esmfold/v1/categorical_mixture.py\npplm_contact/external_tools/esm/esmfold/v1/esmfold.py\npplm_contact/external_tools/esm/esmfold/v1/misc.py\npplm_contact/external_tools/esm/esmfold/v1/pretrained.py\npplm_contact/external_tools/esm/esmfold/v1/tri_self_attn_block.py\npplm_contact/external_tools/esm/esmfold/v1/trunk.py\npplm_contact/external_tools/esm/inverse_folding/__init__.py\npplm_contact/external_tools/esm/inverse_folding/features.py\npplm_contact/external_tools/esm/inverse_folding/gvp_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_modules.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer.py\npplm_contact/external_tools/esm/inverse_folding/gvp_transformer_encoder.py\npplm_contact/external_tools/esm/inverse_folding/gvp_utils.py\npplm_contact/external_tools/esm/inverse_folding/multichain_util.py\npplm_contact/external_tools/esm/inverse_folding/transformer_decoder.py\npplm_contact/external_tools/esm/inverse_folding/transformer_layer.py\npplm_contact/external_tools/esm/inverse_folding/util.py\npplm_contact/external_tools/esm/model/__init__.py\npplm_contact/external_tools/esm/model/esm1.py\npplm_contact/external_tools/esm/model/esm2.py\npplm_contact/external_tools/esm/model/msa_transformer.py\npplm_contact/external_tools/esm/models/download_model.sh\npplm_contact/models/download_model.sh\npplm_ppi/__init__.py\npplm_ppi/model.py\nweights/download_weights.sh",
+      "reflection": "The example FASTAs exist but model weight files don't appear in the tree; next search specifically for weight file extensions."
+    },
+    {
+      "step": 2,
+      "thought": "Search the repo for any .pt files (pretrained checkpoints) which the script would load.",
+      "action": "find_repo_files({\"pattern\":\".pt\",\"include_binary\":true})",
+      "observation": "No filenames matched '.pt' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo",
+      "reflection": "No .pt checkpoints present. I'll check for .pkl (ensemble/model weights) as well."
+    },
+    {
+      "step": 3,
+      "thought": "Search the repo for any .pkl files (model weight pickles) referenced by run_pplm-ppi.py.",
+      "action": "find_repo_files({\"pattern\":\".pkl\",\"include_binary\":true})",
+      "observation": "No filenames matched '.pkl' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo",
+      "reflection": "No .pkl weight files present. Next resolve the question paths for the FASTA inputs to real repo paths."
+    },
+    {
+      "step": 4,
+      "thought": "Resolve the question's seq1.fasta path to the actual file in this repo snapshot to know which FASTA to pass to the script.",
+      "action": "resolve_repo_path({\"question_path\":\"PPLM/notebooks/run_pplm-ppi/data/seq1.fasta\"})",
+      "observation": "Resolving question path 'PPLM/notebooks/run_pplm-ppi/data/seq1.fasta' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo:\nbasename: example/seq1.fasta [text, 149 B]",
+      "reflection": "seq1 maps to example/seq1.fasta. Resolve seq2 next."
+    },
+    {
+      "step": 5,
+      "thought": "Resolve the question's seq2.fasta path to the actual file in this repo snapshot.",
+      "action": "resolve_repo_path({\"question_path\":\"PPLM/notebooks/run_pplm-ppi/data/seq2.fasta\"})",
+      "observation": "Resolving question path 'PPLM/notebooks/run_pplm-ppi/data/seq2.fasta' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo:\nbasename: example/seq2.fasta [text, 97 B]",
+      "reflection": "Both FASTAs are available as example/*.fasta. I'll attempt to run the PPLM-PPI entrypoint with GPU id 0 to get the predicted score."
+    },
+    {
+      "step": 6,
+      "thought": "Run the provided entrypoint with the resolved FASTA paths and --gpu_id 0 to obtain the printed predicted interaction score.",
+      "action": "execute_command({\"command\":\"python run_pplm-ppi.py example/seq1.fasta example/seq2.fasta --gpu_id 0\",\"timeout\":120000})",
+      "observation": "Exit code: 1\n\nSTDERR:\nD:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T172546-04338594\\.venv\\Lib\\site-packages\\torch\\_subclasses\\functional_tensor.py:368: UserWarning: Failed to initialize NumPy: No module named 'numpy' (Triggered internally at C:\\actions-runner\\_work\\pytorch\\pytorch\\torch\\csrc\\utils\\tensor_numpy.cpp:84.)\n  cpu = _conversion_method_template(device=torch.device(\"cpu\"))\nTraceback (most recent call last):\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T172546-04338594\\workspace\\run_pplm-ppi.py\", line 134, in <module>\n    main()\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T172546-04338594\\workspace\\run_pplm-ppi.py\", line 32, in main\n    model_weights = torch.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), \"weights/ppi_models.pkl\"), map_location=device)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T172546-04338594\\.venv\\Lib\\site-packages\\torch\\serialization.py\", line 1561, in load\n    with _open_file_like(f, \"rb\") as opened_file:\n         ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T172546-04338594\\.venv\\Lib\\site-packages\\torch\\serialization.py\", line 795, in _open_file_like\n    return _open_file(name_or_buffer, mode)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T172546-04338594\\.venv\\Lib\\site-packages\\torch\\serialization.py\", line 776, in __init__\n    super().__init__(open(name, mode))  # noqa: SIM115\n                     ^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'D:\\\\University\\\\Masters\\\\Semester 1\\\\Group-25-Research-Project\\\\Papers\\\\14-PPLM\\\\runs\\\\20260818T172546-04338594\\\\workspace\\\\weights/ppi_models.pkl'\n",
+      "reflection": "Execution failed because the script expects weights/ppi_models.pkl (and likely the pplm .pt checkpoint) in weights/; these files are absent. I'll search the repo/readme for references to where to obtain them."
+    },
+    {
+      "step": 7,
+      "thought": "Search the repo text for references to ppi_models.pkl or download instructions to confirm weight availability and origin.",
+      "action": "search_repo({\"query\":\"ppi_models\"})",
+      "observation": "Search results for 'ppi_models' under D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\repo:\nREADME.md:44: 2. **PPLM-PPI**: [https://zhanggroup.org/PPLM/bin/weights/ppi_models.pkl](https://zhanggroup.org/PPLM/bin/weights/ppi_models.pkl) or [pplm-ppi_weights](https://drive.google.com/file/d/1QxSFXojCQmLzgrTz398lUEdIZmqVVV9E/view?usp=share_link...\nrun_pplm-ppi.py:32: model_weights = torch.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), \"weights/ppi_models.pkl\"), map_location=device)\nweights/download_weights.sh:14: if wget --spider -q \"https://zhanggroup.org/PPLM/bin/weights/ppi_models.pkl\"; then\nweights/download_weights.sh:16: wget \"https://zhanggroup.org/PPLM/bin/weights/ppi_models.pkl\"",
+      "reflection": "Repo points to external downloads for the required weight files; they are not present locally. Therefore I cannot produce the real predicted score here without those weights."
+    }
+  ],
+  "final_answer": "EXECUTION_REQUIRED — gate blocked: A high-severity missing_artifact (core PPI and PPLM checkpoints) prevents running the PPLM-PPI workflow to produce the reported score and the worker did not bypass it. (gaps: Missing core PPI and PPLM checkpoints (weights/ppi_models.pkl, weights/pplm_t33_650M.pt))",
+  "failure_analysis": {
+    "answer_status": "blocked",
+    "blocker_type": "runtime_error",
+    "blocker_explanation": "Gate agent blocked this answer. A high-severity missing_artifact (core PPI and PPLM checkpoints) prevents running the PPLM-PPI workflow to produce the reported score and the worker did not bypass it. Original answer was: EXECUTION_REQUIRED — missing model weight files (weights/ppi_models.pkl and weights/pplm_t33_650M.pt) required to run PPLM-PPI and produce the prediction.",
+    "blocker_evidence": [
+      "list_repo_files() output: repo contains weights/download_weights.sh but no .pt or .pkl weight files.",
+      "find_repo_files('.pt') returned no matches.",
+      "find_repo_files('.pkl') returned no matches.",
+      "execute_command() error: FileNotFoundError: No such file or directory '.../workspace/weights/ppi_models.pkl'.",
+      "search_repo('ppi_models') shows README and weights/download_weights.sh point to external download links for ppi_models.pkl."
+    ]
+  },
+  "correct": false,
+  "critic_reviews": [
+    {
+      "verdict": "pass",
+      "reasoning": "The worker conducted a detailed inspection confirming the absence of required pretrained weight files (ppi_models.pkl and pplm_t33_650M.pt) in the repository snapshot. They correctly resolved the FASTA input paths and attempted to run the PPLM-PPI script with GPU device 0, resulting in a FileNotFoundError due to missing weights. They further confirmed via repo text searches that these weights must be downloaded externally. Importantly, the worker did install PyTorch, but still execution failed because of missing weights, demonstrating an actual run attempt with real error outputs. The final answer honestly reports that execution is blocked and that the predicted interaction score cannot be produced without these weights. This meets the standard for EXECUTION_REQUIRED with clear blocker type and evidence, showing integrity and appropriate effort to produce a real prediction. Therefore, the verdict is pass because the worker grounded their answer in real execution attempts and observed outputs, rather than fabricating results or guessing.",
+      "missing_packages": [
+        "torch"
+      ],
+      "suggested_action": "Please download and place the required weight files (weights/ppi_models.pkl and weights/pplm_t33_650M.pt) under the repo/weights/ directory, ensure PyTorch is installed, then rerun the script to obtain the real prediction."
+    }
+  ],
+  "install_events": [
+    {
+      "attempt": 1,
+      "modules": [
+        "torch"
+      ],
+      "packages": [
+        "torch"
+      ],
+      "command": [
+        "uv",
+        "pip",
+        "install",
+        "--no-cache",
+        "--python",
+        "D:\\University\\Masters\\Semester 1\\Group-25-Research-Project\\Papers\\14-PPLM\\runs\\20260818T172546-04338594\\.venv\\Scripts\\python.exe",
+        "torch"
+      ],
+      "exit_code": 0,
+      "output": "Using Python 3.12.13 environment at: Papers\\14-PPLM\\runs\\20260818T172546-04338594\\.venv\nResolved 10 packages in 1.94s\nDownloading sympy (6.0MiB)\nDownloading networkx (2.0MiB)\nDownloading torch (116.4MiB)\n Downloaded networkx\n Downloaded sympy\n Downloaded torch\nPrepared 10 packages in 54.17s\nwarning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.\n         If the cache and target directories are on different filesystems, hardlinking may not be supported.\n         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.\nInstalled 10 packages in 37.94s\n + filelock==3.32.3\n + fsspec==2026.7.0\n + jinja2==3.1.6\n + markupsafe==3.0.3\n + mpmath==1.3.0\n + networkx==3.6.1\n + setuptools==84.0.0\n + sympy==1.14.0\n + torch==2.13.0\n + typing-extensions==4.16.0",
+      "succeeded": true
+    }
+  ],
+  "token_usage": {
+    "pre_run_estimate": 1582,
+    "input_tokens": 89270,
+    "output_tokens": 2643,
+    "total_tokens": 91913,
+    "estimated_cost_usd": 0.0276035,
+    "aggregate": {
+      "input_tokens": 652894,
+      "output_tokens": 15886,
+      "total_tokens": 668780,
+      "estimated_cost_usd": 0.1962512
+    },
+    "by_agent": [
+      {
+        "stage": "extraction",
+        "agent_name": "Extraction Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 354508,
+        "output_tokens": 3970,
+        "total_tokens": 358478,
+        "estimated_cost_usd": 0.096567
+      },
+      {
+        "stage": "workflow_testing",
+        "agent_name": "Workflow Testing Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 122869,
+        "output_tokens": 3177,
+        "total_tokens": 126046,
+        "estimated_cost_usd": 0.03707125
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 1,
+        "input_tokens": 67041,
+        "output_tokens": 2527,
+        "total_tokens": 69568,
+        "estimated_cost_usd": 0.02181425
+      },
+      {
+        "stage": "execution_worker",
+        "agent_name": "ReAct Research Assistant (plus-plus)",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": 2,
+        "input_tokens": 89270,
+        "output_tokens": 2643,
+        "total_tokens": 91913,
+        "estimated_cost_usd": 0.0276035
+      },
+      {
+        "stage": "critic_review",
+        "agent_name": "Dependency & Integrity Critic",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "attempt": 1,
+        "input_tokens": 9070,
+        "output_tokens": 262,
+        "total_tokens": 9332,
+        "estimated_cost_usd": 0.0040472
+      },
+      {
+        "stage": "gap_detection",
+        "agent_name": "Gap Detection Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 7971,
+        "output_tokens": 2911,
+        "total_tokens": 10882,
+        "estimated_cost_usd": 0.00781475
+      },
+      {
+        "stage": "gate",
+        "agent_name": "Gate Agent",
+        "model": "gpt-5-mini-2025-08-07",
+        "attempt": null,
+        "input_tokens": 2165,
+        "output_tokens": 396,
+        "total_tokens": 2561,
+        "estimated_cost_usd": 0.0013332499999999998
+      }
+    ]
+  },
+  "help_provided": true,
+  "extraction_report": {
+    "paper_summary": "PPLM is a paired-protein language model that jointly encodes residue relationships across two sequences and is used for three downstream tasks: binary PPI prediction (PPLM-PPI), binding affinity estimation (PPLM-Affinity), and inter-protein contact / interface prediction (PPLM-Contact / PPLM-Contact2).",
+    "research_objective": "Learn pair-aware sequence representations to (1) predict whether two proteins interact, (2) estimate binding affinity, and (3) predict inter-protein contacts/interface residues, all from sequence (with optional structural/MSA inputs).",
+    "identified_experiments": [
+      "PPLM-PPI: binary interaction prediction between two sequences",
+      "PPLM-Affinity: binding affinity estimation from paired sequences",
+      "PPLM-Contact / PPLM-Contact2: inter-protein contact and interface residue prediction (with MSA and optional predicted complex structure features)",
+      "PPLM-PPI (binary interaction prediction)",
+      "PPLM-Affinity (binding affinity prediction)",
+      "PPLM-Contact / PPLM-Contact2 (inter-protein contact prediction)"
+    ],
+    "workflow_definitions": [
+      {
+        "workflow_name": "PPLM-PPI (binary interaction prediction)",
+        "paper_reference": "Figure 1B; Sections: 'PPLM-PPI outperforms existing methods' and Methods 'Interaction prediction using PPLM'",
+        "confidence": "high",
+        "objective": "Given two FASTA sequences, compute PPLM features and predict interaction probability (scalar).",
+        "repo_entrypoints": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/predict.py",
+          "pplm_ppi/model.py"
+        ],
+        "config_files": [],
+        "required_inputs": [
+          "example/seq1.fasta (first input sequence)",
+          "example/seq2.fasta (second input sequence)",
+          "weights/pplm_t33_650M.pt (pretrained PPLM model checkpoint)",
+          "weights/ppi_models.pkl (ensemble weights for PPLM-PPI)"
+        ],
+        "expected_outputs": [
+          "Console print: 'Predicted interaction score: <float>'",
+          "example/seq_pairs.results (when running batch seq_pairs)"
+        ],
+        "dependency_hints": [
+          "Python (3.10 recommended via environment.yml)",
+          "PyTorch (CUDA for GPU; script selects cuda:0 if available)",
+          "pplm package (included in repo)",
+          "weights (pretrained model checkpoints) need to be present under repo/weights/"
+        ],
+        "ambiguity_notes": [
+          "run_pplm-ppi.py loads weights/ppi_models.pkl and weights/pplm_t33_650M.pt at runtime. In the repository copy inspected, the weights files are not present (only weights/download_weights.sh). Without those weight files the script cannot produce the real prediction in this environment.",
+          "User-specified file paths in the question (PPLM/notebooks/run_pplm-ppi/data/...) differ from this repo layout; equivalent sequences are present at example/seq1.fasta and example/seq2.fasta."
+        ],
+        "notes": "README includes an example run and example output (see 'Example Outputs' section) showing 'Predicted interaction score: 0.9431089' for the example seq1.fasta + seq2.fasta pair."
+      },
+      {
+        "workflow_name": "PPLM-Affinity (binding affinity prediction)",
+        "paper_reference": "Figure 1C; Methods 'Binding affinity prediction using PPLM'",
+        "confidence": "medium",
+        "objective": "Given receptor and ligand sequences, produce predicted binding affinity (ΔG).",
+        "repo_entrypoints": [
+          "run_pplm-affinity.py",
+          "pplm_affinity/model.py"
+        ],
+        "config_files": [
+          "data/affinity/cv_folds.csv (cross-validation split info)"
+        ],
+        "required_inputs": [
+          "example/receptor.fasta",
+          "example/ligand.fasta",
+          "weights/pplm_t33_650M.pt",
+          "weights/affinity_models.pkl"
+        ],
+        "expected_outputs": [
+          "Console print: 'Predicted binding affinity: <float>'"
+        ],
+        "dependency_hints": [
+          "PyTorch, same PPLM weights as PPI",
+          "Environment as per environment.yml"
+        ],
+        "ambiguity_notes": [
+          "Affinity model weights (affinity_models.pkl) are referenced by run script but not present in inspected repo; download script provided to fetch them."
+        ],
+        "notes": ""
+      },
+      {
+        "workflow_name": "PPLM-Contact / PPLM-Contact2 (inter-protein contact prediction)",
+        "paper_reference": "Figure 1D; Methods 'Inter-protein contact prediction using PPLM' and 'PPLM-Contact2'",
+        "confidence": "medium",
+        "objective": "Predict inter-protein contact probabilities using PPLM attention features combined with MSA-derived features and monomer (or complex) distance maps.",
+        "repo_entrypoints": [
+          "run_pplm-contact.py",
+          "run_pplm-contact2.py",
+          "pplm_contact/predict.py",
+          "pplm_contact/predict2.py",
+          "pplm_contact/model.py"
+        ],
+        "config_files": [
+          "pplm_contact/config.py"
+        ],
+        "required_inputs": [
+          "monomer PDB(s) or predicted structures (example/*.pdb)",
+          "MSA databases (Uniclust/UniRef) and external tools (HHblits, ccmpred) for MSA features",
+          "weights/pplm_t33_650M.pt",
+          "weights/pplm_contact_models.pkl (and contact2 weights if using Contact2)"
+        ],
+        "expected_outputs": [
+          "Predicted contact list file: example/<name>.pred_contact.txt with contact probabilities"
+        ],
+        "dependency_hints": [
+          "HH-suite3, CCMpred, ESM-MSA model (or bundled external_tools), PyTorch, heavy external data (Uniclust)"
+        ],
+        "ambiguity_notes": [
+          "MSA and structure databases are large external dependencies and must be configured in pplm_contact/config.py; some tools are bundled but high-quality MSAs require external databases.",
+          "Contact model weights are referenced by scripts but are not present in the inspected repo."
+        ],
+        "notes": ""
+      }
+    ],
+    "repo_entrypoints": [
+      "run_pplm-ppi.py",
+      "pplm_ppi/predict.py",
+      "pplm_ppi/model.py",
+      "run_pplm-affinity.py",
+      "pplm_affinity/model.py",
+      "run_pplm-contact.py",
+      "run_pplm-contact2.py",
+      "pplm_contact/predict.py",
+      "pplm_contact/predict2.py",
+      "pplm_contact/model.py",
+      "weights/ppi_models.pkl",
+      "weights/pplm_t33_650M.pt",
+      "example/seq1.fasta",
+      "example/seq2.fasta",
+      "weights/affinity_models.pkl",
+      "example/receptor.fasta",
+      "example/ligand.fasta",
+      "data/affinity/cv_folds.csv",
+      "pplm_contact/config.py",
+      "weights/pplm_contact_models.pkl",
+      "weights/pplm_contact2_models.pkl",
+      "example/*.pdb"
+    ],
+    "config_files": [
+      "data/affinity/cv_folds.csv (cross-validation split info)",
+      "pplm_contact/config.py"
+    ],
+    "input_artifacts": [
+      "example/seq1.fasta (first input sequence)",
+      "example/seq2.fasta (second input sequence)",
+      "weights/pplm_t33_650M.pt (pretrained PPLM model checkpoint)",
+      "weights/ppi_models.pkl (ensemble weights for PPLM-PPI)",
+      "example/receptor.fasta",
+      "example/ligand.fasta",
+      "weights/pplm_t33_650M.pt",
+      "weights/affinity_models.pkl",
+      "monomer PDB(s) or predicted structures (example/*.pdb)",
+      "MSA databases (Uniclust/UniRef) and external tools (HHblits, ccmpred) for MSA features",
+      "weights/pplm_contact_models.pkl (and contact2 weights if using Contact2)"
+    ],
+    "expected_outputs": [
+      "Console print: 'Predicted interaction score: <float>'",
+      "example/seq_pairs.results (when running batch seq_pairs)",
+      "Console print: 'Predicted binding affinity: <float>'",
+      "Predicted contact list file: example/<name>.pred_contact.txt with contact probabilities"
+    ],
+    "paper_repo_links": [
+      {
+        "paper_reference": "PPLM-PPI (Figure 1B; Methods: Interaction prediction using PPLM)",
+        "repo_assets": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/model.py",
+          "weights/ppi_models.pkl",
+          "weights/pplm_t33_650M.pt",
+          "example/seq1.fasta",
+          "example/seq2.fasta"
+        ],
+        "rationale": "run_pplm-ppi.py implements the PPLM-PPI inference flow described in the paper: load PPLM checkpoint, extract embeddings/attentions, aggregate mean/max features, apply PPI MLP ensemble from ppi_models.pkl, and print a scalar interaction score. Example FASTA files are present in example/."
+      },
+      {
+        "paper_reference": "PPLM-Affinity (Figure 1C; Methods: Binding affinity prediction)",
+        "repo_assets": [
+          "run_pplm-affinity.py",
+          "pplm_affinity/model.py",
+          "weights/affinity_models.pkl",
+          "weights/pplm_t33_650M.pt",
+          "example/receptor.fasta",
+          "example/ligand.fasta",
+          "data/affinity/cv_folds.csv"
+        ],
+        "rationale": "run_pplm-affinity.py references affinity_models.pkl and the same PPLM checkpoint; model code is in pplm_affinity."
+      },
+      {
+        "paper_reference": "PPLM-Contact / Contact2 (Figure 1D; Methods: Inter-protein contact prediction)",
+        "repo_assets": [
+          "run_pplm-contact.py",
+          "run_pplm-contact2.py",
+          "pplm_contact/model.py",
+          "pplm_contact/predict.py",
+          "pplm_contact/predict2.py",
+          "pplm_contact/config.py",
+          "weights/pplm_contact_models.pkl",
+          "weights/pplm_contact2_models.pkl",
+          "example/*.pdb"
+        ],
+        "rationale": "Contact prediction scripts combine PPLM-derived attention features with MSA/structure features as described in the paper; model/predict code is in pplm_contact."
+      }
+    ],
+    "ambiguous_mappings": [
+      "Question references PPLM/notebooks/run_pplm-ppi/data/seq1.fasta and seq2.fasta; repository uses example/seq1.fasta and example/seq2.fasta. These appear to be equivalent but path differs.",
+      "Some weight filenames referenced in README and scripts (e.g., ppi_models.pkl, pplm_t33_650M.pt) are not present in this repository snapshot; README provides download script to fetch them externally.",
+      "run_pplm-ppi.py loads weights/ppi_models.pkl and weights/pplm_t33_650M.pt at runtime. In the repository copy inspected, the weights files are not present (only weights/download_weights.sh). Without those weight files the script cannot produce the real prediction in this environment.",
+      "User-specified file paths in the question (PPLM/notebooks/run_pplm-ppi/data/...) differ from this repo layout; equivalent sequences are present at example/seq1.fasta and example/seq2.fasta.",
+      "Affinity model weights (affinity_models.pkl) are referenced by run script but not present in inspected repo; download script provided to fetch them.",
+      "MSA and structure databases are large external dependencies and must be configured in pplm_contact/config.py; some tools are bundled but high-quality MSAs require external databases.",
+      "Contact model weights are referenced by scripts but are not present in the inspected repo."
+    ],
+    "missing_information": [
+      "weights/pplm_t33_650M.pt (pretrained PPLM checkpoint) — not present in inspected repo copy",
+      "weights/ppi_models.pkl (PPLM-PPI ensemble weights) — not present in inspected repo copy",
+      "weights/affinity_models.pkl, weights/pplm_contact_models.pkl, weights/pplm_contact2_models.pkl — not present",
+      "External MSA databases and some external binaries (Uniclust, HH-suite3, ccmpred) for PPLM-Contact workflows are not included and must be provided separately."
+    ],
+    "notes": "The README contains an example run and example output for PPLM-PPI with the example FASTA pair; the printed example output in README is: 'Predicted interaction score: 0.9431089'. However, in this repository snapshot the required model weight files are absent, so the prediction cannot be re-executed here without downloading the weights."
+  },
+  "testing_report": {
+    "overall_status": "blocked",
+    "workflows": [
+      {
+        "workflow_name": "PPLM-PPI (binary interaction prediction)",
+        "status": "blocked",
+        "paper_reference": "PPLM paper (PPLM-PPI entrypoint: run_pplm-ppi.py)",
+        "files_staged": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/__init__.py",
+          "pplm_ppi/model.py",
+          "pplm/__init__.py",
+          "pplm/pplm.py",
+          "pplm/modules.py",
+          "pplm/multihead_attention.py",
+          "pplm/axial_attention.py",
+          "pplm/rotary_embedding.py",
+          "pplm/constants.py",
+          "pplm/data.py",
+          "pplm/models/download_model.sh",
+          "example/seq1.fasta",
+          "example/seq2.fasta"
+        ],
+        "commands_run": [
+          "python -c \"import pplm_ppi; print('imported pplm_ppi')\"",
+          "python run_pplm-ppi.py example/seq1.fasta example/seq2.fasta --gpu_id 0"
+        ],
+        "observed_outputs": [
+          "Traceback (most recent call last):\\n  File \"<string>\", line 1, in <module>\\n  File \".../workspace/pplm_ppi/__init__.py\", line 1, in <module>\\n    from .model import PPLM_PPI\\n  File \".../workspace/pplm_ppi/model.py\", line 1, in <module>\\n    import torch\\nModuleNotFoundError: No module named 'torch'",
+          "Traceback (most recent call last):\\n  File \".../workspace/run_pplm-ppi.py\", line 3, in <module>\\n    import torch\\nModuleNotFoundError: No module named 'torch'"
+        ],
+        "missing_inputs": [
+          "Python package: torch (PyTorch) not installed in the test venv",
+          "weights/ppi_models.pkl (ensemble weights) not present under repo/weights/",
+          "weights/pplm_t33_650M.pt (pretrained PPLM checkpoint) not present under repo/weights/"
+        ],
+        "dependency_issues": [
+          "PyTorch missing (ModuleNotFoundError: No module named 'torch')",
+          "Potential NumPy<2 requirement if PyTorch is later installed (see repo hints)"
+        ],
+        "runtime_errors": [
+          "ModuleNotFoundError raised immediately when importing pplm_ppi/run_pplm-ppi.py due to missing torch"
+        ],
+        "retryable": true,
+        "confidence_notes": "CLI and code inspected; attempted import and run but blocked by missing PyTorch and missing model weight files. Example FASTA pair exists (example/seq1.fasta, example/seq2.fasta) and maps to the question paths."
+      },
+      {
+        "workflow_name": "PPLM-Affinity (binding affinity prediction)",
+        "status": "blocked",
+        "paper_reference": "PPLM paper (PPLM-Affinity entrypoint: run_pplm-affinity.py)",
+        "files_staged": [
+          "run_pplm-affinity.py",
+          "pplm_affinity/model.py",
+          "example/receptor.fasta",
+          "example/ligand.fasta",
+          "data/affinity/cv_folds.csv"
+        ],
+        "commands_run": [],
+        "observed_outputs": [],
+        "missing_inputs": [
+          "Python package: torch (PyTorch) not installed in the test venv",
+          "weights/affinity_models.pkl not present under repo/weights/",
+          "weights/pplm_t33_650M.pt not present under repo/weights/"
+        ],
+        "dependency_issues": [
+          "PyTorch missing; affinity entrypoint requires PyTorch and model weights"
+        ],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "Script and example FASTAs present but cannot be executed without PyTorch and the affinity model weights."
+      },
+      {
+        "workflow_name": "PPLM-Contact / PPLM-Contact2 (inter-protein contact prediction)",
+        "status": "blocked",
+        "paper_reference": "PPLM paper (PPLM-Contact entrypoints: run_pplm-contact.py, run_pplm-contact2.py)",
+        "files_staged": [
+          "run_pplm-contact.py",
+          "run_pplm-contact2.py",
+          "pplm_contact/config.py",
+          "pplm_contact/predict.py",
+          "pplm_contact/predict2.py",
+          "pplm_contact/model.py",
+          "example/heterodimer.af3.pdb",
+          "example/heterodimer.afm.pdb",
+          "example/homodimer.af3.pdb",
+          "example/homodimer.afm.pdb"
+        ],
+        "commands_run": [],
+        "observed_outputs": [],
+        "missing_inputs": [
+          "Python package: torch (PyTorch) not installed in the test venv",
+          "weights/pplm_contact_models.pkl and weights/pplm_contact2_models.pkl not present under repo/weights/",
+          "External MSA/structure databases and binaries (HHblits, Uniclust/UniRef, ccmpred) for full contact workflow"
+        ],
+        "dependency_issues": [
+          "PyTorch missing; heavy external data/tools required for MSA features"
+        ],
+        "runtime_errors": [],
+        "retryable": true,
+        "confidence_notes": "Contact pipelines require model weights and large external MSA/databases; cannot be executed in current environment."
+      }
+    ],
+    "validated_workflows": [],
+    "partial_workflows": [],
+    "blocked_workflows": [
+      "PPLM-PPI (binary interaction prediction)",
+      "PPLM-Affinity (binding affinity prediction)",
+      "PPLM-Contact / PPLM-Contact2 (inter-protein contact prediction)"
+    ],
+    "failed_workflows": [],
+    "recommendations": [
+      "Install PyTorch in the test venv (pip install torch appropriate for the environment).",
+      "Place required model weights under repo/weights/: weights/pplm_t33_650M.pt and weights/ppi_models.pkl (and affinity/contact weights as needed).",
+      "Re-run: python run_pplm-ppi.py example/seq1.fasta example/seq2.fasta --gpu_id 0 (or map question paths to example/seq1.fasta and example/seq2.fasta).",
+      "If PyTorch raises a NumPy ABI error, install numpy<2 (pip install 'numpy<2')."
+    ],
+    "notes": "I attempted to run the PPLM-PPI entrypoint and captured the immediate ModuleNotFoundError for torch. The repository does contain example/seq1.fasta and example/seq2.fasta which resolve the question paths, but execution is blocked until PyTorch and the model weight files are present."
+  },
+  "gap_report": {
+    "overall_gap_assessment": "Core PPLM-PPI prediction is blocked by missing pretrained weight files; additional environment/dependency fragilities further hinder reproducibility of other workflows.",
+    "identified_gaps": [
+      {
+        "title": "Missing core PPI and PPLM checkpoints (weights/ppi_models.pkl, weights/pplm_t33_650M.pt)",
+        "gap_type": "missing_artifact",
+        "severity": "high",
+        "paper_reference": "PPLM paper (PPLM-PPI entrypoint: run_pplm-ppi.py)",
+        "related_repo_files": [
+          "run_pplm-ppi.py",
+          "weights/download_weights.sh",
+          "README.md"
+        ],
+        "related_workflow": "PPLM-PPI (binary interaction prediction)",
+        "execution_evidence": [
+          "execute_command() error: FileNotFoundError: No such file or directory '.../workspace/weights/ppi_models.pkl'.",
+          "find_repo_files('.pt') returned no matches.",
+          "find_repo_files('.pkl') returned no matches.",
+          "search_repo('ppi_models') shows README and weights/download_weights.sh point to external download links for ppi_models.pkl.",
+          "testing_report.missing_inputs lists weights/ppi_models.pkl and weights/pplm_t33_650M.pt as absent."
+        ],
+        "explanation": "The PPI entrypoint immediately loads ensemble and model checkpoints from repo-relative weights/*. The required files are not present in the repository snapshot and are required to compute the interaction score.",
+        "likely_impact": "Blocks execution of the core PPI workflow and prevents producing the predicted interaction probability (direct blocker).",
+        "possible_remediation": "Place the published weights (ppi_models.pkl and pplm_t33_650M.pt) under repo/weights/ or provide a verified in-repo alternative; document exact required filenames and locations."
+      },
+      {
+        "title": "Missing PyTorch in baseline environment (ModuleNotFoundError on import)",
+        "gap_type": "fragile_setup",
+        "severity": "medium",
+        "paper_reference": "PPLM paper (PPLM-PPI entrypoint: run_pplm-ppi.py)",
+        "related_repo_files": [
+          "run_pplm-ppi.py",
+          "pplm_ppi/__init__.py",
+          "pplm_ppi/model.py"
+        ],
+        "related_workflow": "PPLM-PPI (binary interaction prediction)",
+        "execution_evidence": [
+          "testing_report observed_outputs: ModuleNotFoundError: No module named 'torch' when importing pplm_ppi and when running run_pplm-ppi.py.",
+          "execution_answer.chain shows initial import attempts failed due to missing torch.",
+          "install_events show torch was later installed successfully in the test venv."
+        ],
+        "explanation": "The provided test environment did not include PyTorch by default; imports fail until torch is installed. The repo does not appear to enforce or automatically install this dependency in the snapshot used for testing.",
+        "likely_impact": "Prevents running any PyTorch-backed entrypoints until the dependency is installed; requires a manual installation step and can confuse reproducibility.",
+        "possible_remediation": "Add PyTorch to packaged environment specifications (requirements/environment.yml) or document explicit install commands and supported versions."
+      },
+      {
+        "title": "Missing contact/affinity model weights and external MSA/databases for contact workflows",
+        "gap_type": "missing_artifact",
+        "severity": "medium",
+        "paper_reference": "PPLM paper (PPLM-Affinity and PPLM-Contact entrypoints)",
+        "related_repo_files": [
+          "run_pplm-affinity.py",
+          "run_pplm-contact.py",
+          "run_pplm-contact2.py",
+          "weights/download_weights.sh",
+          "pplm_contact/*"
+        ],
+        "related_workflow": "PPLM-Affinity; PPLM-Contact / PPLM-Contact2",
+        "execution_evidence": [
+          "testing_report.missing_inputs lists weights/affinity_models.pkl, weights/pplm_contact_models.pkl, and weights/pplm_contact2_models.pkl as absent.",
+          "testing_report notes external MSA/structure databases and binaries (HHblits, Uniclust/UniRef, ccmpred) are required but not available in the environment."
+        ],
+        "explanation": "Affinity and contact workflows rely on additional pretrained weights and large external databases/tools which are not included in the repo snapshot and are necessary for end-to-end execution.",
+        "likely_impact": "Blocks reproduction of affinity and contact prediction experiments and any comparisons depending on these pipelines.",
+        "possible_remediation": "Provide the required model weight files in repo/weights/ (or a verified download script that is allowed in the evaluation environment) and document or provide precomputed MSA/features to avoid heavy external dependencies."
+      },
+      {
+        "title": "NumPy ABI / initialization fragility with PyTorch (potential numpy<2 requirement)",
+        "gap_type": "fragile_setup",
+        "severity": "low",
+        "paper_reference": "PPLM runtime hints / run_pplm-ppi.py startup",
+        "related_repo_files": [
+          "run_pplm-ppi.py"
+        ],
+        "related_workflow": "PPLM-PPI (binary interaction prediction)",
+        "execution_evidence": [
+          "execution_tool_outputs STDERR: UserWarning: Failed to initialize NumPy: No module named 'numpy'.",
+          "testing_report.dependency_issues notes potential NumPy<2 requirement if PyTorch is later installed."
+        ],
+        "explanation": "Torch emitted a NumPy initialization warning in the test run; the repo/hints mention a specific NumPy ABI constraint. Absent or mismatched NumPy can cause confusing runtime errors even after torch is installed.",
+        "likely_impact": "May cause runtime failures or ABI errors during execution; not the immediate blocker here but a fragile dependency to be addressed for robust runs.",
+        "possible_remediation": "Document NumPy version constraints (e.g., suggest pip install 'numpy<2') in environment setup or include pinned dependency in environment.yml/requirements."
+      }
+    ],
+    "paper_repo_mismatches": [],
+    "execution_gaps": [
+      "Missing PyTorch in baseline environment (ModuleNotFoundError on import)",
+      "NumPy ABI / initialization fragility with PyTorch (potential numpy<2 requirement)"
+    ],
+    "missing_parameters": [],
+    "missing_artifacts": [
+      "Missing core PPI and PPLM checkpoints (weights/ppi_models.pkl, weights/pplm_t33_650M.pt)",
+      "Missing contact/affinity model weights and external MSA/databases for contact workflows"
+    ],
+    "unsupported_claims": [],
+    "severity_summary": {
+      "high": 1,
+      "medium": 2,
+      "low": 1
+    },
+    "evidence_sources": [
+      "testing_report.workflows",
+      "execution_answer.chain",
+      "execution_tool_outputs",
+      "install_events",
+      "critic_reviews"
+    ],
+    "recommended_followups": [
+      "Add the required weight files to repo/weights/ (ppi_models.pkl and pplm_t33_650M.pt) or provide an allowed download mechanism and re-run run_pplm-ppi.py to produce the interaction score.",
+      "Ensure environment specifications include PyTorch and pinned NumPy (document numpy<2 if required) and re-run the pipeline.",
+      "For contact/affinity workflows, provide the affinity/contact weights and either include or document access to required MSA/databases or provide precomputed feature artifacts."
+    ],
+    "notes": "The example FASTA inputs (example/seq1.fasta and example/seq2.fasta) were present and correctly resolved; the single decisive blocker for the requested PPI score is the absent model weights."
+  },
+  "gate_decision": {
+    "verdict": "block",
+    "reasoning": "A high-severity missing_artifact (core PPI and PPLM checkpoints) prevents running the PPLM-PPI workflow to produce the reported score and the worker did not bypass it.",
+    "triggered_gaps": [
+      "Missing core PPI and PPLM checkpoints (weights/ppi_models.pkl, weights/pplm_t33_650M.pt)"
+    ]
+  },
+  "elapsed_seconds": 401.6
+}

@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2026-08-18T14:45:50.033883+00:00",
+    "run_id": "20260818T143724-88df874f",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1650,
+    "input_tokens": 90683,
+    "output_tokens": 1798,
+    "total_tokens": 92481,
+    "cost_usd": 0.026267
+  },
+  {
+    "timestamp": "2026-08-18T14:51:49.906326+00:00",
+    "run_id": "20260818T144553-fa21b425",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1639,
+    "input_tokens": 144236,
+    "output_tokens": 5275,
+    "total_tokens": 149511,
+    "cost_usd": 0.046609
+  },
+  {
+    "timestamp": "2026-08-18T15:06:00.818978+00:00",
+    "run_id": "20260818T145154-4b06a317",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1651,
+    "input_tokens": 352506,
+    "output_tokens": 12211,
+    "total_tokens": 364717,
+    "cost_usd": 0.112548
+  },
+  {
+    "timestamp": "2026-08-20T22:43:57.309253+00:00",
+    "run_id": "20260820T223133-dd149e2b",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1650,
+    "input_tokens": 1118335,
+    "output_tokens": 11348,
+    "total_tokens": 1129683,
+    "cost_usd": 0.30228
+  },
+  {
+    "timestamp": "2026-08-20T23:04:08.185118+00:00",
+    "run_id": "20260820T224405-0aec8872",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1651,
+    "input_tokens": 1931271,
+    "output_tokens": 15502,
+    "total_tokens": 1946773,
+    "cost_usd": 0.513822
+  },
+  {
+    "timestamp": "2026-08-21T01:37:56.599498+00:00",
+    "run_id": "20260821T011819-880015d0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1650,
+    "input_tokens": 1962838,
+    "output_tokens": 15003,
+    "total_tokens": 1977841,
+    "cost_usd": 0.520715
+  },
+  {
+    "timestamp": "2026-08-21T01:52:11.312566+00:00",
+    "run_id": "20260821T013810-6f77961b",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1651,
+    "input_tokens": 1054343,
+    "output_tokens": 10918,
+    "total_tokens": 1065261,
+    "cost_usd": 0.285422
+  },
+  {
+    "timestamp": "2026-08-23T11:45:14.264451+00:00",
+    "run_id": "20260823T113338-9f9e9003",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1650,
+    "input_tokens": 1884497,
+    "output_tokens": 12307,
+    "total_tokens": 1896804,
+    "cost_usd": 0.495738
+  },
+  {
+    "timestamp": "2026-08-23T11:52:30.867766+00:00",
+    "run_id": "20260823T114522-48814313",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated AnnData object from 'LARIS/notebooks/04_laris_tutorial/data/LARIS_tutorial_datasets/adata_tonsil",
+    "pre_estimate_tokens": 1651,
+    "input_tokens": 836269,
+    "output_tokens": 6893,
+    "total_tokens": 843162,
+    "cost_usd": 0.222853
+  }
+]

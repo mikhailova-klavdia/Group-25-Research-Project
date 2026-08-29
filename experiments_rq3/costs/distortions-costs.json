@@ -1,0 +1,134 @@
+[
+  {
+    "timestamp": "2026-08-18T15:11:09.681758+00:00",
+    "run_id": "20260818T150605-ed9b96c8",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans metadata from 'distortions/notebooks/c_elegans/data/c_elegans_metadata.csv'. How many unique cell ty",
+    "pre_estimate_tokens": 1537,
+    "input_tokens": 128260,
+    "output_tokens": 3951,
+    "total_tokens": 132211,
+    "cost_usd": 0.039967
+  },
+  {
+    "timestamp": "2026-08-18T15:17:04.796820+00:00",
+    "run_id": "20260818T151113-e9fe1162",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 135187,
+    "output_tokens": 6334,
+    "total_tokens": 141521,
+    "cost_usd": 0.046465
+  },
+  {
+    "timestamp": "2026-08-18T15:21:52.158672+00:00",
+    "run_id": "20260818T151712-4720cf47",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1629,
+    "input_tokens": 99600,
+    "output_tokens": 5118,
+    "total_tokens": 104718,
+    "cost_usd": 0.035136
+  },
+  {
+    "timestamp": "2026-08-20T18:56:33.946386+00:00",
+    "run_id": "20260820T183853-bc3231ba",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the 3D mammoth point cloud data from 'distortions/notebooks/mammoth/data/mammoth_3d.csv' (10000 points with x, y, ",
+    "pre_estimate_tokens": 1632,
+    "input_tokens": 781659,
+    "output_tokens": 8238,
+    "total_tokens": 789897,
+    "cost_usd": 0.211891
+  },
+  {
+    "timestamp": "2026-08-20T20:42:05.466779+00:00",
+    "run_id": "20260820T204017-e3ac57c0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated distortion singular values from 'distortions/notebooks/pbmc/data/distortion_singular_values.csv' ",
+    "pre_estimate_tokens": 1562,
+    "input_tokens": 214461,
+    "output_tokens": 2441,
+    "total_tokens": 216902,
+    "cost_usd": 0.058497
+  },
+  {
+    "timestamp": "2026-08-20T23:50:43.781633+00:00",
+    "run_id": "20260820T234813-698652a7",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated distortion singular values from 'distortions/notebooks/pbmc/data/distortion_singular_values.csv' ",
+    "pre_estimate_tokens": 1562,
+    "input_tokens": 345472,
+    "output_tokens": 4516,
+    "total_tokens": 349988,
+    "cost_usd": 0.0954
+  },
+  {
+    "timestamp": "2026-08-20T23:55:07.467594+00:00",
+    "run_id": "20260820T235048-3901b5b7",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1652,
+    "input_tokens": 360936,
+    "output_tokens": 4347,
+    "total_tokens": 365283,
+    "cost_usd": 0.098928
+  },
+  {
+    "timestamp": "2026-08-21T00:08:00.862530+00:00",
+    "run_id": "20260820T235512-eabc08e0",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the 3D mammoth point cloud data from 'distortions/notebooks/mammoth/data/mammoth_3d.csv' (10000 points with x, y, ",
+    "pre_estimate_tokens": 1632,
+    "input_tokens": 2318437,
+    "output_tokens": 9648,
+    "total_tokens": 2328085,
+    "cost_usd": 0.598905
+  },
+  {
+    "timestamp": "2026-08-23T14:44:54.108625+00:00",
+    "run_id": "20260823T144141-49fea02d",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the pre-generated distortion singular values from 'distortions/notebooks/pbmc/data/distortion_singular_values.csv' ",
+    "pre_estimate_tokens": 1562,
+    "input_tokens": 361002,
+    "output_tokens": 2962,
+    "total_tokens": 363964,
+    "cost_usd": 0.096174
+  },
+  {
+    "timestamp": "2026-08-23T14:49:55.602660+00:00",
+    "run_id": "20260823T144457-3f0a15a4",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1652,
+    "input_tokens": 390711,
+    "output_tokens": 5073,
+    "total_tokens": 395784,
+    "cost_usd": 0.107824
+  },
+  {
+    "timestamp": "2026-08-23T15:48:21.431291+00:00",
+    "run_id": "20260823T154413-f726ecda",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Load the C. elegans expression data from 'distortions/notebooks/c_elegans/data/c_elegans_data.csv' (86024 cells x 100 fe",
+    "pre_estimate_tokens": 1629,
+    "input_tokens": 347573,
+    "output_tokens": 4256,
+    "total_tokens": 351829,
+    "cost_usd": 0.095405
+  },
+  {
+    "timestamp": "2026-08-23T15:59:11.911203+00:00",
+    "run_id": "20260823T155303-05a2e615",
+    "model": "gpt-5-mini-2025-08-07",
+    "question": "Using the pre-generated PBMC3k AnnData object from 'distortions/notebooks/pbmc/data/data/pbmc3k_processed.h5ad' (2638 ce",
+    "pre_estimate_tokens": 1592,
+    "input_tokens": 268120,
+    "output_tokens": 3985,
+    "total_tokens": 272105,
+    "cost_usd": 0.075
+  }
+]
